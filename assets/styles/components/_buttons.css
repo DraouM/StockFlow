@@ -1,0 +1,94 @@
+/* _button.css: Styles specific to button components. */
+
+/* Base button styles */
+.button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Primary button */
+.button-primary {
+    background-color: #3498db;
+    color: #ffffff;
+    border: 1px solid transparent;
+}
+
+.button-primary:hover {
+    background-color: #2980b9;
+}
+
+/* Secondary button */
+.button-secondary {
+    background-color: #7f8c8d;
+    color: #ffffff;
+    border: 1px solid transparent;
+}
+
+.button-secondary:hover {
+    background-color: #616a6b;
+}
+
+/* Success button */
+.button-success {
+    background-color: #2ecc71;
+    color: #ffffff;
+    border: 1px solid transparent;
+}
+
+.button-success:hover {
+    background-color: #27ae60;
+}
+
+/* Danger button */
+.button-danger {
+    background-color: #e74c3c;
+    color: #ffffff;
+    border: 1px solid transparent;
+}
+
+.button-danger:hover {
+    background-color: #c0392b;
+}
+
+/* Warning button */
+.button-warning {
+    background-color: #f39c12;
+    color: #ffffff;
+    border: 1px solid transparent;
+}
+
+.button-warning:hover {
+    background-color: #e67e22;
+}
+
+/* Disabled button */
+.button:disabled {
+    background-color: #bdc3c7;
+    color: #ffffff;
+    cursor: not-allowed;
+    border: 1px solid transparent;
+}
+
+/* Button with icon */
+.button .icon {
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+.button-large {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.25rem;
+}
+
+.button-small {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
