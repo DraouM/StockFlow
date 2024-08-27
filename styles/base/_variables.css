@@ -1,0 +1,9 @@
+/* _variables.css: Stores CSS variables for colors, fonts, spacing, etc., for easy theming and consistency. */
+
+/* CSS Variables */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --font-family: 'Arial, sans-serif';
+    --base-spacing: 16px;
+}

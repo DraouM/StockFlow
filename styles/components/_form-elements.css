@@ -1,0 +1,91 @@
+/* form-elements.css */
+
+/* Common Form Element Styles */
+
+
+/* Searchable Dropdown */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.dropdown-content li {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content li:hover {
+    background-color: #f1f1f1;
+}
+
+/* Select Dropdown */
+select {
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f8f8f8;
+    background: url('data:image/svg+xml;charset=US-ASCII,%3csvg xmlns%3d%27http%3a//www.w3.org/2000/svg%27 width%3d%2710%27 height%3d%275%27 viewBox%3d%270 0 10 5%27%3e%3cpath fill%3d%27%23ccc%27 d%3d%27M0 0l5 5 5-5z%27/%3e%3c/svg%3e') no-repeat right 0.5rem center;
+    background-size: 0.65em;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    transition: background-color 0.3s ease;
+}
+
+.select:hover {
+    background-color: #e8e8e8;
+}
+
+select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Radio Button Styles */
+input[type="radio"] {
+    display: none;
+}
+
+input[type="radio"]+label {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+input[type="radio"]:checked+label {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Checkbox Styles
+input[type="checkbox"] {
+    display: none;
+}
+
+input[type="checkbox"]+label {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+input[type="checkbox"]:checked+label {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+} */

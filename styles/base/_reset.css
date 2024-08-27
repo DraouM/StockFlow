@@ -1,0 +1,7 @@
+/* _reset.css: Contains CSS reset rules to ensure consistent styling across different browsers. */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }

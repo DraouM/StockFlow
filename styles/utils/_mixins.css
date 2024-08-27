@@ -1,0 +1,8 @@
+/* _mixins.css: Contains CSS mixins for reusable chunks of CSS code. */
+
+/* CSS Mixins - using reusable classes */
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

@@ -1,0 +1,27 @@
+/* The main entry point for your CSS. This file imports all other CSS files and provides global styles. */
+
+/* Main CSS File */
+
+@import url('base/_reset.css');
+@import url('base/_variables.css');
+
+@import url('utils/_mixins.css');
+
+@import url('layout/sidebar.css');
+
+@import url('components/_alerts.css');
+@import url('components/_buttons.css');
+@import url('components/_cards.css');
+@import url('components/_form-elements.css');
+@import url('components/_forms.css');
+@import url('components/_inputs.css');
+@import url('components/_modals.css');
+@import url('components/_paginations.css');
+@import url('components/_searchInput.css');
+@import url('components/_tables.css');
+@import url('components/_tooltips.css');
+
+/* Global Styles */
+body {
+    font-family: var(--font-family);
+}

@@ -1,0 +1,17 @@
+.card {
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.card-header {
+    background-color: #3498db;
+    color: #ffffff;
+    padding: 1rem;
+}
+
+.card-body {
+    padding: 1rem;
+}
