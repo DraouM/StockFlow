@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enhanced Table Example</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .sortable {
+        cursor: pointer;
+      }
+      .sortable::after {
+        content: " ▼";
+        font-size: 0.8em;
+        opacity: 0.5;
+      }
+      .sortable.asc::after {
+        content: " ▲";
+      }
+      .table-search {
+        margin-bottom: 10px;
+        padding: 5px;
+        width: 100%;
+      }
+
+      #emptyTableMessage {
+        text-align: center;
+        display: none;
+      }
+      #emptyTableMessage img {
+        max-width: 200px;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Client List</h1>
+    <table id="clientTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>John Doe</td>
+          <td>john@example.com</td>
+          <td>Paid</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Jane Smith</td>
+          <td>jane@example.com</td>
+          <td>Unpaid</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Bob Johnson</td>
+          <td>bob@example.com</td>
+          <td>Paid</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Alice Brown</td>
+          <td>alice@example.com</td>
+          <td>Paid</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Charlie Wilson</td>
+          <td>charlie@example.com</td>
+          <td>Unpaid</td>
+        </tr>
+      </tbody>
+    </table>
+    <div id="clientTable-empty-message">
+      <p>No clients found</p>
+      <img src="../assets/empty-table.png" alt="Empty table" />
+    </div>
+
+    <script src="../../scripts/common/EnhancedTable.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const clientTable = new EnhancedTable("clientTable", {
+          searchable: true,
+          sortable: true,
+          emptyMessage: "No clients found",
+          emptyImageSrc: "../assets/empty-table.png",
+        });
+      });
+    </script>
+  </body>
+</html>

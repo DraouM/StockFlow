@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Enhanced Table Example</title>
+        <link rel="stylesheet" href="../../styles/main.css" />
+        <link rel="stylesheet" href="stock.css" />
+      </head>
+      <body>
+        <h1>Stock Management</h1>
+        <table id="stockTable">
+          <thead>
+            <tr>
+              <th>Product ID</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Product A</td>
+              <td>Category 1</td>
+              <td>$10.00</td>
+              <td>50</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Product B</td>
+              <td>Category 2</td>
+              <td>$15.00</td>
+              <td>30</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Product C</td>
+              <td>Category 1</td>
+              <td>$20.00</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Product D</td>
+              <td>Category 3</td>
+              <td>$25.00</td>
+              <td>10</td>
+            </tr>
+          </tbody>
+        </table>
+        <div id="stockTable-empty-message">
+          <p>No Item found</p>
+          <img src="../assets/empty-table.png" alt="Empty table" />
+        </div>
+
+        <script src="../../scripts/common/EnhancedTable.js"></script>
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            const clientTable = new EnhancedTable("stockTable", {
+              searchable: true,
+              sortable: true,
+              emptyMessage: "No Item found",
+              emptyImageSrc: "../assets/empty-table.png",
+            });
+          });
+        </script>
+      </body>
+    </html>
+  </body>
+</html>
