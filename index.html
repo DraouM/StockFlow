@@ -3,10 +3,78 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Products</title>
+    <style>
+      /* Basic styles for the table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+      }
+    </style>
   </head>
   <body>
     <h1>Hello, Electron!</h1>
     <p>Welcome to your first Electron app.</p>
+
+    <h1>Products</h1>
+    <table id="products-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Product Value</th>
+          <!-- Add more columns as needed -->
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Product rows will be inserted here dynamically -->
+      </tbody>
+    </table>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          // Fetch all products using the exposed API
+          const products = await window.electronAPI.products.getAll();
+
+          // Get the table body element
+          const tableBody = document.querySelector("#products-table tbody");
+
+          // Clear any existing rows
+          tableBody.innerHTML = "";
+
+          // Iterate over each product and add a row to the table
+          products.forEach((product) => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${product.id}</td>
+                <td>${product.product_name}</td>
+                <td>${product.stock_quantity}</td>
+                <td>${product.unit_price}</td>
+                <td>${product.product_value}</td>
+                <!-- Add more columns as needed -->
+            `;
+
+            // Append the row to the table body
+            tableBody.appendChild(row);
+          });
+        } catch (error) {
+          console.error("Error fetching products:", error);
+        }
+      });
+    </script>
   </body>
 </html>
