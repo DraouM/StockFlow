@@ -1,15 +1,17 @@
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
+const { dbPath } = require("../config/dbConfig");
+
+const { closeConnection, openConnection } = require("../config/connection");
 
 class ProductModel {
-  constructor(dbPath = "inventory.db") {
-    this.dbPath = path.join(process.env.APPDATA || process.env.HOME, dbPath);
-    this.db = null;
+  constructor() {
+    this.db = openConnection();
   }
 
   async connect() {
     return new Promise((resolve, reject) => {
-      this.db = new sqlite3.Database(this.dbPath, (err) => {
+      this.db = new sqlite3.Database(dbPath, (err) => {
         if (err) reject(err);
         else resolve();
       });
@@ -30,7 +32,7 @@ class ProductModel {
     const sql = `
       CREATE TABLE IF NOT EXISTS products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        product_name TEXT NOT NULL,
+        product_name TEXT NOT NULL UNIQUE,
         product_unit INTEGER NOT NULL DEFAULT 1,
         stock_quantity INTEGER NOT NULL CHECK (stock_quantity >= 0),
         unit_price REAL NOT NULL CHECK (unit_price > 0),
@@ -138,6 +140,38 @@ class ProductModel {
     });
   }
 
+  getProductValue(productId) {
+    return new Promise((resolve, reject) => {
+      const sql =
+        "SELECT stock_quantity * unit_price AS product_value FROM products WHERE id = ?";
+      this.db.get(sql, [productId], (err, row) => {
+        if (err) reject(err);
+        else resolve(row ? row.product_value : null);
+      });
+    });
+  }
+
+  getTotalWithTax(productId) {
+    return new Promise((resolve, reject) => {
+      const sql =
+        "SELECT stock_quantity * unit_price * (1 + tax_rate) AS total_with_tax FROM products WHERE id = ?";
+      this.db.get(sql, [productId], (err, row) => {
+        if (err) reject(err);
+        else resolve(row ? row.total_with_tax : null);
+      });
+    });
+  }
+
+  getStockUnits(productId) {
+    return new Promise((resolve, reject) => {
+      const sql =
+        "SELECT CAST(stock_quantity AS FLOAT) / product_unit AS stock_units FROM products WHERE id = ?";
+      this.db.get(sql, [productId], (err, row) => {
+        if (err) reject(err);
+        else resolve(row ? row.stock_units : null);
+      });
+    });
+  }
   // Static utility methods
   static calculateProductValue(stockQuantity, unitPrice) {
     return stockQuantity * unitPrice;
@@ -151,5 +185,8 @@ class ProductModel {
     return stockQuantity / productUnit;
   }
 }
+
+// When your application is shutting down:
+closeConnection();
 
 module.exports = ProductModel;
