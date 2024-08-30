@@ -13,7 +13,10 @@ function createWindow() {
   });
 
   // Load the `index.html` file into the window
-  win.loadFile("index.html");
+  // win.loadFile("index.html");
+  win.loadFile(
+    "/home/mohamed/Documents/Projects/StockFlow/pages/stock/stock.html"
+  );
 
   // Open DevTools (optional)
   win.webContents.openDevTools();
