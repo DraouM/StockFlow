@@ -1,20 +1,16 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const spinner = new LoadingSpinner("products-table", {
+  const spinner = new LoadingSpinner("stockTable", {
     message: "Loading products...",
   });
 
   try {
-    // Show the spinner
-    spinner.show();
-
-    // Simulate a delay to see the loader (e.g., 2 seconds)
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    spinner.show(); // Show spinner before data fetching
 
     // Fetch all products using the exposed API
     const products = await window.electronAPI.products.getAll();
 
     // Get the table body element
-    const tableBody = document.querySelector("#products-table tbody");
+    const tableBody = document.querySelector("#stockTable tbody");
 
     // Clear any existing rows
     tableBody.innerHTML = "";
@@ -27,36 +23,59 @@ document.addEventListener("DOMContentLoaded", async () => {
       const row = document.createElement("tr");
 
       row.innerHTML = `
-          <td>${product.id}</td>
-          <td>${product.product_name}</td>
-          <td>${product.stock_quantity}</td>
-          <td>${product.unit_price}</td>
-          <td>${product.product_value}</td>
-          <!-- Add more columns as needed -->
-        `;
+  <td>${product.id}</td>
+  <td>${product.product_name}</td>
+  <td>${product.product_unit}</td>
+  <td>${product.stock_quantity}</td>
+  <td>${product.stock_quantity / product.product_unit}</td>
+  <td>${product.unit_price}</td>
+  <td>${product.product_value}</td>
+  <td>${product.tax_rate}</td>
+  <td>
+    <button class="button button-small button-secondary edit-button" data-id="${
+      product.id
+    }">Edit</button>
+    <button class="button button-small button-secondary delete-button" data-id="${
+      product.id
+    }">Delete</button>
+  </td>
+`;
 
-      // Append the row to the fragment
       fragment.appendChild(row);
     });
 
     // Append the fragment to the table body
     tableBody.appendChild(fragment);
 
-    // Initialize the EnhancedTable after rows are added
-    const stockTable = new EnhancedTable("products-table", {
+    spinner.hide(); // Hide spinner after data fetching is done
+
+    // Initialize the EnhancedTable
+    const stockTable = new EnhancedTable("stockTable", {
       searchable: true,
       sortable: true,
       emptyMessage: "No Item found",
       emptyImageSrc: "../assets/empty-table.png",
     });
-    // Hide the spinner even if there's an error
-    spinner.hide();
-
     // Optionally handle the case where no products are available
     if (products.length === 0) {
       stockTable.checkTableEmpty(0);
     }
   } catch (error) {
     console.error("Error fetching products:", error);
+
+    spinner.hide(); // Hide spinner in case of an error
+
+    // Optionally, display an error message to the user
   }
 });
+// Add a listener to the edit button for each row
+// Use event delegation to handle clicks on .edit-button
+document
+  .querySelector("#stockTable tbody")
+  .addEventListener("click", (event) => {
+    if (event.target.classList.contains("edit-button")) {
+      const productId = event.target.dataset.id;
+      // Handle the edit action for the product with productId
+      console.log("Edit product with ID:", productId);
+    }
+  });
