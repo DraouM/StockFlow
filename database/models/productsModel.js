@@ -108,7 +108,7 @@ class ProductModel {
   }
 
   async listProducts() {
-    const sql = "SELECT * FROM products";
+    const sql = "SELECT * FROM products_with_total";
     return this.allQuery(sql);
   }
 
