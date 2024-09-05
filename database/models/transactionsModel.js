@@ -36,6 +36,13 @@ class TransactionsModel {
       transaction_type,
       notes = "",
     } = transaction;
+
+    if (!party_id || !total_amount || !transaction_type || !transaction_date) {
+      throw new Error("Missing required fields in transaction data");
+    } else {
+      console.log("mliha");
+    }
+
     const sql = `
       INSERT INTO transactions (party_id, total_amount, discount, transaction_date, transaction_type, notes)
       VALUES (?, ?, ?, ?, ?, ?)
@@ -60,6 +67,8 @@ class TransactionsModel {
 
     try {
       const transaction = await this.getQuery(sql, params);
+      console.log("hello from transactions model", transaction);
+
       return transaction;
     } catch (error) {
       console.error("Failed to get transaction:", error);
@@ -83,8 +92,21 @@ class TransactionsModel {
     }
   }
 
+  async listTransactions() {
+    const sql = "SELECT * FROM Transactions ORDER BY transaction_date DESC";
+    try {
+      const transactions = await this.allQuery(sql);
+      return transactions;
+    } catch (error) {
+      console.error("Failed to get transactions:", error);
+      throw error;
+    }
+  }
+
   // Update a transaction
   async update(transactionId, updateData) {
+    console.log("Updating transaction in model:", transactionId, updateData);
+
     const {
       total_amount,
       discount,
@@ -93,26 +115,24 @@ class TransactionsModel {
       notes,
       settled,
     } = updateData;
+
     const sql = `
-      UPDATE Transactions
+      UPDATE transactions
       SET total_amount = ?, discount = ?, transaction_date = ?, transaction_type = ?, notes = ?, settled = ?
       WHERE transaction_id = ?
     `;
-    try {
-      const result = await this.runQuery(sql, [
-        total_amount,
-        discount,
-        transaction_date,
-        transaction_type,
-        notes,
-        settled,
-        transactionId,
-      ]);
-      return result.changes > 0;
-    } catch (error) {
-      console.error("Failed to update transaction:", error);
-      throw error;
-    }
+
+    const result = await this.runQuery(sql, [
+      total_amount,
+      discount,
+      transaction_date,
+      transaction_type,
+      notes,
+      settled,
+      transactionId,
+    ]);
+
+    return result;
   }
 
   // Delete a transaction
@@ -231,7 +251,7 @@ class TransactionsModel {
   }
 }
 
-// When your application is shutting down:
-closeConnection();
+// // When your application is shutting down:
+// closeConnection();
 
 module.exports = TransactionsModel;

@@ -56,7 +56,7 @@ async function seedTransactions() {
     console.log("Transactions inserted successfully.");
 
     // Update an existing transaction
-    const updateSuccess = await transactionsModel.update(5, {
+    const updateSuccess = await transactionsModel.update(3, {
       total_amount: 210.0,
       discount: 15.0,
       transaction_date: "2024-09-02",
@@ -106,7 +106,7 @@ async function seedTransactions() {
     const finalTransactions =
       await transactionsModel.getTransactionsByDateRange(
         "2024-09-01",
-        "2024-09-03"
+        "2024-09-04"
       );
     console.log("Final transactions list:", finalTransactions);
   } catch (error) {
