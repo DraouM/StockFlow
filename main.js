@@ -1,37 +1,79 @@
+// Import core Electron modules and necessary packages
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 
-// Create a new BrowserWindow when `app` is ready
-function createWindow() {
-  const win = new BrowserWindow({
-    width: 1200, // Set window width
-    height: 800, // Set window height
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"), // Preload script
-    },
-  });
-
-  // Load the `index.html` file into the window
-  // win.loadFile("index.html");
-  win.loadFile(
-    "/home/mohamed/Documents/Projects/StockFlow/pages/stock/stock.html"
-  );
-
-  // Open DevTools (optional)
-  win.webContents.openDevTools();
-}
-
-// When Electron has finished initialization, create the window
-app.whenReady().then(createWindow);
-
+// Import Product handlers
 const {
   getAllProducts,
   getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
-} = require("./handlers/productsHandler");
+} = require("./ipc/productHandlers");
 
+// Import Transaction handlers
+const {
+  getAllTransactions,
+  getTransactionById,
+  createTransaction,
+  updateTransaction,
+  deleteTransaction,
+  getTransactionsByDateRange,
+  getTotalAmountByType,
+  settleTransaction,
+  getUnsettledTransactions,
+} = require("./ipc/transactionHandlers");
+
+// Import Party handlers
+// const {
+//   getAllParties,
+//   getPartyById,
+//   createParty,
+//   updateParty,
+//   deleteParty,
+// } = require("./ipc/partiesHandler");
+
+// Create a new BrowserWindow when `app` is ready
+function createWindow() {
+  const win = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"), // Preload script
+    },
+  });
+
+  // Load a specific page (you can change it to index.html or another page)
+  win.loadFile(
+    "/home/mohamed/Documents/Projects/StockFlow/pages/transactions/transactions.html"
+  );
+
+  // Optionally, open DevTools for debugging
+  win.webContents.openDevTools();
+}
+
+// --------- Electron App Lifecycle Events ---------
+
+// When Electron is initialized, create a window
+app.whenReady().then(createWindow);
+
+// Quit the app when all windows are closed, except on macOS
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
+});
+
+// Re-create a window when the app icon is clicked (macOS)
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});
+
+// --------- IPC Handlers: Grouped by Functionality ---------
+
+// Products IPC Handlers
 ipcMain.handle("products-get-all", getAllProducts);
 ipcMain.handle("products-get-by-id", (event, productId) =>
   getProductById(productId)
@@ -44,28 +86,19 @@ ipcMain.handle("products-update", (event, id, productData) =>
 );
 ipcMain.handle("products-delete", (event, id) => deleteProduct(id));
 
-const {
-  getAllTransactions,
-  getTransactionById,
-  createTransaction,
-  updateTransaction,
-  deleteTransaction,
-  getTransactionsByDateRange,
-  getTotalAmountByType,
-  settleTransaction,
-  getUnsettledTransactions,
-} = require("./handlers/transactionsHandler");
-
+// Transactions IPC Handlers
 ipcMain.handle("transactions-get-all", getAllTransactions);
-ipcMain.handle("transactions-get-by-id", (event, transactionId) =>
-  getTransactionById(transactionId)
-);
-ipcMain.handle("transactions-create", (event, transactionData) =>
-  createTransaction(transactionData)
-);
-ipcMain.handle("transactions-update", (event, id, transactionData) =>
-  updateTransaction(id, transactionData)
-);
+ipcMain.handle("transactions-get-by-id", (event, transactionId) => {
+  console.log("Data received in main process:", transactionId);
+  return getTransactionById(transactionId);
+});
+ipcMain.handle("transactions-create", (event, transactionData) => {
+  return createTransaction(transactionData);
+});
+ipcMain.handle("transactions-update", (event, id, transactionData) => {
+  console.log("Data received in main process (UPDATE):", id, transactionData);
+  return updateTransaction(event, id, transactionData);
+});
 ipcMain.handle("transactions-delete", (event, id) => deleteTransaction(id));
 ipcMain.handle(
   "transactions-get-by-date-range",
@@ -82,44 +115,17 @@ ipcMain.handle("transactions-get-unsettled", (event, partyId) =>
   getUnsettledTransactions(partyId)
 );
 
-const {
-  getAllParties,
-  getPartyById,
-  createParty,
-  updateParty,
-  deleteParty,
-} = require("./handlers/partiesHandler");
+// Parties IPC Handlers
+// ipcMain.handle("parties-get-all", getAllParties);
+// ipcMain.handle("parties-get-by-id", (event, partyId) => getPartyById(partyId));
+// ipcMain.handle("parties-create", (event, partyData) => createParty(partyData));
+// ipcMain.handle("parties-update", (event, id, partyData) =>
+//   updateParty(id, partyData)
+// );
+// ipcMain.handle("parties-delete", (event, id) => deleteParty(id));
 
-ipcMain.handle("parties-get-all", getAllParties);
-ipcMain.handle("parties-get-by-id", (event, partyId) => getPartyById(partyId));
-ipcMain.handle("parties-create", (event, partyData) => createParty(partyData));
-ipcMain.handle("parties-update", (event, id, partyData) =>
-  updateParty(id, partyData)
-);
-ipcMain.handle("parties-delete", (event, id) => deleteParty(id));
-
-// Quit when all windows are closed (except on macOS)
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
-});
-
-// Re-create a window when the app icon is clicked (macOS)
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
-});
-
-// index.js or app.js
-// const { closeConnection } = require('./database/connection');
-// const Product = require('./models/Product');
-
-// // ... your app logic here ...
-
-// // When shutting down your app:
+// Optional: Handle graceful shutdowns
 // process.on('SIGINT', () => {
-//   closeConnection();
+//   closeConnection(); // Call your DB connection close function if needed
 //   process.exit(0);
 // });

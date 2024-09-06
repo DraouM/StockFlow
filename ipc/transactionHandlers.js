@@ -17,7 +17,10 @@ exports.getAllTransactions = async () => {
 // Function to get a transaction by its ID
 exports.getTransactionById = async (event, transactionId) => {
   try {
-    return await transactionsModel.getById(transactionId);
+    const result = await transactionsModel.getById(transactionId);
+    console.log("hello from transactions handlers", result);
+
+    return result;
   } catch (error) {
     console.error(`Error getting transaction ${transactionId}:`, error);
     throw error;
@@ -25,7 +28,9 @@ exports.getTransactionById = async (event, transactionId) => {
 };
 
 // Function to create a new transaction
-exports.createTransaction = async (event, transactionData) => {
+exports.createTransaction = async (transactionData) => {
+  console.log("Transaction data received in handler:", transactionData); // Log the data in the handler
+
   try {
     return await transactionsModel.create(transactionData);
   } catch (error) {
@@ -37,6 +42,8 @@ exports.createTransaction = async (event, transactionData) => {
 // Function to update a transaction by its ID
 exports.updateTransaction = async (event, transactionId, updateData) => {
   try {
+    console.log("Transaction ID:", transactionId); // Should be a valid ID
+    console.log("Update Data:", updateData); // Should contain the update data object
     return await transactionsModel.update(transactionId, updateData);
   } catch (error) {
     console.error(`Error updating transaction ${transactionId}:`, error);

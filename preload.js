@@ -15,29 +15,43 @@ contextBridge.exposeInMainWorld("electronAPI", {
   },
   transactions: {
     getAll: () => ipcRenderer.invoke("transactions-get-all"),
-    getById: (id) => ipcRenderer.invoke("transactions:getById", id),
+    getById: (id) => ipcRenderer.invoke("transactions-get-by-id", id),
     create: (transactionData) =>
       ipcRenderer.invoke("transactions:create", transactionData),
-    update: (id, transactionData) =>
-      ipcRenderer.invoke("transactions:update", id, transactionData),
-    delete: (id) => ipcRenderer.invoke("transactions:delete", id),
+
+    update: (id, transactionData) => {
+      console.log(
+        "STEP B => Data received in preload script:",
+        id,
+        transactionData
+      ); // Debug log
+
+      console.log(
+        "Data received in preload before invoking IPC (UPDATE):",
+        id,
+        transactionData
+      );
+      return ipcRenderer.invoke("transactions-update", id, transactionData);
+    },
+
+    delete: (id) => ipcRenderer.invoke("transactions-delete", id),
     getByDateRange: (startDate, endDate, type) =>
       ipcRenderer.invoke(
-        "transactions:getByDateRange",
+        "transactions-get-by-date-range",
         startDate,
         endDate,
         type
       ),
     getTotalAmountByType: (type, startDate, endDate) =>
       ipcRenderer.invoke(
-        "transactions:getTotalAmountByType",
+        "transactions-get-total-amount-by-type",
         type,
         startDate,
         endDate
       ),
-    settle: (id) => ipcRenderer.invoke("transactions:settle", id),
+    settle: (id) => ipcRenderer.invoke("transactions-settle", id),
     getUnsettled: (partyId = null) =>
-      ipcRenderer.invoke("transactions:getUnsettled", partyId),
+      ipcRenderer.invoke("transactions-get-unsettled", partyId),
   },
   parties: {
     getAll: () => ipcRenderer.invoke("parties-get-all"),
