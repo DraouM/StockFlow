@@ -130,13 +130,11 @@ ipcMain.handle("parties-get-all", getAllParties);
 ipcMain.handle("parties-get-by-id", (event, partyId) =>
   getPartyById(event, partyId)
 );
-ipcMain.handle("parties-create", (event, partyData) =>
-  createParty(event, partyData)
-);
-ipcMain.handle("parties-update", (event, id, partyData) =>
+ipcMain.handle("create", (event, partyData) => createParty(event, partyData));
+ipcMain.handle("update", (event, id, partyData) =>
   updateParty(event, id, partyData)
 );
-ipcMain.handle("parties-delete", (event, id) => deleteParty(event, id));
+ipcMain.handle("delete", (event, id) => deleteParty(event, id));
 ipcMain.handle("parties-get-total-debt", (event, partyId) =>
   getTotalDebt(event, partyId)
 );
