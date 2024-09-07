@@ -116,13 +116,30 @@ ipcMain.handle("transactions-get-unsettled", (event, partyId) =>
 );
 
 // Parties IPC Handlers
-// ipcMain.handle("parties-get-all", getAllParties);
-// ipcMain.handle("parties-get-by-id", (event, partyId) => getPartyById(partyId));
-// ipcMain.handle("parties-create", (event, partyData) => createParty(partyData));
-// ipcMain.handle("parties-update", (event, id, partyData) =>
-//   updateParty(id, partyData)
-// );
-// ipcMain.handle("parties-delete", (event, id) => deleteParty(id));
+const {
+  getAllParties,
+  getPartyById,
+  createParty,
+  updateParty,
+  deleteParty,
+  getTotalDebt,
+} = require("./ipc/partiesHandler");
+
+// Parties IPC Handlers
+ipcMain.handle("parties-get-all", getAllParties);
+ipcMain.handle("parties-get-by-id", (event, partyId) =>
+  getPartyById(event, partyId)
+);
+ipcMain.handle("parties-create", (event, partyData) =>
+  createParty(event, partyData)
+);
+ipcMain.handle("parties-update", (event, id, partyData) =>
+  updateParty(event, id, partyData)
+);
+ipcMain.handle("parties-delete", (event, id) => deleteParty(event, id));
+ipcMain.handle("parties-get-total-debt", (event, partyId) =>
+  getTotalDebt(event, partyId)
+);
 
 // Optional: Handle graceful shutdowns
 // process.on('SIGINT', () => {
