@@ -7,7 +7,29 @@
   </head>
   <body>
     <h1>Transacitions</h1>
+    <section id="transactionsContainer">
+      <table id="transactionsTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Party ID</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Discount</th>
+            <th>Note</th>
+            <th>Setteled</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div id="transactionsTable-empty-message">
+        <p>No transactions found.</p>
+      </div>
+    </section>
 
+    <script src="../../scripts/common/EnhancedTable.js"></script>
+    <script src="../../scripts/common/LoadingSpinner.js"></script>
     <script src="transactions.js"></script>
   </body>
 </html>
