@@ -55,10 +55,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
   },
   parties: {
     getAll: () => ipcRenderer.invoke("parties-get-all"),
-    getById: (id) => ipcRenderer.invoke("parties:getById", id),
+    getById: (id) => ipcRenderer.invoke("parties-get-by-id", id),
     create: (partyData) => ipcRenderer.invoke("parties:create", partyData),
     update: (id, partyData) =>
       ipcRenderer.invoke("parties:update", id, partyData),
     delete: (id) => ipcRenderer.invoke("parties:delete", id),
+    getTotalDebt: (id) => ipcRenderer.invoke("parties-get-total-debt", id),
   },
 });
