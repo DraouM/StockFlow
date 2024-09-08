@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     spinner.show(); // Show spinner before data fetching
 
-    // Fetch all products using the exposed API
+    // Fetch all the transactions using the exposed API
     const transactions = await window.electronAPI.transactions.getAll();
 
     // Get the table body element
@@ -197,11 +197,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const fragment = document.createDocumentFragment();
 
     // Iterate over each product and add a row to the fragment
-    transactions.forEach((transaction) => {
+    for (const transaction of transactions) {
+      const party = await window.electronAPI.parties.getById(
+        transaction.party_id
+      );
+
       const row = document.createElement("tr");
       row.innerHTML = `
       <td>${transaction.transaction_id}</td>
-      <td>${transaction.party_id}</td>
+      <td>${party.name}</td>
       <td>${transaction.transaction_date}</td>
       <td>${transaction.transaction_type}</td>
       <td>${transaction.total_amount}</td>
@@ -212,7 +216,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Append the fragment to the table body
       fragment.appendChild(row);
-    });
+    }
     // Append the fragment to the table body
     tableBody.appendChild(fragment);
 
