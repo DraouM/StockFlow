@@ -23,15 +23,14 @@ const {
   settleTransaction,
   getUnsettledTransactions,
 } = require("./ipc/transactionHandlers");
-
-// Import Party handlers
-// const {
-//   getAllParties,
-//   getPartyById,
-//   createParty,
-//   updateParty,
-//   deleteParty,
-// } = require("./ipc/partiesHandler");
+const {
+  getAllParties,
+  getPartyById,
+  createParty,
+  updateParty,
+  deleteParty,
+  getPartyTotalDebt,
+} = require("./ipc/partyHandlers");
 
 // Create a new BrowserWindow when `app` is ready
 function createWindow() {
@@ -116,16 +115,6 @@ ipcMain.handle("transactions-get-unsettled", (event, partyId) =>
 );
 
 // Parties IPC Handlers
-const {
-  getAllParties,
-  getPartyById,
-  createParty,
-  updateParty,
-  deleteParty,
-  getTotalDebt,
-} = require("./ipc/partiesHandler");
-
-// Parties IPC Handlers
 ipcMain.handle("parties-get-all", getAllParties);
 ipcMain.handle("parties-get-by-id", (event, partyId) =>
   getPartyById(event, partyId)
@@ -136,7 +125,7 @@ ipcMain.handle("update", (event, id, partyData) =>
 );
 ipcMain.handle("delete", (event, id) => deleteParty(event, id));
 ipcMain.handle("parties-get-total-debt", (event, partyId) =>
-  getTotalDebt(event, partyId)
+  getPartyTotalDebt(event, partyId)
 );
 
 // Optional: Handle graceful shutdowns
