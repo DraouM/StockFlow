@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Enhanced Table Example</title>
+    <link rel="stylesheet" href="../../assets/styles/main.css" />
+
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -52,21 +54,24 @@
     </style>
   </head>
   <body>
-    <h1>Client List</h1>
-    <table id="clientTable">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Type</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <div id="clientTable-empty-message">
-      <p>No clients found</p>
-      <img src="../assets/empty-table.png" alt="Empty table" />
+    <aside id="sidebar"></aside>
+    <div class="content">
+      <h1>Client List</h1>
+      <table id="clientTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div id="clientTable-empty-message">
+        <p>No clients found</p>
+        <img src="../assets/empty-table.png" alt="Empty table" />
+      </div>
     </div>
 
     <script src="../../scripts/common/EnhancedTable.js"></script>
@@ -80,6 +85,7 @@
         });
       });
     </script>
+    <script src="../common/sidebar.js"></script>
     <script src="client.js"></script>
   </body>
 </html>
