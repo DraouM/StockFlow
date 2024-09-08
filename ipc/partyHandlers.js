@@ -6,7 +6,7 @@ const partiesModel = new PartiesModel();
 // Get all parties
 exports.getAllParties = async () => {
   try {
-    const parties = await partiesModel.getAllParties();
+    const parties = await partiesModel.getAll();
     return parties;
   } catch (error) {
     console.error("Error fetching parties:", error);
@@ -17,7 +17,7 @@ exports.getAllParties = async () => {
 // Get party by ID
 exports.getPartyById = async (event, partyId) => {
   try {
-    const party = await partiesModel.getPartyById(partyId);
+    const party = await partiesModel.getById(partyId);
     return party;
   } catch (error) {
     console.error(`Error fetching party with ID ${partyId}:`, error);
@@ -28,7 +28,7 @@ exports.getPartyById = async (event, partyId) => {
 // Create a new party
 exports.createParty = async (event, partyData) => {
   try {
-    const newPartyId = await partiesModel.createParty(partyData);
+    const newPartyId = await partiesModel.create(partyData);
     return newPartyId;
   } catch (error) {
     console.error("Error creating party:", error);
@@ -39,7 +39,7 @@ exports.createParty = async (event, partyData) => {
 // Update an existing party
 exports.updateParty = async (event, id, partyData) => {
   try {
-    const updatedParty = await partiesModel.updateParty(id, partyData);
+    const updatedParty = await partiesModel.update(id, partyData);
     return updatedParty;
   } catch (error) {
     console.error(`Error updating party with ID ${id}:`, error);
@@ -50,7 +50,7 @@ exports.updateParty = async (event, id, partyData) => {
 // Delete a party
 exports.deleteParty = async (event, id) => {
   try {
-    const deletedParty = await partiesModel.deleteParty(id);
+    const deletedParty = await partiesModel.delete(id);
     return deletedParty;
   } catch (error) {
     console.error(`Error deleting party with ID ${id}:`, error);
@@ -59,7 +59,7 @@ exports.deleteParty = async (event, id) => {
 };
 
 // Get total debt for a party
-exports.getTotalDebt = async (event, partyId) => {
+exports.getPartyTotalDebt = async (event, partyId) => {
   try {
     const totalDebt = await partiesModel.getTotalDebt(partyId);
     return totalDebt;

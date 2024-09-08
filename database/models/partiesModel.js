@@ -46,7 +46,7 @@ class PartiesModel {
   }
 
   // Create a new party
-  async createParty({ name, phone, email, address, party_type }) {
+  async create({ name, phone, email, address, party_type }) {
     const query = `
       INSERT INTO Parties (name, phone, email, address, party_type)
       VALUES (?, ?, ?, ?, ?)
@@ -62,13 +62,13 @@ class PartiesModel {
   }
 
   // Get all parties
-  async getAllParties() {
+  async getAll() {
     const query = `SELECT * FROM Parties`;
     return await this.fetchQuery(query, [], "Error fetching all parties");
   }
 
   // Get party by ID
-  async getPartyById(party_id) {
+  async getById(party_id) {
     const query = `SELECT * FROM Parties WHERE party_id = ?`;
     return await this.fetchSingle(
       query,
@@ -78,7 +78,7 @@ class PartiesModel {
   }
 
   // Update party by ID
-  async updateParty(
+  async update(
     party_id,
     { name, phone, email, address, party_type, total_debt }
   ) {
@@ -106,7 +106,7 @@ class PartiesModel {
   }
 
   // Delete party by ID
-  async deleteParty(party_id) {
+  async delete(party_id) {
     const query = `DELETE FROM Parties WHERE party_id = ?`;
     return await this.runQuery(
       query,
@@ -117,7 +117,7 @@ class PartiesModel {
   }
 
   // Get parties by type (client or supplier)
-  async getPartiesByType(party_type) {
+  async getByType(party_type) {
     const query = `SELECT * FROM Parties WHERE party_type = ?`;
     return await this.fetchQuery(
       query,
