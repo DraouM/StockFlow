@@ -3,45 +3,39 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Enhanced Table Example</title>
+    <link rel="stylesheet" href="../../assets/styles/main.css" />
+    <link rel="stylesheet" href="stock.css" />
   </head>
   <body>
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Enhanced Table Example</title>
-        <link rel="stylesheet" href="../../styles/main.css" />
-        <link rel="stylesheet" href="stock.css" />
-      </head>
-      <body>
-        <h1>Stock Management</h1>
-        <table id="stockTable">
-          <thead>
-            <tr>
-              <th>Num</th>
-              <th>Product Name</th>
-              <th>Quantity (units)</th>
-              <th>Subunit (pieces)</th>
-              <th>total Quanity</th>
-              <th>Unit Price (DA)</th>
-              <th>Product Value (DA)</th>
-              <th>Taxes</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <div id="stockTable-empty-message">
-          <p>No Item found</p>
-          <img src="../assets/empty-table.png" alt="Empty table" />
-        </div>
+    <aside id="sidebar"></aside>
+    <div class="content">
+      <h1>Stock Management</h1>
+      <table id="stockTable">
+        <thead>
+          <tr>
+            <th>Num</th>
+            <th>Product Name</th>
+            <th>Quantity (units)</th>
+            <th>Subunit (pieces)</th>
+            <th>total Quanity</th>
+            <th>Unit Price (DA)</th>
+            <th>Product Value (DA)</th>
+            <th>Taxes</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div id="stockTable-empty-message">
+        <p>No Item found</p>
+        <img src="../assets/empty-table.png" alt="Empty table" />
+      </div>
+    </div>
 
-        <script src="../../scripts/common/EnhancedTable.js"></script>
-        <script src="../../scripts/common/LoadingSpinner.js"></script>
-        <script src="stock.js"></script>
-      </body>
-    </html>
+    <script src="../../scripts/common/EnhancedTable.js"></script>
+    <script src="../../scripts/common/LoadingSpinner.js"></script>
+    <script src="../common/sidebar.js"></script>
+    <script src="stock.js"></script>
   </body>
 </html>
