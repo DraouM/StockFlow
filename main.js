@@ -44,7 +44,7 @@ function createWindow() {
 
   // Load a specific page (you can change it to index.html or another page)
   win.loadFile(
-    "/home/mohamed/Documents/Projects/StockFlow/pages/transactions/transactions.html"
+    "/home/mohamed/Documents/Projects/StockFlow/pages/stock/stock.html"
   );
 
   // Optionally, open DevTools for debugging

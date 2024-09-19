@@ -4,6 +4,7 @@ class EnhancedTable {
     this.options = {
       searchable: true,
       sortable: true,
+      searchInputId: null, // Add option to link external search input
       emptyMessage: "No data available",
       emptyImageSrc: "../assets/empty-table.png",
       ...options,
@@ -18,8 +19,8 @@ class EnhancedTable {
   }
 
   init() {
-    if (this.options.searchable) {
-      this.setupSearch();
+    if (this.options.searchable && this.options.searchInputId) {
+      this.setupSearch(); // Search linked to external input
     }
     if (this.options.sortable) {
       this.setupSort();
@@ -28,11 +29,12 @@ class EnhancedTable {
   }
 
   setupSearch() {
-    const searchInput = document.createElement("input");
-    searchInput.setAttribute("type", "text");
-    searchInput.setAttribute("placeholder", "Search table...");
-    searchInput.classList.add("table-search");
-    this.table.parentNode.insertBefore(searchInput, this.table);
+    // Get the external search input element by ID
+    const searchInput = document.getElementById(this.options.searchInputId);
+    if (!searchInput) {
+      console.error("Search input element not found!");
+      return;
+    }
 
     searchInput.addEventListener("input", () =>
       this.searchTable(searchInput.value)

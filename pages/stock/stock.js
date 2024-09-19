@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const stockTable = new EnhancedTable("stockTable", {
       searchable: true,
       sortable: true,
+      searchInputId: "table-search-input", // Link the search input by ID
       emptyMessage: "No Item found",
       emptyImageSrc: "../assets/empty-table.png",
     });
