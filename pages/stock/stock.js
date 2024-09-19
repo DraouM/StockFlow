@@ -1,3 +1,4 @@
+// Fetch the products from  the databased and display it to the table
 document.addEventListener("DOMContentLoaded", async () => {
   const spinner = new LoadingSpinner("stockTable", {
     message: "Loading products...",
@@ -78,5 +79,46 @@ document
       const productId = event.target.dataset.id;
       // Handle the edit action for the product with productId
       console.log("Edit product with ID:", productId);
+    }
+  });
+
+// Handle the creation of new product
+document
+  .getElementById("newProductForm")
+  .addEventListener("submit", async (e) => {
+    e.preventDefault(); // Prevent the default form submission
+
+    // Collect the product data
+    const productName = document.getElementById("productName").value;
+    const productTaxes =
+      parseFloat(document.getElementById("productTaxes").value) || 0;
+    const subunitsInUnit = parseInt(
+      document.getElementById("subunitsInUnit").value
+    );
+    const productDescription =
+      document.getElementById("productDescription").value || "";
+
+    // Create the product data object
+    const productData = {
+      productName: productName,
+      taxes: productTaxes,
+      subunitsInUnit: subunitsInUnit,
+      // description: productDescription, -- ADD LATER WHEN CREATING THE PROFUCT HISTORY
+    };
+
+    console.log("ProductData ", productData);
+
+    try {
+      const result = await window.electronAPI.products.create(productData);
+
+      if (result.success) {
+        console.log("Product created successfully with ID:", result.id);
+        document.getElementById("newProductForm").reset();
+        document.getElementById("newProductModal").style.display = "none";
+      } else {
+        console.error("Failed to create product:", result.error);
+      }
+    } catch (error) {
+      console.error("Error creating product:", error);
     }
   });
