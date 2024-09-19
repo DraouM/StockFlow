@@ -44,25 +44,36 @@ class ProductModel {
     return this.runQuery(sql);
   }
 
-  async addProduct(
-    productName,
-    productUnit,
-    stockQuantity,
-    unitPrice,
-    taxRate
-  ) {
-    const sql = `
-      INSERT INTO products (product_name, product_unit, stock_quantity, unit_price, tax_rate)
-      VALUES (?, ?, ?, ?, ?)
-    `;
-    const result = await this.runQuery(sql, [
-      productName,
-      productUnit,
-      stockQuantity,
-      unitPrice,
-      taxRate,
-    ]);
-    return result.lastID;
+  async addNewProduct(productData) {
+    if (!productData) {
+      throw new Error("Product data is undefined");
+    }
+
+    const { productName, subunitsInUnit, taxes } = productData;
+    console.log("ccc ", productData);
+
+    // if (!productName || !subunitsInUnit || taxRate === undefined) {
+    //   throw new Error("Missing required product data");
+    // }
+
+    try {
+      const sql = `
+        INSERT INTO products (product_name, product_unit, stock_quantity, unit_price, tax_rate)
+        VALUES (?, ?, ?, ?, ?)
+      `;
+      const result = await this.runQuery(sql, [
+        productName,
+        subunitsInUnit,
+        0, // Initial stock quantity
+        0.001, // Placeholder unit price
+        taxes,
+      ]);
+
+      return result.lastID;
+    } catch (error) {
+      console.error("Error adding new product:", error);
+      throw error;
+    }
   }
 
   async getProduct(productId) {

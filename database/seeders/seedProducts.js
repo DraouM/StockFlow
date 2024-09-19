@@ -7,14 +7,7 @@ async function manageProducts() {
     await product.createTable();
 
     // Add a new product
-    const newId = await product.addProduct(
-      "Chocolate Box",
-      12,
-      "box",
-      60,
-      1.5,
-      0.1
-    );
+    const newId = await product.addNewProduct("Chocolate Box", 12, 0.1);
     console.log(`New product added with ID: ${newId}`);
 
     // Get the product

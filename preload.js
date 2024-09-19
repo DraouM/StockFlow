@@ -8,7 +8,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   products: {
     getAll: () => ipcRenderer.invoke("products-get-all"),
     getById: (id) => ipcRenderer.invoke("products:getById", id),
-    create: (productData) => ipcRenderer.invoke("products:create", productData),
+    create: (productData) => ipcRenderer.invoke("products-create", productData),
     update: (id, productData) =>
       ipcRenderer.invoke("products:update", id, productData),
     delete: (id) => ipcRenderer.invoke("products:delete", id),

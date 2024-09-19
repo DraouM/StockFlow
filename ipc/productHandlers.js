@@ -20,11 +20,12 @@ exports.getProductById = async (event, productId) => {
   }
 };
 
-exports.createProduct = async (event, productData) => {
+exports.createProduct = async (productData) => {
   try {
-    return await ProductModel.create(productData);
+    const lastID = await productModel.addNewProduct(productData);
+    return { success: true, id: lastID };
   } catch (error) {
     console.error("Error creating product:", error);
-    throw error;
+    return { success: false, error: error.message };
   }
 };
