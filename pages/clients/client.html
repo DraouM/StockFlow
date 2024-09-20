@@ -5,65 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Enhanced Table Example</title>
     <link rel="stylesheet" href="../../assets/styles/main.css" />
-
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-      }
-      th,
-      td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-      }
-      th {
-        background-color: #f2f2f2;
-      }
-      .sortable {
-        cursor: pointer;
-      }
-      .sortable::after {
-        content: " ▼";
-        font-size: 0.8em;
-        opacity: 0.5;
-      }
-      .sortable.asc::after {
-        content: " ▲";
-      }
-      .table-search {
-        margin-bottom: 10px;
-        padding: 5px;
-        width: 100%;
-      }
-
-      #emptyTableMessage {
-        text-align: center;
-        display: none;
-      }
-      #emptyTableMessage img {
-        max-width: 200px;
-        margin-top: 20px;
-      }
-    </style>
   </head>
   <body>
     <aside id="sidebar"></aside>
     <div class="content">
       <h1>Client List</h1>
+      <!-- Search input outside the table -->
+      <div class="search-box">
+        <input
+          id="table-search-input"
+          type="text"
+          name="table-search"
+          placeholder="Search in the table..."
+        />
+      </div>
       <table id="clientTable">
         <thead>
           <tr>
             <th>ID</th>
             <th>Name</th>
+            <th>Phone</th>
             <th>Email</th>
+            <th>Address</th>
             <th>Type</th>
+            <th>Debt</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -75,17 +41,9 @@
     </div>
 
     <script src="../../scripts/common/EnhancedTable.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const clientTable = new EnhancedTable("clientTable", {
-          searchable: true,
-          sortable: true,
-          emptyMessage: "No clients found",
-          emptyImageSrc: "../assets/empty-table.png",
-        });
-      });
-    </script>
+    <script src="../../scripts/common/LoadingSpinner.js"></script>
     <script src="../common/sidebar.js"></script>
+    <script src="../../assets/js/modal.js"></script>
     <script src="client.js"></script>
   </body>
 </html>
