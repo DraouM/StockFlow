@@ -212,6 +212,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       <td>${transaction.discount}</td>
       <td>${transaction.notes}</td>
       <td>${transaction.settled}</td>
+      <td><button class="button button-small button-secondary edit-button" data-id="${transaction.transaction_id}">Edit</button> 
       `;
 
       // Append the fragment to the table body
@@ -226,6 +227,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const transactionsTable = new EnhancedTable("transactionsTable", {
       searchable: true,
       sortable: true,
+      searchInputId: "table-search-input", // Link the search input by ID
       emptyMessage: "No Item found",
       emptyImageSrc: "../assets/empty-table.png",
     });
