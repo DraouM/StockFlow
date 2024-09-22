@@ -29,3 +29,23 @@ exports.createProduct = async (productData) => {
     return { success: false, error: error.message };
   }
 };
+
+exports.searchProducts = async (searchTerm) => {
+  try {
+    console.log("BBB ", searchTerm);
+
+    return await productModel.searchProducts(searchTerm);
+  } catch (error) {
+    console.error("Error searching products:", error);
+    throw error;
+  }
+}; //  exports.searchProducts = async ()=>{...}  //  exports.search
+
+// exports.updateProduct = async (event, productId, productData) => {
+//   try {
+//     return await productModel.updateProduct(productId, productData);
+//     } catch (error) {
+//       console.error(`Error updating product ${productId}:`, error);
+//       throw error;
+//       }
+// }

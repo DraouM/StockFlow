@@ -123,6 +123,15 @@ class ProductModel {
     return this.allQuery(sql);
   }
 
+  // Method to fetch products by search term
+  async searchProducts(searchTerm) {
+    const sql = `SELECT * FROM products WHERE product_name LIKE ?`;
+    console.log("AAA ", searchTerm);
+
+    const params = [`%${searchTerm}%`];
+    return this.allQuery(sql, params); // Use the helper method
+  }
+
   // Helper methods
   async runQuery(sql, params = []) {
     return new Promise((resolve, reject) => {

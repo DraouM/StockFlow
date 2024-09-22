@@ -9,6 +9,7 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
+  searchProducts,
 } = require("./ipc/productHandlers");
 
 // Import Transaction handlers
@@ -44,7 +45,7 @@ function createWindow() {
 
   // Load a specific page (you can change it to index.html or another page)
   win.loadFile(
-    "/home/mohamed/Documents/Projects/StockFlow/pages/stock/stock.html"
+    "/home/mohamed/Documents/Projects/StockFlow/pages/transactions/selling/selling.html"
   );
 
   // Optionally, open DevTools for debugging
@@ -84,6 +85,9 @@ ipcMain.handle("products-update", (event, id, productData) =>
   updateProduct(id, productData)
 );
 ipcMain.handle("products-delete", (event, id) => deleteProduct(id));
+ipcMain.handle("products.search", (event, searchTerm) =>
+  searchProducts(searchTerm)
+);
 
 // Transactions IPC Handlers
 ipcMain.handle("transactions-get-all", getAllTransactions);
