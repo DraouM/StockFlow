@@ -32,7 +32,7 @@ class ProductModel {
     const sql = `
       CREATE TABLE IF NOT EXISTS products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        product_name TEXT NOT NULL UNIQUE,
+        name TEXT NOT NULL UNIQUE,
         product_unit INTEGER NOT NULL DEFAULT 1,
         stock_quantity INTEGER NOT NULL CHECK (stock_quantity >= 0),
         unit_price REAL NOT NULL CHECK (unit_price > 0),
@@ -58,7 +58,7 @@ class ProductModel {
 
     try {
       const sql = `
-        INSERT INTO products (product_name, product_unit, stock_quantity, unit_price, tax_rate)
+        INSERT INTO products (name, product_unit, stock_quantity, unit_price, tax_rate)
         VALUES (?, ?, ?, ?, ?)
       `;
       const result = await this.runQuery(sql, [
@@ -83,7 +83,7 @@ class ProductModel {
 
   async updateProduct(productId, updates) {
     const allowedFields = [
-      "product_name",
+      "name",
       "product_unit",
       "stock_quantity",
       "unit_price",
@@ -125,7 +125,7 @@ class ProductModel {
 
   // Method to fetch products by search term
   async searchProducts(searchTerm) {
-    const sql = `SELECT * FROM products WHERE product_name LIKE ?`;
+    const sql = `SELECT * FROM products WHERE name LIKE ?`;
     console.log("AAA ", searchTerm);
 
     const params = [`%${searchTerm}%`];

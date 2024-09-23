@@ -39,7 +39,7 @@ async function manageProducts2() {
     // await product.createTable();
 
     // Add a new product
-    const newId = await product.addProduct("Smartphone", 1, 70, 250, 0.7);
+    const newId = await product.addNewProduct("Smartphone", 1, 70, 250, 0.7);
     console.log(`New product added with ID: ${newId}`);
 
     // Get the product

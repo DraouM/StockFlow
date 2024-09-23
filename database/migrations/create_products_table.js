@@ -23,7 +23,7 @@ class ProductDatabase {
     const tableQuery = `
       CREATE TABLE IF NOT EXISTS products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        product_name TEXT NOT NULL UNIQUE,
+        name TEXT NOT NULL UNIQUE,
         product_unit INTEGER NOT NULL DEFAULT 1,
         stock_quantity INTEGER NOT NULL CHECK (stock_quantity >= 0),
         unit_price REAL NOT NULL CHECK (unit_price > 0),

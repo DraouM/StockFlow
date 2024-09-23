@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       row.innerHTML = `
   <td>${product.id}</td>
-  <td>${product.product_name}</td>
+  <td>${product.name}</td>
   <td>${product.product_unit}</td>
   <td>${product.stock_quantity}</td>
   <td>${product.stock_quantity / product.product_unit}</td>
