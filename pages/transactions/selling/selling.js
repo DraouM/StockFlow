@@ -41,15 +41,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function displayResults(results) {
-    resultsList.innerHTML = "";
+    resultsList.innerHTML = ""; // clear the previous results
     if (results.length > 0) {
       results.forEach((result) => {
         const li = document.createElement("li");
         li.textContent = result.product_name; // Adjust according to your data structure
         li.addEventListener("click", () => {
-          searchInput.value = result.name;
+          // Set the input value to the selected product name
+          searchInput.value = result.product_name;
           searchResults.classList.add("hidden");
-          performSearch(result.name);
+          performSearch(result.product_name);
         });
         resultsList.appendChild(li);
       });
