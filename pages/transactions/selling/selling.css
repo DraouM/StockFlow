@@ -67,3 +67,13 @@
 .hidden {
     display: none;
 }
+
+.no-results-message {
+    color: #999;
+    font-style: italic;
+}
+
+.error-message {
+    color: red;
+    font-weight: bold;
+}

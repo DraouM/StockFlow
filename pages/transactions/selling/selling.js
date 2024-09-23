@@ -1,75 +1,21 @@
-// script.js
 document.addEventListener("DOMContentLoaded", () => {
-  const searchForm = document.getElementById("search-form");
-  const searchInput = document.getElementById("search-input");
-  const searchResults = document.getElementById("search-results");
-  const resultsList = document.getElementById("results-list");
+  const fetchProducts = async (searchTerm) => {
+    return await window.electronAPI.products.searchProducts(searchTerm);
+  };
 
-  let debounceTimer;
+  const onProductSelected = (selectedProduct) => {
+    console.log("Product selected:", selectedProduct);
+    // You can add custom behavior for what happens when a product is selected.
+    // For example, you might want to fill another input field or redirect the user.
+  };
 
-  searchInput.addEventListener("input", () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      const searchTerm = searchInput.value.trim();
-      if (searchTerm.length > 0) {
-        fetchSearchResults(searchTerm);
-      } else {
-        searchResults.classList.add("hidden");
-      }
-    }, 300);
-  });
-
-  searchForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const searchTerm = searchInput.value.trim();
-    if (searchTerm.length > 0) {
-      performSearch(searchTerm);
-    }
-  });
-
-  async function fetchSearchResults(searchTerm) {
-    try {
-      const results = await window.electronAPI.products.searchProducts(
-        searchTerm
-      );
-      console.log("Search results:", results); // Log the search results
-
-      displayResults(results);
-    } catch (error) {
-      console.error("Error fetching search results:", error);
-    }
-  }
-
-  function displayResults(results) {
-    resultsList.innerHTML = ""; // clear the previous results
-    if (results.length > 0) {
-      results.forEach((result) => {
-        const li = document.createElement("li");
-        li.textContent = result.product_name; // Adjust according to your data structure
-        li.addEventListener("click", () => {
-          // Set the input value to the selected product name
-          searchInput.value = result.product_name;
-          searchResults.classList.add("hidden");
-          performSearch(result.product_name);
-        });
-        resultsList.appendChild(li);
-      });
-      searchResults.classList.remove("hidden");
-    } else {
-      searchResults.classList.add("hidden");
-    }
-  }
-
-  function performSearch(searchTerm) {
-    // Implement your search logic here
-    console.log("Performing search for:", searchTerm);
-    // You might want to redirect to a search results page or update the current page
-  }
-
-  // Close the search results when clicking outside
-  document.addEventListener("click", (e) => {
-    if (!searchForm.contains(e.target) && !searchResults.contains(e.target)) {
-      searchResults.classList.add("hidden");
-    }
-  });
+  // Create an instance of the Searchbar class
+  const productSearchbar = new Searchbar(
+    "search-input", // Input field ID
+    "results-list", // Results list ID
+    "search-form", // Search form ID
+    "search-results", // Results div ID
+    fetchProducts, // Fetch function for searching products
+    onProductSelected // Callback when a product is selected
+  );
 });
