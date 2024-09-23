@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (results.length > 0) {
       results.forEach((result) => {
         const li = document.createElement("li");
-        li.textContent = result.name; // Adjust according to your data structure
+        li.textContent = result.product_name; // Adjust according to your data structure
         li.addEventListener("click", () => {
           searchInput.value = result.name;
           searchResults.classList.add("hidden");
