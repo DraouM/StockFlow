@@ -126,6 +126,17 @@ class PartiesModel {
     );
   }
 
+  async search(party_type, searchTerm) {
+    console.log("from parties model", party_type, searchTerm);
+
+    const query = `SELECT * FROM Parties WHERE party_type = ? AND name LIKE ?`;
+    return await this.fetchQuery(
+      query,
+      [party_type, `%${searchTerm}%`],
+      `Error fetching ${party_type}s + ${searchTerm}`
+    );
+  }
+
   // Get total debt of a party by ID
   async getTotalDebt(party_id) {
     const query = `SELECT total_debt FROM Parties WHERE party_id = ?`;

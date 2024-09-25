@@ -31,6 +31,7 @@ const {
   updateParty,
   deleteParty,
   getPartyTotalDebt,
+  searchParty,
 } = require("./ipc/partyHandlers");
 
 // Create a new BrowserWindow when `app` is ready
@@ -130,6 +131,9 @@ ipcMain.handle("update", (event, id, partyData) =>
 ipcMain.handle("delete", (event, id) => deleteParty(event, id));
 ipcMain.handle("parties-get-total-debt", (event, partyId) =>
   getPartyTotalDebt(event, partyId)
+);
+ipcMain.handle("search", (event, partyType, searchTerm) =>
+  searchParty(event, partyType, searchTerm)
 );
 
 // Optional: Handle graceful shutdowns

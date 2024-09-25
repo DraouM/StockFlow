@@ -63,5 +63,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
       ipcRenderer.invoke("parties:update", id, partyData),
     delete: (id) => ipcRenderer.invoke("parties:delete", id),
     getTotalDebt: (id) => ipcRenderer.invoke("parties-get-total-debt", id),
+    searchParty: (partyType, searchTerm) =>
+      ipcRenderer.invoke("search", partyType, searchTerm), // <--- NEW LINE ADDED HERE
   },
 });

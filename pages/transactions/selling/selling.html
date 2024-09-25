@@ -86,11 +86,12 @@
       <form id="search-form" class="search-form">
         <input
           type="text"
+          class="search-input"
           id="search-input"
           placeholder="Search for a Product"
           autocomplete="off"
         />
-        <button type="submit" id="search-btn">
+        <button type="submit" id="search-btn" class="search-btn">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="22"
@@ -166,7 +167,68 @@
       <button type="submit" class="button button-secondary">Submit</button>
     </form>
 
+    <!--  -->
+    <h2>Clients Searchbar</h2>
+    <div class="search-container">
+      <form id="search-form-client" class="search-form">
+        <input
+          type="text"
+          class="search-input"
+          id="search-input-client"
+          placeholder="Search for a Client"
+          autocomplete="off"
+        />
+        <button type="submit" id="search-btn-client" class="search-btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="23"
+            viewBox="0 0 22 23"
+            fill="none"
+          >
+            <path
+              d="M16.4998 16.9997L13.2515 13.7513M13.2515 13.7513C13.7728 13.2299 14.1864 12.611 14.4686 11.9298C14.7508 11.2486 14.896 10.5184 14.896 9.7811C14.896 9.04376 14.7508 8.31364 14.4686 7.63243C14.1864 6.95121 13.7728 6.33225 13.2515 5.81087C12.7301 5.28949 12.1111 4.87592 11.4299 4.59375C10.7487 4.31158 10.0186 4.16635 9.28125 4.16635C8.54391 4.16635 7.81379 4.31158 7.13258 4.59375C6.45137 4.87592 5.8324 5.28949 5.31102 5.81087C4.25806 6.86384 3.6665 8.29197 3.6665 9.7811C3.6665 11.2702 4.25806 12.6984 5.31102 13.7513C6.36399 14.8043 7.79213 15.3958 9.28125 15.3958C10.7704 15.3958 12.1985 14.8043 13.2515 13.7513Z"
+              stroke="#5B5B5B"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+      </form>
+      <div id="search-results-client" class="search-results hidden">
+        <ul id="results-list-client"></ul>
+      </div>
+    </div>
     <script src="selling.js"></script>
     <script src="../../../scripts/common/Searchbar.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const fetchParties = async (searchTerm) => {
+          return await window.electronAPI.parties.searchParty(
+            "client",
+            searchTerm
+          );
+        };
+
+        const onPartySelected = (selectedProduct) => {
+          console.log("Party selected:", selectedProduct);
+          // You can add custom behavior for what happens when a product is selected.
+          // For example, you might want to fill another input field or redirect the user.
+          // displaySelectedProduct(selectedProduct);
+        };
+
+        // Create an instance of the Searchbar class
+        const productSearchbar = new Searchbar(
+          "search-input-client", // Input field ID
+          "results-list-client", // Results list ID
+          "search-form-client", // Search form ID
+          "search-results-client", // Results div ID
+          fetchParties, // Fetch function for searching products
+          onPartySelected // Callback when a product is selected
+        );
+      });
+    </script>
   </body>
 </html>

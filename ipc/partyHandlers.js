@@ -58,6 +58,21 @@ exports.deleteParty = async (event, id) => {
   }
 };
 
+//
+exports.searchParty = async (avent, partyType, searchTerm) => {
+  try {
+    const party = await partiesModel.search(partyType, searchTerm);
+    return party;
+  } catch (error) {
+    console.error(
+      `Error searching party with type ${partyType} and search term ${searchTerm}:
+        `,
+      error
+    );
+    throw error;
+  }
+};
+
 // Get total debt for a party
 exports.getPartyTotalDebt = async (event, partyId) => {
   try {
