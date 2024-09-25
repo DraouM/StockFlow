@@ -113,6 +113,59 @@
       </div>
     </div>
 
+    <form id="product-details-form" class="product-details-form">
+      <!-- Product Name -->
+      <div class="form-group">
+        <label for="productName">Product Name</label>
+        <input
+          type="text"
+          id="productName"
+          name="productName"
+          required
+          readonly
+        />
+        <small class="form-text">Enter the name of the product.</small>
+      </div>
+
+      <!-- Product Quantity -->
+      <div class="form-group">
+        <label for="quantite">Quantity</label>
+        <input type="number" id="quantite" name="quantite" required />
+        <small class="form-text">Enter the quantity of the product.</small>
+      </div>
+
+      <!-- Unit Price -->
+      <div class="form-group">
+        <label for="unitPrice">Unit Price</label>
+        <input
+          type="number"
+          id="unitPrice"
+          name="unitPrice"
+          required
+          readonly
+        />
+        <small class="form-text">The price per unit of the product.</small>
+      </div>
+
+      <!-- Total Price (Quantity * Unit Price) -->
+      <div class="form-group">
+        <label for="totalPrice">Total Price</label>
+        <input
+          type="number"
+          id="totalPrice"
+          name="totalPrice"
+          required
+          readonly
+        />
+        <small class="form-text"
+          >Total cost based on quantity and unit price.</small
+        >
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="button button-secondary">Submit</button>
+    </form>
+
     <script src="selling.js"></script>
     <script src="../../../scripts/common/Searchbar.js"></script>
   </body>
