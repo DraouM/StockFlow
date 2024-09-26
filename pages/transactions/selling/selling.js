@@ -83,23 +83,54 @@ function addToShoppingList() {
 }
 
 function displayShoppingList() {
-  const shoppingListContainer = document.getElementById("shopping-list");
-  shoppingListContainer.innerHTML = ""; // Clear the list
+  const shoppingListBody = document.getElementById("shopping-list-body");
+  shoppingListBody.innerHTML = ""; // Clear the list
 
   shoppingList.forEach((product, index) => {
-    const productElement = document.createElement("li");
-    productElement.innerHTML = `
-      ${product.name} - Quantity: ${product.quantity}, Unit Price: ${
-      product.unit_price
-    }, 
-      Total: ${(product.quantity * product.unit_price).toFixed(2)}
-      <button onclick="removeFromShoppingList(${index})">Remove</button>
-    `;
-    shoppingListContainer.appendChild(productElement);
+    const row = document.createElement("tr");
+    row.innerHTML = `
+  <td>${product.name}</td>
+  <td>${product.quantity}</td>
+  <td>$${product.unit_price.toFixed(2)}</td>
+  <td>$${(product.quantity * product.unit_price).toFixed(2)}</td>
+  <td>
+    <button onclick="removeFromShoppingList(${index})" class="button button-remove">Remove</button>
+  </td>
+`;
+    shoppingListBody.appendChild(row);
   });
 
   calculateTotal();
 }
+
+function removeFromShoppingList(index) {
+  shoppingList.splice(index, 1);
+  displayShoppingList();
+}
+
+function calculateTotal() {
+  const total = shoppingList.reduce(
+    (sum, product) => sum + product.quantity * product.unit_price,
+    0
+  );
+  document.getElementById("total-price").textContent = `Total: $${total.toFixed(
+    2
+  )}`;
+}
+
+function clearShoppingList() {
+  shoppingList = [];
+  displayShoppingList();
+}
+
+// Event listener for the clear list button
+document
+  .getElementById("clear-list")
+  .addEventListener("click", clearShoppingList);
+
+// Initial display
+displayShoppingList();
+
 function calculateTotal() {
   // Call this function inside displayShoppingList() to update the total price
   const total = shoppingList.reduce(

@@ -80,10 +80,8 @@
       back
     </a>
 
-    <h2>Second</h2>
-
     <!-- CLIENT  -->
-    <h2>Clients Searchbar</h2>
+    <h2>Products Searchbar</h2>
 
     <div class="main-container">
       <div class="product-section">
@@ -181,10 +179,28 @@
         </form>
 
         <!-- Your shopping list here -->
-        <div id="shopping-list-container">
+        <div id="shopping-list-container" class="shopping-list-container">
           <h3>Shopping List</h3>
-          <ul id="shopping-list"></ul>
-          <p id="total-price">Total Price: $0.00</p>
+          <table id="shopping-list-table" class="shopping-list-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="shopping-list-body">
+              <!-- Shopping list items will be inserted here -->
+            </tbody>
+          </table>
+          <div class="shopping-list-summary">
+            <p id="total-price" class="total-price">Total: $0.00</p>
+            <button id="clear-list" class="button button-danger">
+              Clear List
+            </button>
+          </div>
         </div>
       </div>
 
