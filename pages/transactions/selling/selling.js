@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function displaySelectedProduct(product) {
   // Get form input elements
   const productNameInput = document.getElementById("productName");
-  const quantityInput = document.getElementById("quantite");
+  const quantityInput = document.getElementById("quantity");
   const unitPriceInput = document.getElementById("unitPrice");
   const totalPriceInput = document.getElementById("totalPrice");
 
@@ -52,4 +52,69 @@ function displaySelectedProduct(product) {
     const totalPrice = quantity * unitPrice;
     totalPriceInput.value = totalPrice.toFixed(2); // Round to two decimal places
   }
+
+  // Store the product data in a temporary object for adding to the shopping list
+  window.selectedProduct = product;
+}
+
+// Adding Selected Product to a Shopping List
+let shoppingList = []; // Array to store selected products
+
+function addToShoppingList() {
+  const quantity = parseInt(document.getElementById("quantity").value, 10);
+
+  // Check if the product is already in the shopping list
+  const existingProduct = shoppingList.find(
+    (item) => item.id === window.selectedProduct.id
+  );
+
+  if (existingProduct) {
+    // Update the quantity of the existing product
+    existingProduct.quantity += quantity;
+  } else {
+    // Add the product to the shopping list with the selected quantity
+    shoppingList.push({
+      ...window.selectedProduct,
+      quantity: quantity,
+    });
+  }
+
+  displayShoppingList(); // Update the displayed shopping list
+}
+
+function displayShoppingList() {
+  const shoppingListContainer = document.getElementById("shopping-list");
+  shoppingListContainer.innerHTML = ""; // Clear the list
+
+  shoppingList.forEach((product, index) => {
+    const productElement = document.createElement("li");
+    productElement.innerHTML = `
+      ${product.name} - Quantity: ${product.quantity}, Unit Price: ${
+      product.unit_price
+    }, 
+      Total: ${(product.quantity * product.unit_price).toFixed(2)}
+      <button onclick="removeFromShoppingList(${index})">Remove</button>
+    `;
+    shoppingListContainer.appendChild(productElement);
+  });
+
+  calculateTotal();
+}
+function calculateTotal() {
+  // Call this function inside displayShoppingList() to update the total price
+  const total = shoppingList.reduce(
+    (acc, product) => acc + product.quantity * product.unit_price,
+    0
+  );
+  document.getElementById(
+    "total-price"
+  ).innerText = `Total Price: $${total.toFixed(2)}`;
+}
+
+function removeFromShoppingList(index) {
+  shoppingList.splice(index, 1); // Remove the product from the shopping list
+  displayShoppingList(); // Update the displayed list
+}
+function selectProductFromSearch(product) {
+  displayProductInfo(product);
 }
