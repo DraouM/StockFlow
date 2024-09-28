@@ -1,3 +1,4 @@
+/*PRODUCTS SEARCHING*/
 document.addEventListener("DOMContentLoaded", () => {
   const fetchProducts = async (searchTerm) => {
     return await window.electronAPI.products.searchProducts(searchTerm);
@@ -21,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 
-// Form handler
+/*PRODUCTS FORM HANDLER*/
 function displaySelectedProduct(product) {
   // Get form input elements
   const productNameInput = document.getElementById("productName");
@@ -61,11 +62,17 @@ function displaySelectedProduct(product) {
 let shoppingList = []; // Array to store selected products
 
 function addToShoppingList() {
-  const quantity = parseInt(document.getElementById("quantity").value, 10);
+  const quantity = parseInt(document.getElementById("quantity").value, 0);
+  const unitPrice = parseFloat(document.getElementById("unitPrice").value) || 0;
 
-  // Check if the product is already in the shopping list
+  if (!window.selectedProduct) {
+    alert("Please select a product first.");
+    return;
+  }
+  // Check if the product with the same price is already in the shopping list
   const existingProduct = shoppingList.find(
-    (item) => item.id === window.selectedProduct.id
+    (item) =>
+      item.id === window.selectedProduct.id && item.unitPrice === unitPrice
   );
 
   if (existingProduct) {
@@ -76,6 +83,7 @@ function addToShoppingList() {
     shoppingList.push({
       ...window.selectedProduct,
       quantity: quantity,
+      unitPrice: unitPrice, // Ensure to store the current unit price and price
     });
   }
 
@@ -103,7 +111,6 @@ function clearForm() {
     searchInput.value = "";
   }
 }
-
 function displayShoppingList() {
   const shoppingListBody = document.getElementById("shopping-list-body");
   shoppingListBody.innerHTML = ""; // Clear the list
@@ -111,18 +118,20 @@ function displayShoppingList() {
   shoppingList.forEach((product, index) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-  <td>${product.name}</td>
-  <td>${product.quantity}</td>
-  <td>$${product.unit_price.toFixed(2)}</td>
-  <td>$${(product.quantity * product.unit_price).toFixed(2)}</td>
-  <td>
-    <button onclick="removeFromShoppingList(${index})" class="button button-remove">Remove</button>
-  </td>
-`;
+      <td>${product.name}</td>
+      <td>${product.quantity}</td>
+      <td>$${product.unitPrice.toFixed(2)}</td> <!-- Changed to unitPrice -->
+      <td>$${(product.quantity * product.unitPrice).toFixed(
+        2
+      )}</td> <!-- Changed to unitPrice -->
+      <td>
+        <button onclick="removeFromShoppingList(${index})" class="button button-remove">Remove</button>
+      </td>
+    `;
     shoppingListBody.appendChild(row);
   });
 
-  calculateTotal();
+  calculateTotal(); // Ensure that the total is recalculated with the correct prices
 }
 
 function removeFromShoppingList(index) {
