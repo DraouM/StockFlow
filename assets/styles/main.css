@@ -26,3 +26,9 @@
 body {
     font-family: var(--font-family);
 }
+
+h2,
+h3 {
+    color: #2c3e50;
+    margin-top: 30px;
+}

@@ -92,3 +92,14 @@
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
 }
+
+.button-remove {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 4px 8px;
+    font-size: 0.9em;
+}
+
+.button-remove:hover {
+    background-color: #e0e0e0;
+}
