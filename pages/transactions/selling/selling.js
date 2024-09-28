@@ -80,6 +80,28 @@ function addToShoppingList() {
   }
 
   displayShoppingList(); // Update the displayed shopping list
+  // Clear the form after adding the product
+  clearForm();
+}
+
+// Function to clear the form fields after adding to the shopping list
+function clearForm() {
+  const productNameInput = document.getElementById("productName");
+  const quantityInput = document.getElementById("quantity");
+  const unitPriceInput = document.getElementById("unitPrice");
+  const totalPriceInput = document.getElementById("totalPrice");
+  const searchInput = document.getElementById("search-input"); // Add the search bar element
+
+  // Reset the form inputs
+  productNameInput.value = "";
+  quantityInput.value = "";
+  unitPriceInput.value = "";
+  totalPriceInput.value = "";
+
+  // Clear the product search bar
+  if (searchInput) {
+    searchInput.value = "";
+  }
 }
 
 function displayShoppingList() {

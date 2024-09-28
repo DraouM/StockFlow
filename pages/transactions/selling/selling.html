@@ -136,6 +136,15 @@
             </button>
           </div>
         </div>
+
+        <!-- Confirm Transaction -->
+        <button
+          type="button button-primary"
+          id="confirm-transaction"
+          class="button button-primary"
+        >
+          Confirm Transaction
+        </button>
       </div>
 
       <div class="client-section">
@@ -186,7 +195,6 @@
                 required
                 readonly
               />
-              <small class="form-text">Enter the name of the Client.</small>
             </div>
 
             <!-- Product Quantity -->
@@ -197,15 +205,20 @@
                 id="clientAddress"
                 name="clientAddress"
                 required
+                readonly
               />
-              <small class="form-text">Enter Client Address.</small>
             </div>
 
             <!-- Client Phone -->
             <div class="form-group">
               <label for="clientPhone">Client Phone</label>
-              <input type="text" id="clientPhone" name="clientPhone" required />
-              <small class="form-text">Enter Client Phone.</small>
+              <input
+                type="text"
+                id="clientPhone"
+                name="clientPhone"
+                required
+                readonly
+              />
             </div>
 
             <!--Client Total Debt -->
@@ -218,7 +231,6 @@
                 required
                 readonly
               />
-              <small class="form-text">Client Debt.</small>
             </div>
 
             <!-- Submit Button -->
@@ -293,6 +305,7 @@
     <script src="selling.js"></script>
     <script src="../../../scripts/common/Searchbar.js"></script>
 
+    <!-- Client form handler -->
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const fetchParties = async (searchTerm) => {
@@ -317,6 +330,8 @@
           const clientPhoneInput = document.getElementById("clientPhone");
           const clientDebtInput = document.getElementById("clientDebt");
 
+          // Store the client ID in the data attribute
+          clientNameInput.dataset.clientId = client.party_id;
           // Populate form inputs with selected product data
           clientNameInput.value = client.name || "";
           clientAddressInput.value = client.address || "";
@@ -333,6 +348,75 @@
           fetchParties, // Fetch function for searching products
           onPartySelected // Callback when a product is selected
         );
+      });
+    </script>
+
+    <!-- Confirm transaction -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const confirmButton = document.getElementById("confirm-transaction");
+        confirmButton.addEventListener("click", confirmTransaction);
+
+        function confirmTransaction() {
+          // Get client details
+          const clientId =
+            document.getElementById("clientName").dataset.clientId; // Assuming you store the client ID in a data attribute
+          const totalAmount = parseFloat(
+            document.getElementById("finalAmount").value
+          );
+          const discount =
+            parseFloat(document.getElementById("discount").value) || 0;
+
+          // Get current date
+          const currentDate = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
+
+          // Create transaction object
+          const transaction = {
+            party_id: parseInt(clientId),
+            total_amount: totalAmount,
+            discount: discount,
+            transaction_date: currentDate,
+            transaction_type: "selling", // Assuming this is a selling transaction
+            notes: "Transaction from web interface",
+          };
+
+          // Log the transaction to console
+          console.log("New Transaction:", transaction);
+
+          // Here you would typically send this data to your backend
+          // For example:
+          // sendTransactionToBackend(transaction);
+
+          // Clear the shopping list and reset forms
+          clearShoppingList();
+          resetForms();
+        }
+
+        function clearShoppingList() {
+          // Clear the shopping list table
+          const shoppingListBody =
+            document.getElementById("shopping-list-body");
+          shoppingListBody.innerHTML = "";
+
+          // Reset total price
+          document.getElementById("total-price").textContent = "Total: $0.00";
+        }
+
+        function resetForms() {
+          // Reset product form
+          document.getElementById("product-details-form").reset();
+
+          // Reset client form
+          document.getElementById("client-details-form").reset();
+
+          // Reset purchase form
+          document.getElementById("purchase-form").reset();
+        }
+
+        // You might want to implement this function to actually send the data to your backend
+        // function sendTransactionToBackend(transaction) {
+        //   // Use fetch or another method to send the data to your server
+        // }
       });
     </script>
   </body>
