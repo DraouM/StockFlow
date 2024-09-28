@@ -102,13 +102,13 @@
             >
           </div>
 
-          <!-- Submit Button -->
+          <!-- ADD to list Button -->
           <button
             type="button"
             onclick="addToShoppingList()"
             class="button button-secondary"
           >
-            Submit
+            Add to List
           </button>
         </form>
 
@@ -139,90 +139,154 @@
       </div>
 
       <div class="client-section">
-        <h2>Clients Searchbar</h2>
-        <!-- Your client search form here -->
-        <div class="search-container">
-          <form id="search-form-client" class="search-form">
-            <input
-              type="text"
-              class="search-input"
-              id="search-input-client"
-              placeholder="Search for a Client"
-              autocomplete="off"
-            />
-            <button type="submit" id="search-btn-client" class="search-btn">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="22"
-                height="23"
-                viewBox="0 0 22 23"
-                fill="none"
-              >
-                <path
-                  d="M16.4998 16.9997L13.2515 13.7513M13.2515 13.7513C13.7728 13.2299 14.1864 12.611 14.4686 11.9298C14.7508 11.2486 14.896 10.5184 14.896 9.7811C14.896 9.04376 14.7508 8.31364 14.4686 7.63243C14.1864 6.95121 13.7728 6.33225 13.2515 5.81087C12.7301 5.28949 12.1111 4.87592 11.4299 4.59375C10.7487 4.31158 10.0186 4.16635 9.28125 4.16635C8.54391 4.16635 7.81379 4.31158 7.13258 4.59375C6.45137 4.87592 5.8324 5.28949 5.31102 5.81087C4.25806 6.86384 3.6665 8.29197 3.6665 9.7811C3.6665 11.2702 4.25806 12.6984 5.31102 13.7513C6.36399 14.8043 7.79213 15.3958 9.28125 15.3958C10.7704 15.3958 12.1985 14.8043 13.2515 13.7513Z"
-                  stroke="#5B5B5B"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
+        <div class="client-info-section">
+          <h2>Clients Searchbar</h2>
+          <!-- Your client search form here -->
+          <div class="search-container">
+            <form id="search-form-client" class="search-form">
+              <input
+                type="text"
+                class="search-input"
+                id="search-input-client"
+                placeholder="Search for a Client"
+                autocomplete="off"
+              />
+              <button type="submit" id="search-btn-client" class="search-btn">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22"
+                  height="23"
+                  viewBox="0 0 22 23"
+                  fill="none"
+                >
+                  <path
+                    d="M16.4998 16.9997L13.2515 13.7513M13.2515 13.7513C13.7728 13.2299 14.1864 12.611 14.4686 11.9298C14.7508 11.2486 14.896 10.5184 14.896 9.7811C14.896 9.04376 14.7508 8.31364 14.4686 7.63243C14.1864 6.95121 13.7728 6.33225 13.2515 5.81087C12.7301 5.28949 12.1111 4.87592 11.4299 4.59375C10.7487 4.31158 10.0186 4.16635 9.28125 4.16635C8.54391 4.16635 7.81379 4.31158 7.13258 4.59375C6.45137 4.87592 5.8324 5.28949 5.31102 5.81087C4.25806 6.86384 3.6665 8.29197 3.6665 9.7811C3.6665 11.2702 4.25806 12.6984 5.31102 13.7513C6.36399 14.8043 7.79213 15.3958 9.28125 15.3958C10.7704 15.3958 12.1985 14.8043 13.2515 13.7513Z"
+                    stroke="#5B5B5B"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </form>
+            <div id="search-results-client" class="search-results hidden">
+              <ul id="results-list-client"></ul>
+            </div>
+          </div>
+
+          <!-- Your client details form here -->
+          <form id="client-details-form" class="client-details-form">
+            <!-- Client Name -->
+            <div class="form-group">
+              <label for="clientName">Client Name</label>
+              <input
+                type="text"
+                id="clientName"
+                name="clientName"
+                required
+                readonly
+              />
+              <small class="form-text">Enter the name of the Client.</small>
+            </div>
+
+            <!-- Product Quantity -->
+            <div class="form-group">
+              <label for="clientAddress">Client Adrress</label>
+              <input
+                type="text"
+                id="clientAddress"
+                name="clientAddress"
+                required
+              />
+              <small class="form-text">Enter Client Address.</small>
+            </div>
+
+            <!-- Client Phone -->
+            <div class="form-group">
+              <label for="clientPhone">Client Phone</label>
+              <input type="text" id="clientPhone" name="clientPhone" required />
+              <small class="form-text">Enter Client Phone.</small>
+            </div>
+
+            <!--Client Total Debt -->
+            <div class="form-group">
+              <label for="clientDebt">Client Debt</label>
+              <input
+                type="number"
+                id="clientDebt"
+                name="clientDebt"
+                required
+                readonly
+              />
+              <small class="form-text">Client Debt.</small>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="button button-secondary">
+              Submit
             </button>
           </form>
-          <div id="search-results-client" class="search-results hidden">
-            <ul id="results-list-client"></ul>
-          </div>
         </div>
 
-        <!-- Your client details form here -->
-        <form id="client-details-form" class="client-details-form">
-          <!-- Client Name -->
-          <div class="form-group">
-            <label for="clientName">Client Name</label>
-            <input
-              type="text"
-              id="clientName"
-              name="clientName"
-              required
-              readonly
-            />
-            <small class="form-text">Enter the name of the Client.</small>
-          </div>
-
-          <!-- Product Quantity -->
-          <div class="form-group">
-            <label for="clientAddress">Client Adrress</label>
-            <input
-              type="text"
-              id="clientAddress"
-              name="clientAddress"
-              required
-            />
-            <small class="form-text">Enter Client Address.</small>
-          </div>
-
-          <!-- Client Phone -->
-          <div class="form-group">
-            <label for="clientPhone">Client Phone</label>
-            <input type="text" id="clientPhone" name="clientPhone" required />
-            <small class="form-text">Enter Client Phone.</small>
-          </div>
-
-          <!--Client Total Debt -->
-          <div class="form-group">
-            <label for="clientDebt">Client Debt</label>
-            <input
-              type="number"
-              id="clientDebt"
-              name="clientDebt"
-              required
-              readonly
-            />
-            <small class="form-text">Client Debt.</small>
-          </div>
-
-          <!-- Submit Button -->
-          <button type="submit" class="button button-secondary">Submit</button>
-        </form>
+        <!-- Payment -->
+        <div class="purchase-section">
+          <h3>Purchase Details</h3>
+          <form id="purchase-form" class="purchase-form">
+            <div class="form-group">
+              <label for="totalAmount">Total Amount</label>
+              <input
+                type="number"
+                id="totalAmount"
+                name="totalAmount"
+                required
+                readonly
+              />
+            </div>
+            <div class="form-group">
+              <label for="discount">Discount</label>
+              <input
+                type="number"
+                id="discount"
+                name="discount"
+                min="0"
+                step="0.01"
+              />
+            </div>
+            <div class="form-group">
+              <label for="finalAmount">Final Amount</label>
+              <input
+                type="number"
+                id="finalAmount"
+                name="finalAmount"
+                required
+                readonly
+              />
+            </div>
+            <div class="form-group">
+              <label for="paymentAmount">Payment Amount</label>
+              <input
+                type="number"
+                id="paymentAmount"
+                name="paymentAmount"
+                required
+                min="0"
+                step="0.01"
+              />
+            </div>
+            <div class="form-group">
+              <label for="remainingDebt">New Total Debt</label>
+              <input
+                type="number"
+                id="remainingDebt"
+                name="remainingDebt"
+                readonly
+              />
+            </div>
+            <button type="submit" class="button button-secondary">
+              Complete Purchase
+            </button>
+          </form>
+        </div>
       </div>
     </div>
 
