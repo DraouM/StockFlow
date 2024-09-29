@@ -345,6 +345,102 @@
       });
     </script>
 
+    <!-- Purchase form handler -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const purchaseForm = document.getElementById("purchase-form");
+        const totalAmountInput = document.getElementById("totalAmount");
+        const discountInput = document.getElementById("discount");
+        const finalAmountInput = document.getElementById("finalAmount");
+        const paymentAmountInput = document.getElementById("paymentAmount");
+        const remainingDebtInput = document.getElementById("remainingDebt");
+        const clientDebtInput = document.getElementById("clientDebt");
+
+        // Update final amount when discount changes
+        discountInput.addEventListener("input", updateFinalAmount);
+
+        // Update remaining debt when payment amount changes
+        paymentAmountInput.addEventListener("input", updateRemainingDebt);
+
+        // Handle form submission
+        purchaseForm.addEventListener("submit", handlePurchaseSubmit);
+
+        function updateFinalAmount() {
+          const totalAmount = parseFloat(totalAmountInput.value) || 0;
+          const discount = parseFloat(discountInput.value) || 0;
+          const finalAmount = Math.max(totalAmount - discount, 0);
+          finalAmountInput.value = finalAmount.toFixed(2);
+          updateRemainingDebt();
+        }
+
+        function updateRemainingDebt() {
+          const finalAmount = parseFloat(finalAmountInput.value) || 0;
+          const paymentAmount = parseFloat(paymentAmountInput.value) || 0;
+          const currentDebt = parseFloat(clientDebtInput.value) || 0;
+          const newDebt = currentDebt + (finalAmount - paymentAmount);
+          remainingDebtInput.value = newDebt.toFixed(2);
+        }
+
+        function handlePurchaseSubmit(event) {
+          event.preventDefault();
+
+          const totalAmount = parseFloat(totalAmountInput.value);
+          const discount = parseFloat(discountInput.value) || 0;
+          const finalAmount = parseFloat(finalAmountInput.value);
+          const paymentAmount = parseFloat(paymentAmountInput.value);
+          const remainingDebt = parseFloat(remainingDebtInput.value);
+
+          if (paymentAmount < finalAmount) {
+            const confirmPurchase = confirm(
+              "The payment amount is less than the final amount. This will increase the client's debt. Do you want to proceed?"
+            );
+            if (!confirmPurchase) {
+              return;
+            }
+          }
+
+          const purchaseDetails = {
+            totalAmount,
+            discount,
+            finalAmount,
+            paymentAmount,
+            remainingDebt,
+          };
+
+          console.log("Purchase completed:", purchaseDetails);
+
+          // Here you would typically send this data to your backend
+          // For example:
+          // sendPurchaseToBackend(purchaseDetails);
+
+          // Reset the form and update related data
+          resetPurchaseForm();
+          updateClientDebt(remainingDebt);
+        }
+
+        function resetPurchaseForm() {
+          purchaseForm.reset();
+          totalAmountInput.value = "0.00";
+          finalAmountInput.value = "0.00";
+          remainingDebtInput.value = clientDebtInput.value;
+        }
+
+        function updateClientDebt(newDebt) {
+          clientDebtInput.value = newDebt.toFixed(2);
+          // You might want to update this in your client object or send to backend as well
+        }
+
+        // Function to set initial total amount (call this when updating shopping list)
+        function setInitialTotalAmount(amount) {
+          totalAmountInput.value = amount.toFixed(2);
+          updateFinalAmount();
+        }
+
+        // Expose this function so it can be called from outside
+        window.setInitialTotalAmount = setInitialTotalAmount;
+      });
+    </script>
+
     <!-- Confirm transaction -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {

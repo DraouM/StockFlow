@@ -62,7 +62,7 @@ function displaySelectedProduct(product) {
 let shoppingList = []; // Array to store selected products
 
 function addToShoppingList() {
-  const quantity = parseInt(document.getElementById("quantity").value, 0);
+  const quantity = parseInt(document.getElementById("quantity").value, 10);
   const unitPrice = parseFloat(document.getElementById("unitPrice").value) || 0;
 
   if (!window.selectedProduct) {
@@ -129,6 +129,13 @@ function displayShoppingList() {
       </td>
     `;
     shoppingListBody.appendChild(row);
+
+    // for the purchase handler
+    const total = shoppingList.reduce(
+      (sum, item) => sum + item.quantity * item.unitPrice,
+      0
+    );
+    window.setInitialTotalAmount(total);
   });
 
   calculateTotal(); // Ensure that the total is recalculated with the correct prices
