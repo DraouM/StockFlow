@@ -34,6 +34,7 @@ class TransactionsModel {
       discount = 0,
       transaction_date,
       transaction_type,
+      settled = 1,
       notes = "",
     } = transaction;
 
@@ -44,8 +45,8 @@ class TransactionsModel {
     }
 
     const sql = `
-      INSERT INTO transactions (party_id, total_amount, discount, transaction_date, transaction_type, notes)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO transactions (party_id, total_amount, discount, transaction_date, transaction_type,settled, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
     const result = await this.runQuery(sql, [
       party_id,
@@ -53,6 +54,7 @@ class TransactionsModel {
       discount,
       transaction_date,
       transaction_type,
+      settled,
       notes,
     ]);
     return result.lastID;

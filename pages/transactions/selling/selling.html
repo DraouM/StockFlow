@@ -413,16 +413,16 @@
           // For example:
           // sendPurchaseToBackend(purchaseDetails);
 
-          // Reset the form and update related data
-          resetPurchaseForm();
+          // Update client debt and reset the form
           updateClientDebt(remainingDebt);
+          resetPurchaseForm();
         }
 
         function resetPurchaseForm() {
           purchaseForm.reset();
-          totalAmountInput.value = "0.00";
           finalAmountInput.value = "0.00";
           remainingDebtInput.value = clientDebtInput.value;
+          // Note: We're not resetting totalAmountInput here
         }
 
         function updateClientDebt(newDebt) {
@@ -467,6 +467,7 @@
             discount: discount,
             transaction_date: currentDate,
             transaction_type: "selling", // Assuming this is a selling transaction
+            settled: 0,
             notes: "Transaction from web interface",
           };
 
@@ -475,7 +476,7 @@
 
           // Here you would typically send this data to your backend
           // For example:
-          // sendTransactionToBackend(transaction);
+          saveDataInDatabase(transaction);
 
           // Clear the shopping list and reset forms
           clearShoppingList();
@@ -504,9 +505,12 @@
         }
 
         // You might want to implement this function to actually send the data to your backend
-        // function sendTransactionToBackend(transaction) {
-        //   // Use fetch or another method to send the data to your server
-        // }
+        async function saveDataInDatabase(newTransaction) {
+          console.log("AA ", newTransaction);
+
+          await window.electronAPI.transactions.create(newTransaction);
+          console.log("transaction created successefully");
+        }
       });
     </script>
   </body>

@@ -19,7 +19,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     getAll: () => ipcRenderer.invoke("transactions-get-all"),
     getById: (id) => ipcRenderer.invoke("transactions-get-by-id", id),
     create: (transactionData) =>
-      ipcRenderer.invoke("transactions:create", transactionData),
+      ipcRenderer.invoke("transactions-create", transactionData),
 
     update: (id, transactionData) => {
       console.log(
