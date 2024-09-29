@@ -32,6 +32,13 @@ body {
     gap: 20px;
 }
 
+.client-info-section,
+.purchase-section {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
 /* Search container */
 .search-container {
@@ -76,13 +83,6 @@ body {
     padding: 10px;
     border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .main-container {
-        grid-template-columns: 1fr;
-    }
 }
 
 
@@ -131,40 +131,6 @@ body {
     font-weight: bold;
 }
 
-
-/*  */
-/* CLIENT SECTION */
-
-.client-section {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.client-info-section,
-.purchase-section {
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.client-info-section h3,
-.purchase-section h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #333;
-}
-
-
-.form-group input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
 .button-secondary {
     grid-column: span 2;
     justify-self: end;
@@ -180,5 +146,12 @@ body {
     .button-secondary {
         grid-column: 1;
         width: 100%;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .main-container {
+        grid-template-columns: 1fr;
     }
 }
