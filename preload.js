@@ -10,7 +10,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     getById: (id) => ipcRenderer.invoke("products:getById", id),
     create: (productData) => ipcRenderer.invoke("products-create", productData),
     update: (id, productData) =>
-      ipcRenderer.invoke("products:update", id, productData),
+      ipcRenderer.invoke("products-update", id, productData),
     delete: (id) => ipcRenderer.invoke("products:delete", id),
     searchProducts: (searchTerm) =>
       ipcRenderer.invoke("products.search", searchTerm), // <--- NEW LINE ADDED HERE
