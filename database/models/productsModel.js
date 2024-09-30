@@ -82,6 +82,8 @@ class ProductModel {
   }
 
   async updateProduct(productId, updates) {
+    console.log("From The Product Model ", productId, updates);
+
     const allowedFields = [
       "name",
       "product_unit",

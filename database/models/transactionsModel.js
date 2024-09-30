@@ -38,26 +38,60 @@ class TransactionsModel {
       notes = "",
     } = transaction;
 
-    if (!party_id || !total_amount || !transaction_type || !transaction_date) {
-      throw new Error("Missing required fields in transaction data");
-    } else {
-      console.log("mliha");
+    console.log("Received transaction data:", transaction);
+
+    // Improved validation
+    const missingFields = [];
+    if (party_id === undefined) missingFields.push("party_id");
+    if (total_amount === undefined) missingFields.push("total_amount");
+    if (!transaction_type) missingFields.push("transaction_type");
+    if (!transaction_date) missingFields.push("transaction_date");
+
+    if (missingFields.length > 0) {
+      throw new Error(
+        `Missing required fields in transaction data: ${missingFields.join(
+          ", "
+        )}`
+      );
+    }
+
+    // Type checking
+    if (typeof party_id !== "number")
+      throw new Error("party_id must be a number");
+    if (typeof total_amount !== "number")
+      throw new Error("total_amount must be a number");
+    if (typeof transaction_type !== "string")
+      throw new Error("transaction_type must be a string");
+    if (
+      !(transaction_date instanceof Date) &&
+      isNaN(Date.parse(transaction_date))
+    ) {
+      throw new Error(
+        "transaction_date must be a valid date string or Date object"
+      );
     }
 
     const sql = `
-      INSERT INTO transactions (party_id, total_amount, discount, transaction_date, transaction_type,settled, notes)
+      INSERT INTO transactions (party_id, total_amount, discount, transaction_date, transaction_type, settled, notes)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const result = await this.runQuery(sql, [
-      party_id,
-      total_amount,
-      discount,
-      transaction_date,
-      transaction_type,
-      settled,
-      notes,
-    ]);
-    return result.lastID;
+
+    try {
+      const result = await this.runQuery(sql, [
+        party_id,
+        total_amount,
+        discount,
+        transaction_date,
+        transaction_type,
+        settled,
+        notes,
+      ]);
+      console.log("Transaction created successfully. ID:", result.lastID);
+      return result.lastID;
+    } catch (error) {
+      console.error("Error executing SQL query:", error);
+      throw new Error(`Failed to create transaction: ${error.message}`);
+    }
   }
 
   // Get a transaction by ID
