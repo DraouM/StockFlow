@@ -8,11 +8,12 @@
     <link rel="stylesheet" href="selling.css" />
   </head>
   <body>
-    <h1>Selling Page</h1>
+    <header>
+      <!-- HTML -->
+      <a href="../transactions.html" id="back-button"> back </a>
 
-    <a href="../transactions.html" class="button button-primary button-medium">
-      back
-    </a>
+      <h1>Selling Page</h1>
+    </header>
 
     <!-- CLIENT  -->
     <h2>Products Searchbar</h2>
@@ -369,6 +370,9 @@
           const totalAmount = parseFloat(totalAmountInput.value) || 0;
           const discount = parseFloat(discountInput.value) || 0;
           const finalAmount = Math.max(totalAmount - discount, 0);
+
+          console.log("FINAL AMount ", finalAmount);
+
           finalAmountInput.value = finalAmount.toFixed(2);
           updateRemainingDebt();
         }
@@ -432,7 +436,11 @@
 
         // Function to set initial total amount (call this when updating shopping list)
         function setInitialTotalAmount(amount) {
+          console.log("SETINITIAL ", amount);
+
           totalAmountInput.value = amount.toFixed(2);
+          console.log("DONE");
+
           updateFinalAmount();
         }
 
@@ -504,12 +512,77 @@
           document.getElementById("purchase-form").reset();
         }
 
-        // You might want to implement this function to actually send the data to your backend
         async function saveDataInDatabase(newTransaction) {
-          console.log("AA ", newTransaction);
+          try {
+            console.log("Transaction data to be saved:", newTransaction);
 
-          await window.electronAPI.transactions.create(newTransaction);
-          console.log("transaction created successefully");
+            // Validate transaction data
+            const requiredFields = [
+              "party_id",
+              "total_amount",
+              "transaction_date",
+              "transaction_type",
+            ];
+            for (const field of requiredFields) {
+              if (!(field in newTransaction)) {
+                throw new Error(
+                  `Missing required field in transaction data: ${field}`
+                );
+              }
+            }
+
+            // Create transaction
+            const transactionId = await window.electronAPI.transactions.create(
+              newTransaction
+            );
+            console.log(
+              "Transaction created successfully with ID:",
+              transactionId
+            );
+
+            // Get current shopping list
+            const currentShoppingList = getShoppingList();
+            console.log("Current Shopping List:", currentShoppingList);
+
+            // Prepare the shopping list with updated quantities
+            const updatedShoppingList = currentShoppingList.map((item) => ({
+              productId: item.productId,
+              newStockQuantity: item.stockQuantity - item.quantityPurchased,
+            }));
+
+            console.log("Updated Shopping List:", updatedShoppingList);
+
+            // Update product quantities
+            await updateProductsQuantity(updatedShoppingList);
+            console.log("Purchase completed and product quantities updated");
+
+            // Return the transaction ID
+            return transactionId;
+          } catch (error) {
+            console.error("Error in saveDataInDatabase:", error);
+            throw error; // Re-throw the error for the caller to handle
+          }
+        }
+
+        async function updateProductsQuantity(shoppingList) {
+          try {
+            for (const item of shoppingList) {
+              console.log("Item ", item);
+
+              const updates = {
+                stock_quantity: item.newStockQuantity,
+              };
+
+              console.log("Product ", item.productId, updates);
+
+              await window.electronAPI.products.update(item.productId, updates);
+              console.log(`Updated quantity for product ${item.productId}`);
+            }
+            console.log("All product quantities updated successfully");
+          } catch (error) {
+            console.error("Error updating product quantities:", error);
+            throw error;
+          }
         }
       });
     </script>

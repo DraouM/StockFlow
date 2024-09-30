@@ -60,13 +60,36 @@ function displaySelectedProduct(product) {
 
 // Adding Selected Product to a Shopping List
 let shoppingList = []; // Array to store selected products
+function getShoppingList() {
+  console.log("Shopping List AA ", shoppingList);
+
+  return shoppingList.map((item) => ({
+    productId: item.id,
+    stockQuantity: item.stock_quantity,
+    quantityPurchased: item.quantityPurchased,
+    newStockQuantity: item.stock_quantity - item.quantityPurchased,
+  }));
+}
 
 function addToShoppingList() {
-  const quantity = parseInt(document.getElementById("quantity").value, 10);
+  const quantityPurchased = parseInt(
+    document.getElementById("quantity").value,
+    10
+  );
   const unitPrice = parseFloat(document.getElementById("unitPrice").value) || 0;
 
   if (!window.selectedProduct) {
     alert("Please select a product first.");
+    return;
+  }
+
+  if (isNaN(quantityPurchased) || quantityPurchased <= 0) {
+    alert("Please enter a valid quantity.");
+    return;
+  }
+
+  if (isNaN(unitPrice) || unitPrice < 0) {
+    alert("Please enter a valid unit price.");
     return;
   }
   // Check if the product with the same price is already in the shopping list
@@ -77,12 +100,12 @@ function addToShoppingList() {
 
   if (existingProduct) {
     // Update the quantity of the existing product
-    existingProduct.quantity += quantity;
+    existingProduct.quantityPurchased += quantityPurchased;
   } else {
     // Add the product to the shopping list with the selected quantity
     shoppingList.push({
       ...window.selectedProduct,
-      quantity: quantity,
+      quantityPurchased: quantityPurchased,
       unitPrice: unitPrice, // Ensure to store the current unit price and price
     });
   }
@@ -115,13 +138,17 @@ function displayShoppingList() {
   const shoppingListBody = document.getElementById("shopping-list-body");
   shoppingListBody.innerHTML = ""; // Clear the list
 
+  console.log("Shopping List", shoppingList);
+
   shoppingList.forEach((product, index) => {
     const row = document.createElement("tr");
+    console.log("Product", index, product);
+
     row.innerHTML = `
       <td>${product.name}</td>
-      <td>${product.quantity}</td>
+      <td>${product.quantityPurchased}</td>
       <td>$${product.unitPrice.toFixed(2)}</td> <!-- Changed to unitPrice -->
-      <td>$${(product.quantity * product.unitPrice).toFixed(
+      <td>$${(product.quantityPurchased * product.unitPrice).toFixed(
         2
       )}</td> <!-- Changed to unitPrice -->
       <td>
@@ -131,10 +158,23 @@ function displayShoppingList() {
     shoppingListBody.appendChild(row);
 
     // for the purchase handler
-    const total = shoppingList.reduce(
-      (sum, item) => sum + item.quantity * item.unitPrice,
-      0
-    );
+
+    // Improved code with error checking
+    const total = shoppingList.reduce((sum, item) => {
+      const quantity = Number(item.quantityPurchased);
+      const price = Number(item.unitPrice);
+
+      if (isNaN(quantity) || isNaN(price)) {
+        console.error("Invalid data:", item);
+        return sum; // Skip this item
+      }
+
+      return sum + quantity * price;
+    }, 0);
+
+    console.log("Total:", total.toFixed(2)); // Format to 2 decimal places
+    console.log("Total ", total);
+
     window.setInitialTotalAmount(total);
   });
 
@@ -148,12 +188,13 @@ function removeFromShoppingList(index) {
 
 function calculateTotal() {
   const total = shoppingList.reduce(
-    (sum, product) => sum + product.quantity * product.unit_price,
+    (sum, product) => sum + product.quantityPurchased * product.unit_price,
     0
   );
   document.getElementById("total-price").textContent = `Total: $${total.toFixed(
     2
   )}`;
+  console.log("Total from calculateTotal ", total);
 }
 
 function clearShoppingList() {
@@ -172,7 +213,7 @@ displayShoppingList();
 function calculateTotal() {
   // Call this function inside displayShoppingList() to update the total price
   const total = shoppingList.reduce(
-    (acc, product) => acc + product.quantity * product.unit_price,
+    (acc, product) => acc + product.quantityPurchased * product.unit_price,
     0
   );
   document.getElementById(

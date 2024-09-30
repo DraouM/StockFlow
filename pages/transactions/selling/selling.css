@@ -8,6 +8,46 @@ body {
     padding: 20px;
 }
 
+header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Back Button with Slash Icon */
+#back-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 20px;
+    text-decoration: none;
+    color: #007bff;
+    background-color: transparent;
+    border: none;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+#back-button::before {
+    content: "\2190";
+    /* Unicode for left arrow */
+    margin-right: 8px;
+    /* Space between icon and text */
+}
+
+#back-button:hover {
+    color: #0056b3;
+    /* Change color on hover */
+    transform: translateX(-2px);
+    /* Slight left movement on hover */
+}
+
+#back-button:active {
+    color: #004494;
+    transform: translateX(0);
+    /* Reset movement on click */
+}
+
+
+
 /* Main container */
 .main-container {
     display: flex;
