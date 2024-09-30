@@ -41,11 +41,11 @@ exports.searchProducts = async (searchTerm) => {
   }
 }; //  exports.searchProducts = async ()=>{...}  //  exports.search
 
-// exports.updateProduct = async (event, productId, productData) => {
-//   try {
-//     return await productModel.updateProduct(productId, productData);
-//     } catch (error) {
-//       console.error(`Error updating product ${productId}:`, error);
-//       throw error;
-//       }
-// }
+exports.updateProduct = async (productId, productData) => {
+  try {
+    return await productModel.updateProduct(productId, productData);
+  } catch (error) {
+    console.error(`Error updating product ${productId}:`, error);
+    throw error;
+  }
+};
