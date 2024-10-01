@@ -10,6 +10,10 @@
   <body>
     <h1>Buying Page</h1>
 
+    <button data-modal="newProductModal" class="button button-secondary">
+      Create New Product
+    </button>
+
     <main class="main-container">
       <section class="product-section">
         <!-- Your product search form here -->
@@ -293,7 +297,120 @@
       </section>
     </main>
 
+    <!-- CHECK LATER !! -->
+    <div id="newProductModal" class="modal">
+      <form id="newProductForm" class="modal-content">
+        <span class="close">&times;</span>
+        <div class="form-group">
+          <label for="productName">Product Name</label>
+          <input
+            type="text"
+            id="productName"
+            name="productName"
+            value="kokaw"
+            required
+          />
+          <small class="form-text">Enter the name of the product.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="productTaxes">Taxes (%)</label>
+          <input
+            type="number"
+            id="productTaxes"
+            name="productTaxes"
+            step="0.01"
+            min="0"
+            value="1.2"
+          />
+          <small class="form-text">
+            Enter the applicable tax percentage.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="subunitsInUnit">Subunits in 1 Unit</label>
+          <input
+            type="text"
+            id="subunitsInUnit"
+            name="subunitsInUnit"
+            placeholder="e.g., 1 box contains 8 bottles"
+            value="6"
+            required
+          />
+          <small class="form-text">
+            Specify the number of subunits (e.g., bottles) in one unit (e.g.,
+            box).
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="productDescription">Description (Optional)</label>
+          <textarea
+            id="productDescription"
+            name="productDescription"
+            placeholder="Product first creation"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <button
+          type="submit"
+          onclick="createNewProduct()"
+          class="button button-secondary"
+        >
+          Add Product
+        </button>
+      </form>
+    </div>
+
     <script src="../../../scripts/common/Searchbar.js"></script>
+    <script src="../../../assets/js/modal.js"></script>
     <script src="buying.js"></script>
+
+    <!-- Handle the creation of new product -->
+    <script>
+      document
+        .getElementById("newProductForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault(); // Prevent the default form submission
+
+          // Collect the product data
+          const productName = document.getElementById("productName").value;
+          const productTaxes =
+            parseFloat(document.getElementById("productTaxes").value) || 0;
+          const subunitsInUnit = parseInt(
+            document.getElementById("subunitsInUnit").value
+          );
+          const productDescription =
+            document.getElementById("productDescription").value || "";
+
+          // Create the product data object
+          const productData = {
+            productName: productName,
+            taxes: productTaxes,
+            subunitsInUnit: subunitsInUnit,
+            // description: productDescription, -- ADD LATER WHEN CREATING THE PROFUCT HISTORY
+          };
+
+          console.log("ProductData ", productData);
+
+          try {
+            const result = await window.electronAPI.products.create(
+              productData
+            );
+
+            if (result.success) {
+              console.log("Product created successfully with ID:", result.id);
+              document.getElementById("newProductForm").reset();
+              document.getElementById("newProductModal").style.display = "none";
+            } else {
+              console.error("Failed to create product:", result.error);
+            }
+          } catch (error) {
+            console.error("Error creating product:", error);
+          }
+        });
+    </script>
   </body>
 </html>
