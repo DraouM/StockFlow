@@ -186,17 +186,6 @@ function removeFromShoppingList(index) {
   displayShoppingList();
 }
 
-function calculateTotal() {
-  const total = shoppingList.reduce(
-    (sum, product) => sum + product.quantityPurchased * product.unit_price,
-    0
-  );
-  document.getElementById("total-price").textContent = `Total: $${total.toFixed(
-    2
-  )}`;
-  console.log("Total from calculateTotal ", total);
-}
-
 function clearShoppingList() {
   shoppingList = [];
   displayShoppingList();
@@ -225,6 +214,7 @@ function removeFromShoppingList(index) {
   shoppingList.splice(index, 1); // Remove the product from the shopping list
   displayShoppingList(); // Update the displayed list
 }
+
 function selectProductFromSearch(product) {
   displayProductInfo(product);
 }
