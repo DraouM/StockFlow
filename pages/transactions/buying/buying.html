@@ -142,20 +142,20 @@
         </button>
       </section>
 
-      <section class="client-section">
-        <div class="client-info-section">
-          <h2>Buyer Searchbar</h2>
-          <!-- Your client search form here -->
+      <section class="supplier-section">
+        <div class="supplier-info-section">
+          <h2>Supplier Searchbar</h2>
+          <!-- Your supplier search form here -->
           <div class="search-container">
-            <form id="search-form-client" class="search-form">
+            <form id="search-form-supplier" class="search-form">
               <input
                 type="text"
                 class="search-input"
-                id="search-input-client"
-                placeholder="Search for a Client"
+                id="search-input-supplier"
+                placeholder="Search for a supplier"
                 autocomplete="off"
               />
-              <button type="submit" id="search-btn-client" class="search-btn">
+              <button type="submit" id="search-btn-supplier" class="search-btn">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="22"
@@ -173,20 +173,20 @@
                 </svg>
               </button>
             </form>
-            <div id="search-results-client" class="search-results hidden">
-              <ul id="results-list-client"></ul>
+            <div id="search-results-supplier" class="search-results hidden">
+              <ul id="results-list-supplier"></ul>
             </div>
           </div>
 
-          <!-- Your client details form here -->
-          <form id="client-details-form" class="client-details-form">
-            <!-- Client Name -->
+          <!-- Your supplier details form here -->
+          <form id="supplier-details-form" class="supplier-details-form">
+            <!-- supplier Name -->
             <div class="form-group">
-              <label for="clientName">Client Name</label>
+              <label for="supplierName">supplier Name</label>
               <input
                 type="text"
-                id="clientName"
-                name="clientName"
+                id="supplierName"
+                name="supplierName"
                 required
                 readonly
               />
@@ -194,35 +194,35 @@
 
             <!-- Product Quantity -->
             <div class="form-group">
-              <label for="clientAddress">Client Adrress</label>
+              <label for="supplierAddress">supplier Adrress</label>
               <input
                 type="text"
-                id="clientAddress"
-                name="clientAddress"
+                id="supplierAddress"
+                name="supplierAddress"
                 required
                 readonly
               />
             </div>
 
-            <!-- Client Phone -->
+            <!-- supplier Phone -->
             <div class="form-group">
-              <label for="clientPhone">Client Phone</label>
+              <label for="supplierPhone">supplier Phone</label>
               <input
                 type="text"
-                id="clientPhone"
-                name="clientPhone"
+                id="supplierPhone"
+                name="supplierPhone"
                 required
                 readonly
               />
             </div>
 
-            <!--Client Total Debt -->
+            <!--supplier Total Debt -->
             <div class="form-group">
-              <label for="clientDebt">Client Debt</label>
+              <label for="supplierDebt">supplier Debt</label>
               <input
                 type="number"
-                id="clientDebt"
-                name="clientDebt"
+                id="supplierDebt"
+                name="supplierDebt"
                 required
                 readonly
               />
@@ -412,6 +412,53 @@
             console.error("Error creating product:", error);
           }
         });
+    </script>
+
+    <!-- supplier form handler -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const fetchParties = async (searchTerm) => {
+          return await window.electronAPI.parties.searchParty(
+            "supplier",
+            searchTerm
+          );
+        };
+
+        const onPartySelected = (selectedSupplier) => {
+          console.log("Supplier selected:", selectedSupplier);
+          // You can add custom behavior for what happens when a product is selected.
+          // For example, you might want to fill another input field or redirect the user.
+          displaySelectedSupplier(selectedSupplier);
+        };
+
+        // Form handler
+        function displaySelectedSupplier(supplier) {
+          // Get form input elements
+          const supplierNameInput = document.getElementById("supplierName");
+          const supplierAddressInput =
+            document.getElementById("supplierAddress");
+          const supplierPhoneInput = document.getElementById("supplierPhone");
+          const supplierDebtInput = document.getElementById("supplierDebt");
+
+          // Store the supplier ID in the data attribute
+          supplierNameInput.dataset.supplierId = supplier.party_id;
+          // Populate form inputs with selected product data
+          supplierNameInput.value = supplier.name || "";
+          supplierAddressInput.value = supplier.address || "";
+          supplierPhoneInput.value = supplier.phone || "";
+          supplierDebtInput.value = supplier.total_debt || 0.0;
+        }
+
+        // Create an instance of the Searchbar class
+        const supplierSearchbar = new Searchbar(
+          "search-input-supplier", // Input field ID
+          "results-list-supplier", // Results list ID
+          "search-form-supplier", // Search form ID
+          "search-results-supplier", // Results div ID
+          fetchParties, // Fetch function for searching products
+          onPartySelected // Callback when a product is selected
+        );
+      });
     </script>
   </body>
 </html>
