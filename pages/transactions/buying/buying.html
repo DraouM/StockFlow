@@ -302,11 +302,11 @@
       <form id="newProductForm" class="modal-content">
         <span class="close">&times;</span>
         <div class="form-group">
-          <label for="productName">Product Name</label>
+          <label for="productDesignation">Product Name</label>
           <input
             type="text"
-            id="productName"
-            name="productName"
+            id="productDesignation"
+            name="productDesignation"
             value="kokaw"
             required
           />
@@ -376,7 +376,8 @@
           e.preventDefault(); // Prevent the default form submission
 
           // Collect the product data
-          const productName = document.getElementById("productName").value;
+          const productDesignation =
+            document.getElementById("productDesignation").value;
           const productTaxes =
             parseFloat(document.getElementById("productTaxes").value) || 0;
           const subunitsInUnit = parseInt(
@@ -387,7 +388,7 @@
 
           // Create the product data object
           const productData = {
-            productName: productName,
+            productName: productDesignation,
             taxes: productTaxes,
             subunitsInUnit: subunitsInUnit,
             // description: productDescription, -- ADD LATER WHEN CREATING THE PROFUCT HISTORY
