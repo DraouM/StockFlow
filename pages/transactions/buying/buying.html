@@ -14,6 +14,112 @@
       Create New Product
     </button>
 
+    <div class="product-form">
+      <h2>Product Information</h2>
+      <form id="product-details-form">
+        <div class="form-section">
+          <div class="form-group">
+            <label for="productName">Product Name</label>
+            <input type="text" id="productName" name="productName" required />
+          </div>
+          <div class="form-group">
+            <label for="quantityInUnit">Quantity (In Unit)</label>
+            <input
+              type="number"
+              id="quantityInUnit"
+              name="quantityInUnit"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="quantityInSubUnit">Quantity (In Subunit)</label>
+            <input
+              type="number"
+              id="quantityInSubUnit"
+              name="quantityInSubUnit"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-section buying-section">
+          <h3>Buying Information</h3>
+          <div class="form-group">
+            <label for="buyingPrice">Buying Price</label>
+            <input
+              type="number"
+              id="buyingPrice"
+              name="buyingPrice"
+              step="0.01"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="buyingTax">Buying Tax (%)</label>
+            <input
+              type="number"
+              id="buyingTax"
+              name="buyingTax"
+              step="0.01"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="totalBuyingPrice">Total Buying Price</label>
+            <input
+              type="number"
+              id="totalBuyingPrice"
+              name="totalBuyingPrice"
+              readonly
+            />
+          </div>
+        </div>
+
+        <div class="form-section selling-section">
+          <h3>Selling Information</h3>
+          <div class="form-group">
+            <label for="sellingPrice">Selling Price</label>
+            <input
+              type="number"
+              id="sellingPrice"
+              name="sellingPrice"
+              step="0.01"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="sellingTax">Selling Tax (%)</label>
+            <input
+              type="number"
+              id="sellingTax"
+              name="sellingTax"
+              step="0.01"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="totalSellingPrice">Total Selling Price</label>
+            <input
+              type="number"
+              id="totalSellingPrice"
+              name="totalSellingPrice"
+              readonly
+            />
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button
+            type="button"
+            class="button button-secondary"
+            onclick="addToPurchaseList()"
+          >
+            Add to Purchase List
+          </button>
+        </div>
+      </form>
+    </div>
+
     <main class="main-container">
       <section class="product-section">
         <!-- Your product search form here -->
@@ -459,6 +565,52 @@
           onPartySelected // Callback when a product is selected
         );
       });
+    </script>
+
+    <!-- The new product form implemnetaion -->
+    <script>
+      // Function to calculate total prices
+      function calculateTotals() {
+        const quantity =
+          parseFloat(document.getElementById("quantity").value) || 0;
+        const buyingPrice =
+          parseFloat(document.getElementById("buyingPrice").value) || 0;
+        const buyingTax =
+          parseFloat(document.getElementById("buyingTax").value) || 0;
+        const sellingPrice =
+          parseFloat(document.getElementById("sellingPrice").value) || 0;
+        const sellingTax =
+          parseFloat(document.getElementById("sellingTax").value) || 0;
+
+        const totalBuyingPrice = quantity * buyingPrice * (1 + buyingTax / 100);
+        const totalSellingPrice =
+          quantity * sellingPrice * (1 + sellingTax / 100);
+
+        document.getElementById("totalBuyingPrice").value =
+          totalBuyingPrice.toFixed(2);
+        document.getElementById("totalSellingPrice").value =
+          totalSellingPrice.toFixed(2);
+      }
+
+      // Add event listeners to input fields
+      const inputFields = [
+        "quantity",
+        "buyingPrice",
+        "buyingTax",
+        "sellingPrice",
+        "sellingTax",
+      ];
+      inputFields.forEach((fieldId) => {
+        document
+          .getElementById(fieldId)
+          .addEventListener("input", calculateTotals);
+      });
+
+      // Placeholder function for adding to purchase list
+      function addToPurchaseList() {
+        // Implement your logic here
+        alert("Product added to purchase list");
+      }
     </script>
   </body>
 </html>
