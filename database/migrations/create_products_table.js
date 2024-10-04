@@ -1,5 +1,5 @@
 const { openConnection, closeConnection } = require("../config/connection");
-
+// add product history
 class ProductDatabase {
   constructor() {
     this.db = openConnection();
