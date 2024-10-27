@@ -3,10 +3,7 @@ const path = require("path");
 
 module.exports = {
   // Database file path
-  dbPath: path.join(
-    process.env.APPDATA || process.env.HOME,
-    "your_app_name.db"
-  ),
+  dbPath: path.join(process.env.APPDATA || process.env.HOME, "inventory.db"),
 
   // SQLite options
   options: {
