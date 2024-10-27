@@ -1,35 +1,73 @@
-const PartiesModel = require("../models/partiesModel");
+// seeds/seedParty.js
+const PartiesModel = require("../models/PartiesModel");
 
-// Example usage
-const parties = new PartiesModel();
+const seedData = [
+  {
+    name: "ABC Corporation",
+    type: "customer",
+    phone: "123-456-7890",
+    address: "456 Customer Ave",
+    credit_balance: 1000,
+  },
+  {
+    name: "XYZ Suppliers",
+    type: "supplier",
+    phone: "098-765-4321",
+    address: "789 Supplier Blvd",
+    credit_balance: -500,
+  },
+  {
+    name: "General Trading Co",
+    type: "both",
+    phone: "555-123-4567",
+    address: "123 Trading Street",
+    credit_balance: 750,
+  },
+  {
+    name: "Quick Logistics",
+    type: "supplier",
+    phone: "555-987-6543",
+    address: "321 Logistics Avenue",
+    credit_balance: -250,
+  },
+  {
+    name: "Retail Giants",
+    type: "customer",
+    phone: "555-246-8135",
+    address: "789 Retail Road",
+    credit_balance: 1500,
+  },
+];
 
-// Create a new party
-// parties
-//   .createParty({
-//     name: "Amine",
-//     phone: "5466889552",
-//     email: "amine@gmail.com",
-//     address: "658 second St",
-//     party_type: "supplier",
-//   })
-//   .then(() => {
-//     console.log("New party created.");
-//   })
-//   .catch((err) => {
-//     console.error("Error creating party:", err);
-//   });
+async function seedParties() {
+  const partiesModel = new PartiesModel();
 
-// Function to get total debt for a specific party
-async function getPartyTotalDebt(party_id) {
   try {
-    const totalDebt = await parties.getTotalDebt(party_id);
-    console.log(`Total debt for party with ID ${party_id}: ${totalDebt}`);
+    console.log("Starting to seed parties...");
+
+    // Drop existing data
+    await partiesModel.runQuery(
+      "DELETE FROM parties",
+      [],
+      "Cleared existing parties",
+      "Error clearing parties"
+    );
+
+    // Insert seed data
+    for (const party of seedData) {
+      await partiesModel.create(party);
+    }
+
+    console.log("Successfully seeded parties data");
   } catch (error) {
-    console.error("Error fetching total debt:", error);
+    console.error("Error seeding parties:", error);
+    throw error;
   } finally {
-    parties.closeConnection(); // Always close the connection
+    partiesModel.closeConnection();
   }
 }
 
-// Example: Fetch total debt for party with ID 1
-getPartyTotalDebt(4);
+module.exports = {
+  seedParties,
+  seedData, // Export seed data for testing purposes
+};
