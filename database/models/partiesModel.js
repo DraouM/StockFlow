@@ -1,4 +1,7 @@
-const { openConnection, closeConnection } = require("../config/connection");
+const {
+  openConnection,
+  closeConnection: dbCloseConnection,
+} = require("../config/connection");
 
 class PartiesModel {
   constructor() {
@@ -263,7 +266,11 @@ class PartiesModel {
   // Close database connection
   closeConnection() {
     try {
-      closeConnection();
+      if (this.isConnected) {
+        dbCloseConnection();
+        this.isConnected = false;
+        console.log("Database connection closed.");
+      }
     } catch (error) {
       console.error("Error closing database connection:", error.message);
       throw error;

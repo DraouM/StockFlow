@@ -81,7 +81,6 @@ async function runTests() {
   } finally {
     // Only close the connection after all tests are complete
     partiesModel.closeConnection();
-    console.log("Database connection closed.");
   }
 }
 
