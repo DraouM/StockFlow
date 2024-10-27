@@ -1,5 +1,5 @@
 // seeds/seedParty.js
-const PartiesModel = require("../models/PartiesModel");
+const PartiesModel = require("../models/partiesModel");
 
 const seedData = [
   {
@@ -39,9 +39,7 @@ const seedData = [
   },
 ];
 
-async function seedParties() {
-  const partiesModel = new PartiesModel();
-
+async function seedParties(partiesModel) {
   try {
     console.log("Starting to seed parties...");
 
@@ -62,8 +60,6 @@ async function seedParties() {
   } catch (error) {
     console.error("Error seeding parties:", error);
     throw error;
-  } finally {
-    partiesModel.closeConnection();
   }
 }
 
