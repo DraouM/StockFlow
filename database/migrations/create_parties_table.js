@@ -7,7 +7,8 @@ class PartiesDB {
 
   runQuery(query, successMessage, errorMessage) {
     return new Promise((resolve, reject) => {
-      this.db.run(query, (err) => {
+      this.db.exec(query, (err) => {
+        // Changed from run to exec for multiple statements
         if (err) {
           console.error(`${errorMessage}:`, err.message);
           reject(err);
@@ -20,45 +21,43 @@ class PartiesDB {
   }
 
   async createPartiesTable() {
-    const tableQuery = `
-      CREATE TABLE IF NOT EXISTS Parties (
-        party_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        phone TEXT UNIQUE,
-        email TEXT UNIQUE,
-        address TEXT,
-        party_type TEXT CHECK(party_type IN ('client', 'supplier')) NOT NULL,
-        total_debt DECIMAL(10, 2) DEFAULT 0,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-      );
-    `;
+    // Separate DROP and CREATE statements
+    const dropQuery = `DROP TABLE IF EXISTS parties;`;
 
-    const triggerQuery = `
-      CREATE TRIGGER IF NOT EXISTS update_party_timestamp
-      AFTER UPDATE ON Parties
-      FOR EACH ROW
-      BEGIN
-        UPDATE Parties SET updated_at = CURRENT_TIMESTAMP WHERE party_id = OLD.party_id;
-      END;
+    const createTableQuery = `
+      CREATE TABLE IF NOT EXISTS parties (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE,
+        type TEXT NOT NULL CHECK (type IN ('customer', 'supplier', 'both')),
+        credit_balance REAL DEFAULT 0,
+        phone TEXT,
+        address TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `;
 
     const indexQuery = `
-      CREATE INDEX IF NOT EXISTS idx_party_name ON Parties(name);
-      CREATE INDEX IF NOT EXISTS idx_party_type ON Parties(party_type);
+      CREATE INDEX IF NOT EXISTS idx_party_name ON parties(name);
+      CREATE INDEX IF NOT EXISTS idx_party_type ON parties(type);  -- Fixed column name
+      CREATE INDEX IF NOT EXISTS idx_party_balance ON parties(credit_balance);
+      CREATE INDEX IF NOT EXISTS idx_party_timestamp ON parties(updated_at);
     `;
 
     try {
+      // Execute queries in sequence
       await this.runQuery(
-        tableQuery,
+        dropQuery,
+        "Old parties table dropped successfully.",
+        "Error dropping old parties table"
+      );
+
+      await this.runQuery(
+        createTableQuery,
         "Parties table created successfully.",
         "Error creating Parties table"
       );
-      await this.runQuery(
-        triggerQuery,
-        "Trigger for Parties table created successfully.",
-        "Error creating trigger for Parties table"
-      );
+
       await this.runQuery(
         indexQuery,
         "Indexes for Parties table created successfully.",
@@ -66,6 +65,7 @@ class PartiesDB {
       );
     } catch (error) {
       console.error("Failed to set up the parties database:", error);
+      throw error; // Re-throw to handle in calling code
     }
   }
 
@@ -74,8 +74,16 @@ class PartiesDB {
   }
 }
 
-// Instantiate the PartyDB class and create the table
+// Instantiate and run with proper error handling
 const partiesDB = new PartiesDB();
-partiesDB.createPartiesTable().finally(() => {
-  partiesDB.closeConnection();
-});
+partiesDB
+  .createPartiesTable()
+  .then(() => {
+    console.log("Database setup completed successfully");
+  })
+  .catch((error) => {
+    console.error("Database setup failed:", error);
+  })
+  .finally(() => {
+    partiesDB.closeConnection();
+  });
