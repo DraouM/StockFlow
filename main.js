@@ -10,7 +10,7 @@ const {
   updateProduct,
   deleteProduct,
   searchProducts,
-} = require("./ipc/productHandlers");
+} = require("./controllers/productController");
 
 // Import Transaction handlers
 const {
@@ -23,16 +23,7 @@ const {
   getTotalAmountByType,
   settleTransaction,
   getUnsettledTransactions,
-} = require("./ipc/transactionHandlers");
-const {
-  getAllParties,
-  getPartyById,
-  createParty,
-  updateParty,
-  deleteParty,
-  getPartyTotalDebt,
-  searchParty,
-} = require("./ipc/partyHandlers");
+} = require("./controllers/transactionController");
 
 // Create a new BrowserWindow when `app` is ready
 function createWindow() {
@@ -46,7 +37,7 @@ function createWindow() {
 
   // Load a specific page (you can change it to index.html or another page)
   win.loadFile(
-    "/home/mohamed/Documents/Projects/StockFlow/pages/transactions/selling/selling.html"
+    "/home/mohamed/Documents/Projects/StockFlow/pages/clients/client.html"
   );
 
   // Optionally, open DevTools for debugging
@@ -119,22 +110,9 @@ ipcMain.handle("transactions-get-unsettled", (event, partyId) =>
   getUnsettledTransactions(partyId)
 );
 
-// Parties IPC Handlers
-ipcMain.handle("parties-get-all", getAllParties);
-ipcMain.handle("parties-get-by-id", (event, partyId) =>
-  getPartyById(event, partyId)
-);
-ipcMain.handle("create", (event, partyData) => createParty(event, partyData));
-ipcMain.handle("update", (event, id, partyData) =>
-  updateParty(event, id, partyData)
-);
-ipcMain.handle("delete", (event, id) => deleteParty(event, id));
-ipcMain.handle("parties-get-total-debt", (event, partyId) =>
-  getPartyTotalDebt(event, partyId)
-);
-ipcMain.handle("search", (event, partyType, searchTerm) =>
-  searchParty(event, partyType, searchTerm)
-);
+const { setupPartiesIPC } = require("./IPCs/partiesIPC_setup"); //path-to-ipc-setup
+// Call this after creating your electron window
+setupPartiesIPC();
 
 // Optional: Handle graceful shutdowns
 // process.on('SIGINT', () => {
