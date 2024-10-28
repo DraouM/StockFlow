@@ -67,3 +67,17 @@ contextBridge.exposeInMainWorld("electronAPI", {
       ipcRenderer.invoke("search", partyType, searchTerm), // <--- NEW LINE ADDED HERE
   },
 });
+
+// Expose parties API to renderer process
+contextBridge.exposeInMainWorld("partiesAPI", {
+  getAllParties: (req) => ipcRenderer.invoke("parties:getAll", req),
+  getPartyById: (partyId) => ipcRenderer.invoke("parties:getById", partyId),
+  createParty: (partyData) => ipcRenderer.invoke("parties:create", partyData),
+  updateParty: (partyId, updateData) =>
+    ipcRenderer.invoke("parties:update", { partyId, updateData }),
+  deleteParty: (partyId) => ipcRenderer.invoke("parties:delete", partyId),
+  searchParties: (req) => ipcRenderer.invoke("parties:search", req),
+  getPartiesByType: (req) => ipcRenderer.invoke("parties:getByType", req),
+  getPartyDebt: (partyId) => ipcRenderer.invoke("parties:getDebt", partyId),
+  cleanup: () => ipcRenderer.invoke("parties:cleanup"),
+});
