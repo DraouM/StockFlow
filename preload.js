@@ -77,7 +77,11 @@ contextBridge.exposeInMainWorld("partiesAPI", {
     ipcRenderer.invoke("parties:update", { partyId, updateData }),
   deleteParty: (partyId) => ipcRenderer.invoke("parties:delete", partyId),
   searchParties: (req) => ipcRenderer.invoke("parties:search", req),
-  getPartiesByType: (req) => ipcRenderer.invoke("parties:getByType", req),
+  getPartiesByType: (params) => {
+    console.log("Preload received params:", params); // Debug log
+    return ipcRenderer.invoke("parties:getByType", params);
+  },
+
   getPartyDebt: (partyId) => ipcRenderer.invoke("parties:getDebt", partyId),
   cleanup: () => ipcRenderer.invoke("parties:cleanup"),
 });
