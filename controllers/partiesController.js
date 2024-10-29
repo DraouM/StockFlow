@@ -135,28 +135,31 @@ class PartiesController {
   }
 
   // Get parties by type
-  async getPartiesByType(req) {
+  async getPartiesByType(params) {
     try {
-      const { type } = req.params;
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 50;
+      const { type } = params;
+      console.log("Processing type in controller:", type);
 
-      const parties = await this.partiesModel.getByType(type, page, limit);
+      // Get data from model
+      const data = await this.partiesModel.getByType(type);
+      console.log("Data from model:", data); // Debug log
 
+      // Always return a structured response
       return {
         success: true,
-        data: parties,
+        data: data || [], // Ensure data is at least an empty array
         pagination: {
-          page,
-          limit,
-          total: parties.length,
+          // your pagination details
         },
       };
     } catch (error) {
-      console.error(`Error fetching parties of type ${type}:`, error);
-      throw {
+      console.error("Controller error:", error);
+      // Return error response rather than throwing
+      return {
         success: false,
-        error: error.message || "Failed to fetch parties by type",
+        error: error.message,
+        data: [],
+        pagination: {},
       };
     }
   }
