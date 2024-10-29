@@ -7,23 +7,33 @@ async function fetchAllParties() {
     console.error("Error fetching parties:", error);
   }
 }
-
-// Get party by ID
-
 fetchAllParties();
-
-// Example component showing how to fetch a party by ID
-async function getPartyDetails(partyId) {
+// Client-side usage:
+async function displayPartiesByType(type, page = 1, limit = 50) {
   try {
-    const party = await window.partiesAPI.getPartyById(partyId);
-    console.log("Party details:", party);
-    return party;
+    const response = await window.partiesAPI.getPartiesByType({
+      type,
+      page,
+      limit,
+    });
+
+    console.log("Response:", response);
+
+    if (response.success) {
+      const { data, pagination } = response;
+      // Handle the data...
+    } else {
+      console.error("Error:", response.error);
+    }
   } catch (error) {
-    console.error("Error fetching party:", error);
-    throw error;
+    console.error("Error fetching parties by type:", error);
   }
 }
-getPartyDetails(6);
+
+// Usage examples:
+displayPartiesByType("customer"); // Basic usage
+// displayPartiesByType("supplier", 2); // With page
+// displayPartiesByType("both", 1, 25); // With page and limit
 
 //
 document.addEventListener("DOMContentLoaded", async () => {
@@ -95,3 +105,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Optionally, display an error message to the user
   }
 });
+
+// client.js
+async function displayPartiesByType(type, page = 1, limit = 50) {
+  try {
+    console.log("Requesting parties of type:", type);
+
+    const response = await window.partiesAPI.getPartiesByType({
+      type,
+      page,
+      limit,
+    });
+
+    console.log("Response from IPC:", response);
+
+    if (response.success) {
+      const { data, pagination } = response;
+      console.log("Parties data:", data);
+
+      // Handle the data...
+    } else {
+      console.error("Error from server:", response.error);
+      // Handle the error...
+    }
+  } catch (error) {
+    console.error("Client error:", error);
+    // Handle unexpected errors...
+  }
+}
+displayPartiesByType("customer");
+console.log("DONE");
