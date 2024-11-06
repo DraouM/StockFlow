@@ -67,10 +67,26 @@ class PartiesModel {
   }
 
   // Create a new party
-  async create({ name, type, phone, address }) {
+  async create({ name, type, phone, address, nrc, nif, ia, nis }) {
+    // Format validations
+    if (nrc && !nrc.match(/^[0-9]{2}\/[0-9]{2}-[0-9]{7}[A-Z][0-9]{2}$/)) {
+      throw new Error("Invalid NRC format.");
+    }
+    if (nif && !nif.match(/^[0-9]{15}$/)) {
+      throw new Error("Invalid NIF format.");
+    }
+    if (nis && !nis.match(/^[0-9]{12}$/)) {
+      throw new Error("Invalid NIS format.");
+    }
+    if (ia && !ia.match(/^[0-9]{11}$/)) {
+      throw new Error("Invalid IA format.");
+    }
+
+    // Rest of the function remains the same
     const query = `
-      INSERT INTO parties (name, type, phone, address)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO parties (
+        name, type, phone, address, nrc, nif, ia, nis
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     if (!["customer", "supplier", "both"].includes(type)) {
@@ -79,7 +95,8 @@ class PartiesModel {
       );
     }
 
-    const params = [name, type, phone, address];
+    const params = [name, type, phone, address, nrc, nif, ia, nis];
+
     return this.runQuery(
       query,
       params,
@@ -116,11 +133,28 @@ class PartiesModel {
   }
 
   // Update party by ID with validation
-  async update(partyId, { name, type, phone, address, credit_balance }) {
+  async update(
+    partyId,
+    { name, type, phone, address, credit_balance, nrc, nif, ia, nis }
+  ) {
     if (type && !["customer", "supplier", "both"].includes(type)) {
       throw new Error(
         "Invalid party type. Must be customer, supplier, or both."
       );
+    }
+
+    // Format validations
+    if (nrc && !nrc.match(/^[0-9]{2}\/[0-9]{2}-[0-9]{7}[A-Z][0-9]{2}$/)) {
+      throw new Error("Invalid NRC format.");
+    }
+    if (nif && !nif.match(/^[0-9]{15}$/)) {
+      throw new Error("Invalid NIF format.");
+    }
+    if (nis && !nis.match(/^[0-9]{12}$/)) {
+      throw new Error("Invalid NIS format.");
+    }
+    if (ia && !ia.match(/^[0-9]{11}$/)) {
+      throw new Error("Invalid IA format.");
     }
 
     const updates = [];
@@ -146,6 +180,22 @@ class PartiesModel {
       updates.push("credit_balance = ?");
       params.push(credit_balance);
     }
+    if (nrc) {
+      updates.push("nrc = ?");
+      params.push(nrc);
+    }
+    if (nif) {
+      updates.push("nif = ?");
+      params.push(nif);
+    }
+    if (ia) {
+      updates.push("ia = ?");
+      params.push(ia);
+    }
+    if (nis) {
+      updates.push("nis = ?");
+      params.push(nis);
+    }
 
     if (updates.length === 0) {
       throw new Error("No fields provided for update");
@@ -155,7 +205,7 @@ class PartiesModel {
     params.push(partyId);
 
     const query = `
-      UPDATE parties 
+      UPDATE parties
       SET ${updates.join(", ")}
       WHERE id = ?
     `;

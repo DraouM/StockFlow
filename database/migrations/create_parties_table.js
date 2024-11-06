@@ -33,7 +33,28 @@ class PartiesDB {
         phone TEXT,
         address TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+        nrc TEXT UNIQUE CHECK (
+            nrc IS NULL OR 
+            nrc LIKE '__/__/_______A__'  -- Format example: XX/XX-XXXXXXXAXX
+        ),  -- Stores the unique business registration number.
+
+        nif TEXT UNIQUE CHECK (
+            nif IS NULL OR 
+            length(nif) = 15 AND nif GLOB '[0-9]*'  -- 15 digits
+        ),  -- Stores the tax identification number.
+
+        ia TEXT UNIQUE CHECK (
+            ia IS NULL OR 
+            length(ia) = 11 AND ia GLOB '[0-9]*'  -- 11 digits
+        ),  -- Stores the administrative identifier.
+
+        nis TEXT UNIQUE CHECK (
+            nis IS NULL OR 
+            length(nis) = 12 AND nis GLOB '[0-9]*'  -- 12 digits
+        )  -- Stores the social identification number.
+
       );
     `;
 
