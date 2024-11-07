@@ -16,14 +16,23 @@
     <div class="content">
       <h1>Client List</h1>
       <!-- Search input outside the table -->
-      <div class="search-box">
-        <input
-          id="table-search-input"
-          type="text"
-          name="table-search"
-          placeholder="Search in the table..."
-        />
+      <div class="flex">
+        <div class="search-box">
+          <input
+            id="table-search-input"
+            type="text"
+            name="table-search"
+            placeholder="Search in the table..."
+          />
+        </div>
+        <button
+          data-modal="newPartyModel"
+          class="button button-medium button-primary"
+        >
+          Display Model
+        </button>
       </div>
+
       <table id="clientTable">
         <thead>
           <tr>
@@ -43,160 +52,156 @@
         <img src="../assets/empty-table.png" alt="Empty table" />
       </div>
 
-      <button
-        id="display-model-btn"
-        class="button button-medium button-primary"
-      >
-        Display Model
-      </button>
-      <div id="overlay"></div>
       <!-- New Party Creation Model -->
-      <div class="container model" id="parties_creation_model">
-        <!-- PERSONAL INFO -->
-        <section class="personal-info" id="form-1">
-          <div class="number-indicator">1</div>
-          <h3 class="section-title">Personal Info</h3>
+      <div class="modal" id="newPartyModel">
+        <div class="container modal-content" id="parties_creation_model">
+          <span class="close">&times;</span>
+          <!-- PERSONAL INFO -->
+          <section class="personal-info" id="form-1">
+            <div class="number-indicator">1</div>
+            <h3 class="section-title">Personal Info</h3>
 
-          <div class="form-group">
-            <label for="full-name">Full Name</label>
-            <input
-              type="text"
-              id="full-name"
-              name="full-name"
-              value="Mohamed"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="address">Address</label>
-            <input
-              type="text"
-              id="address"
-              name="address"
-              value="123 address lorem"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="phone-number">Phone Number</label>
-            <input
-              type="tel"
-              id="phone-number"
-              name="phone-number"
-              value="06 65 78 94 25"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="type">Type</label>
-            <div class="select-wrapper">
-              <select id="type" name="type">
-                <option value="customer" selected>Customer</option>
-                <option value="supplier">Supplier</option>
-                <option value="both">Both</option>
-              </select>
+            <div class="form-group">
+              <label for="full-name">Full Name</label>
+              <input
+                type="text"
+                id="full-name"
+                name="full-name"
+                value="Mohamed"
+              />
             </div>
-          </div>
 
-          <button class="clear-btn button button-small button-secondary">
-            Clear
-          </button>
-
-          <div class="page-indicators">
-            <span class="page-indicator active"></span>
-            <span class="page-indicator"></span>
-          </div>
-
-          <button class="next-btn button button-small button-primary">
-            Next
-          </button>
-        </section>
-
-        <!-- COMMERCE DETAILS -->
-        <section class="personal-info hidden" id="form-2">
-          <div class="number-indicator">2</div>
-          <h3 class="section-title">Commerce Details</h3>
-
-          <div class="form-group">
-            <div class="label-with-info">
-              <label for="nrc">NRC</label>
-              <button
-                class="info-icon"
-                data-tooltip="Numéro Registre Commerce: A unique identification number assigned to your business by the commercial registry"
-              >
-                <i class="bx bx-info-circle"></i>
-              </button>
+            <div class="form-group">
+              <label for="address">Address</label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                value="123 address lorem"
+              />
             </div>
-            <input
-              type="text"
-              id="nrc"
-              name="nrc"
-              value="123-456-789-459-321"
-            />
-          </div>
 
-          <div class="form-group">
-            <div class="label-with-info">
-              <label for="nif">NIF</label>
-              <button
-                class="info-icon"
-                data-tooltip="Numéro d'Identification Fiscale"
-              >
-                <i class="bx bx-info-circle"></i>
-              </button>
+            <div class="form-group">
+              <label for="phone-number">Phone Number</label>
+              <input
+                type="tel"
+                id="phone-number"
+                name="phone-number"
+                value="06 65 78 94 25"
+              />
             </div>
-            <input
-              type="text"
-              id="nif"
-              name="nif"
-              value="654 256 879 254 368"
-            />
-          </div>
 
-          <div class="form-group">
-            <div class="label-with-info">
-              <label for="ia">IA</label>
-              <button
-                class="info-icon"
-                data-tooltip="Identifiant Administratif"
-              >
-                <i class="bx bx-info-circle"></i>
-              </button>
+            <div class="form-group">
+              <label for="type">Type</label>
+              <div class="select-wrapper">
+                <select id="type" name="type">
+                  <option value="customer" selected>Customer</option>
+                  <option value="supplier">Supplier</option>
+                  <option value="both">Both</option>
+                </select>
+              </div>
             </div>
-            <input type="text" id="ia" name="ia" value="06 65 78 94 25" />
-          </div>
 
-          <div class="form-group">
-            <div class="label-with-info">
-              <label for="nis">NIS</label>
-              <button
-                class="info-icon"
-                data-tooltip="Numéro d'Identification Sociale"
-              >
-                <i class="bx bx-info-circle"></i>
-              </button>
-            </div>
-            <input type="text" id="nis" name="nis" value="Customer" />
-          </div>
-
-          <button class="clear-btn button button-small button-secondary">
-            Clear
-          </button>
-
-          <div class="page-indicators">
-            <span class="page-indicator"></span>
-            <span class="page-indicator active"></span>
-          </div>
-
-          <div class="form-actions">
-            <button class="prev-btn button button-small button-secondary">
-              Previous
+            <button class="clear-btn button button-small button-secondary">
+              Clear
             </button>
-            <button class="create-btn button button-small button-primary">
-              Create
+
+            <div class="page-indicators">
+              <span class="page-indicator active"></span>
+              <span class="page-indicator"></span>
+            </div>
+
+            <button class="next-btn button button-small button-primary">
+              Next
             </button>
-          </div>
-        </section>
+          </section>
+
+          <!-- COMMERCE DETAILS -->
+          <section class="personal-info hidden" id="form-2">
+            <div class="number-indicator">2</div>
+            <h3 class="section-title">Commerce Details</h3>
+
+            <div class="form-group">
+              <div class="label-with-info">
+                <label for="nrc">NRC</label>
+                <button
+                  class="info-icon"
+                  data-tooltip="Numéro Registre Commerce: A unique identification number assigned to your business by the commercial registry"
+                >
+                  <i class="bx bx-info-circle"></i>
+                </button>
+              </div>
+              <input
+                type="text"
+                id="nrc"
+                name="nrc"
+                value="123-456-789-459-321"
+              />
+            </div>
+
+            <div class="form-group">
+              <div class="label-with-info">
+                <label for="nif">NIF</label>
+                <button
+                  class="info-icon"
+                  data-tooltip="Numéro d'Identification Fiscale"
+                >
+                  <i class="bx bx-info-circle"></i>
+                </button>
+              </div>
+              <input
+                type="text"
+                id="nif"
+                name="nif"
+                value="654 256 879 254 368"
+              />
+            </div>
+
+            <div class="form-group">
+              <div class="label-with-info">
+                <label for="ia">IA</label>
+                <button
+                  class="info-icon"
+                  data-tooltip="Identifiant Administratif"
+                >
+                  <i class="bx bx-info-circle"></i>
+                </button>
+              </div>
+              <input type="text" id="ia" name="ia" value="06 65 78 94 25" />
+            </div>
+
+            <div class="form-group">
+              <div class="label-with-info">
+                <label for="nis">NIS</label>
+                <button
+                  class="info-icon"
+                  data-tooltip="Numéro d'Identification Sociale"
+                >
+                  <i class="bx bx-info-circle"></i>
+                </button>
+              </div>
+              <input type="text" id="nis" name="nis" value="Customer" />
+            </div>
+
+            <button class="clear-btn button button-small button-secondary">
+              Clear
+            </button>
+
+            <div class="page-indicators">
+              <span class="page-indicator"></span>
+              <span class="page-indicator active"></span>
+            </div>
+
+            <div class="form-actions">
+              <button class="prev-btn button button-small button-secondary">
+                Previous
+              </button>
+              <button class="create-btn button button-small button-primary">
+                Create
+              </button>
+            </div>
+          </section>
+        </div>
       </div>
     </div>
 
