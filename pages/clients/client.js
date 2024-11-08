@@ -338,6 +338,11 @@ class FormHandler {
   constructor() {
     this.form = document.getElementById("partyCreationForm");
     this.createBtn = document.querySelector(".create-btn");
+    this.personalInfoSection = document.getElementById("form-1");
+    this.commerceDetailsSection = document.getElementById("form-2");
+
+    this.modal = document.getElementById("newPartyModal");
+
     this.setupEventListeners();
   }
 
@@ -374,7 +379,11 @@ class FormHandler {
   }
 
   validateField(field) {
-    const fieldName = field.id.replace("-", ""); // Convert 'full-name' to 'fullName'
+    // const fieldName = field.id.replace("-", ""); // Convert 'full-name' to 'fullName'
+    const fieldName = field.id.replace(/-(.)/g, (_, c) => c.toUpperCase()); // Convert 'full-name' to 'fullName'
+
+    console.log("Field Name ", fieldName);
+
     const section =
       field.closest("section").id === "form-1"
         ? "personalInfo"
@@ -448,6 +457,12 @@ class FormHandler {
       }
     });
 
+    // Explicitly check the full name field
+    const fullNameField = this.form.querySelector("#full-name");
+    if (!this.validateField(fullNameField)) {
+      isValid = false;
+    }
+
     return isValid;
   }
 
@@ -457,6 +472,8 @@ class FormHandler {
 
       // Validate the form
       if (!this.validateForm(formData)) {
+        // Automatically switch to the first section if there are errors
+        this.showSection(this.personalInfoSection);
         return;
       }
 
@@ -468,7 +485,8 @@ class FormHandler {
       // For example:
       // await this.submitToAPI(formData);
 
-      // Show success message
+      // Show success message after the modal is hidden
+      this.hideModal();
       this.showSuccessMessage();
 
       // Reset form
@@ -483,6 +501,22 @@ class FormHandler {
       this.createBtn.disabled = false;
       this.createBtn.textContent = "Create";
     }
+  }
+
+  showSection(section) {
+    // Hide all sections
+    this.personalInfoSection.classList.add("hidden");
+    this.personalInfoSection.classList.remove("active");
+    this.commerceDetailsSection.classList.add("hidden");
+    this.commerceDetailsSection.classList.remove("active");
+
+    // Show the specified section
+    section.classList.remove("hidden");
+    section.classList.add("active");
+  }
+
+  hideModal() {
+    this.modal.classList.add("hidden");
   }
 
   showSuccessMessage() {
