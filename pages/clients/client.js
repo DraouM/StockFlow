@@ -138,31 +138,6 @@ console.log("DONE");
 
 // Model
 
-// document
-//   .getElementById("display-model-btn")
-//   .addEventListener("click", () => toggleModel());
-
-// window.addEventListener("click", (event) => {
-//   const model = document.querySelector(".model");
-//   const overlay = document.getElementById("overlay"); // or use querySelector
-
-//   if (event.target === overlay && overlay.classList.contains("active")) {
-//     toggleModel();
-//   } else if (event.target === model && model.classList.contains("active")) {
-//     //Prevent closing if click is inside model and model has active class.
-//     //this part depends on whether you chose to add `active` class to model in toggle functions
-//     event.stopPropagation(); // or event.preventDefault(); // or you can remove this completely depending on requirements
-//     return;
-//   }
-// });
-
-// function toggleModel() {
-//   const model = document.querySelector(".model");
-//   const overlay = document.getElementById("overlay");
-//   model.classList.toggle("active");
-//   overlay.classList.toggle("active");
-// }
-
 document.addEventListener("DOMContentLoaded", () => {
   const form1 = document.getElementById("form-1");
   const form2 = document.getElementById("form-2");
@@ -205,68 +180,94 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Handle form submission
-  if (createBtn) {
-    createBtn.addEventListener("click", () => {
-      // Collect data from both forms
-      const formData = {
-        personalInfo: {
-          fullName: document.getElementById("full-name").value,
-          address: document.getElementById("address").value,
-          phoneNumber: document.getElementById("phone-number").value,
-          type: document.getElementById("type").value,
-        },
-        commerceDetails: {
-          nrc: document.getElementById("nrc").value,
-          nif: document.getElementById("nif").value,
-          ia: document.getElementById("ia").value,
-          nis: document.getElementById("nis").value,
-        },
-      };
+  // // Handle form submission
+  // if (createBtn) {
+  //   createBtn.addEventListener("click", () => {
+  //     // Collect data from both forms
+  //     const formData = {
+  //       personalInfo: {
+  //         fullName: document.getElementById("full-name").value,
+  //         address: document.getElementById("address").value,
+  //         phoneNumber: document.getElementById("phone-number").value,
+  //         type: document.getElementById("type").value,
+  //       },
+  //       commerceDetails: {
+  //         nrc: document.getElementById("nrc").value,
+  //         nif: document.getElementById("nif").value,
+  //         ia: document.getElementById("ia").value,
+  //         nis: document.getElementById("nis").value,
+  //       },
+  //     };
 
-      // Validate the forms
-      if (validateForms(formData)) {
-        // Handle the submission
-        console.log("Form data:", formData);
-        // You can add your API call or other submission logic here
-        alert("Form submitted successfully!");
-        closeModel();
-      }
-    });
-  }
-  // Close Model
-  function closeModel() {
-    const overlay = document.getElementById("overlay");
-    const model = document.getElementById("model");
-    overlay.classList.remove("active");
-    model.classList.remove("active");
-  }
+  //     // Validate the forms
+  //     if (validateForms(formData)) {
+  //       // Handle the submission
+  //       console.log("Form data:", formData);
+  //       // You can add your API call or other submission logic here
+  //       // alert("Form submitted successfully!");
+  //       console.log("Form submitted successfully!");
+  //     }
+  //   });
+  // }
 
-  // Form validation
-  function validateForms(data) {
-    // Check if required fields are filled
-    const required = [
-      { field: "fullName", label: "Full Name" },
-      { field: "address", label: "Address" },
-      { field: "phoneNumber", label: "Phone Number" },
-      { field: "nrc", label: "NRC" },
-      { field: "nif", label: "NIF" },
-    ];
+  // // Form validation
+  // function validateForms(data) {
+  //   console.log("Data for Validation ", data);
 
-    for (const item of required) {
-      const value =
-        item.field in data.personalInfo
-          ? data.personalInfo[item.field]
-          : data.commerceDetails[item.field];
+  //   // Check if required fields are filled
+  //   const required = [
+  //     { field: "fullName", label: "Full Name" },
+  //     { field: "type", label: "Type" },
+  //   ];
 
-      if (!value || value.trim() === "") {
-        alert(`${item.label} is required`);
-        return false;
-      }
-    }
+  //   for (const item of required) {
+  //     const value = item.field in data.personalInfo;
+  //     console.log("Value to Check ", value);
 
-    return true;
-  }
+  //     if (!value || typeof value !== "string" || value.trim() === "") {
+  //       // alert(`${item.label} is required`);
+  //       console.log(`${item.label} is required`);
+
+  //       return false;
+  //     }
+  //   }
+
+  //   // Validate party type
+  //   if (!["customer", "supplier", "both"].includes(data.personalInfo.type)) {
+  //     alert("Party type must be 'customer', 'supplier', or 'both'");
+  //     return false;
+  //   }
+
+  //   // Validate optional fields
+  //   const optionalFields = [
+  //     { field: "phone", label: "Phone" },
+  //     { field: "address", label: "Address" },
+  //     { field: "nrc", label: "NRC", validator: validateNRC },
+  //     { field: "nif", label: "NIF", validator: validateNIF },
+  //     { field: "ia", label: "IA" },
+  //   ];
+
+  //   for (const item of optionalFields) {
+  //     const value = data.personalInfo[item.field];
+
+  //     if (value && !item.validator?.(value)) {
+  //       alert(`${item.label} is invalid`);
+  //       return false;
+  //     }
+  //   }
+
+  //   return true;
+  // }
+
+  // function validateNRC(nrc) {
+  //   // Implement NRC validation logic here
+  //   return nrc.match(/^[0-9]{2}\/[0-9]{2}-[0-9]{7}[A-Z][0-9]{2}$/);
+  // }
+
+  // function validateNIF(nif) {
+  //   // Implement NIF validation logic here
+  //   return nif.match(/^[0-9]{15}$/);
+  // }
 
   // Handle resize events to manage visibility
   window.addEventListener("resize", () => {
@@ -286,4 +287,258 @@ document.addEventListener("DOMContentLoaded", () => {
     form1.classList.remove("hidden");
     form2.classList.remove("hidden");
   }
+});
+
+// Form validation rules and messages
+const VALIDATION_RULES = {
+  personalInfo: {
+    fullName: {
+      required: true,
+      minLength: 2,
+      pattern: /^[a-zA-Z\s-']+$/,
+      message:
+        "Full name must contain only letters, spaces, hyphens, and apostrophes",
+    },
+    phoneNumber: {
+      required: false,
+      pattern: /^[0-9\s+()-]{8,}$/,
+      message: "Please enter a valid phone number",
+    },
+    type: {
+      required: true,
+      enum: ["customer", "supplier", "both"],
+      message: "Type must be customer, supplier, or both",
+    },
+  },
+  commerceDetails: {
+    nrc: {
+      required: false,
+      pattern: /^[0-9]{2}\/[0-9]{2}-[0-9]{7}[A-Z][0-9]{2}$/,
+      message: "Invalid NRC format. Expected format: XX/XX-XXXXXXXAXX",
+    },
+    nif: {
+      required: false,
+      pattern: /^[0-9]{15}$/,
+      message: "NIF must be exactly 15 digits",
+    },
+    ia: {
+      required: false,
+      pattern: /^[0-9A-Z]{10,}$/,
+      message: "Invalid IA format",
+    },
+    nis: {
+      required: false,
+      pattern: /^[0-9]{20}$/,
+      message: "NIS must be exactly 20 digits",
+    },
+  },
+};
+
+class FormHandler {
+  constructor() {
+    this.form = document.getElementById("partyCreationForm");
+    this.createBtn = document.querySelector(".create-btn");
+    this.setupEventListeners();
+  }
+
+  setupEventListeners() {
+    // Handle form submission
+    this.form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      this.handleSubmission();
+    });
+
+    // Real-time validation on input
+    this.form.addEventListener("input", (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") {
+        this.validateField(e.target);
+      }
+    });
+  }
+
+  collectFormData() {
+    return {
+      personalInfo: {
+        fullName: document.getElementById("full-name").value,
+        address: document.getElementById("address").value,
+        phoneNumber: document.getElementById("phone-number").value,
+        type: document.getElementById("type").value,
+      },
+      commerceDetails: {
+        nrc: document.getElementById("nrc").value,
+        nif: document.getElementById("nif").value,
+        ia: document.getElementById("ia").value,
+        nis: document.getElementById("nis").value,
+      },
+    };
+  }
+
+  validateField(field) {
+    const fieldName = field.id.replace("-", ""); // Convert 'full-name' to 'fullName'
+    const section =
+      field.closest("section").id === "form-1"
+        ? "personalInfo"
+        : "commerceDetails";
+    const rules = VALIDATION_RULES[section]?.[fieldName];
+
+    if (!rules) return true;
+
+    const value = field.value.trim();
+
+    // Check required
+    if (rules.required && !value) {
+      this.showFieldError(field, `${fieldName} is required`);
+      return false;
+    }
+
+    // Check minimum length
+    if (rules.minLength && value.length < rules.minLength) {
+      this.showFieldError(
+        field,
+        `Minimum length is ${rules.minLength} characters`
+      );
+      return false;
+    }
+
+    // Check pattern
+    if (rules.pattern && value && !rules.pattern.test(value)) {
+      this.showFieldError(field, rules.message);
+      return false;
+    }
+
+    // Check enum values
+    if (rules.enum && !rules.enum.includes(value)) {
+      this.showFieldError(field, rules.message);
+      return false;
+    }
+
+    this.clearFieldError(field);
+    return true;
+  }
+
+  showFieldError(field, message) {
+    // Remove any existing error message
+    this.clearFieldError(field);
+
+    // Add error class to field
+    field.classList.add("error");
+
+    // Create and insert error message
+    const errorDiv = document.createElement("div");
+    errorDiv.className = "error-message";
+    errorDiv.textContent = message;
+    field.parentNode.appendChild(errorDiv);
+  }
+
+  clearFieldError(field) {
+    field.classList.remove("error");
+    const existingError = field.parentNode.querySelector(".error-message");
+    if (existingError) {
+      existingError.remove();
+    }
+  }
+
+  validateForm(data) {
+    let isValid = true;
+    const fields = this.form.querySelectorAll("input, select");
+
+    fields.forEach((field) => {
+      if (!this.validateField(field)) {
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  }
+
+  async handleSubmission() {
+    try {
+      const formData = this.collectFormData();
+
+      // Validate the form
+      if (!this.validateForm(formData)) {
+        return;
+      }
+
+      // Disable submit button and show loading state
+      this.createBtn.disabled = true;
+      this.createBtn.textContent = "Creating...";
+
+      // Here you would typically make an API call
+      // For example:
+      // await this.submitToAPI(formData);
+
+      // Show success message
+      this.showSuccessMessage();
+
+      // Reset form
+      this.form.reset();
+
+      // Close modal (assuming you have a closeModal function)
+      // closeModal();
+    } catch (error) {
+      this.showErrorMessage(error);
+    } finally {
+      // Re-enable submit button
+      this.createBtn.disabled = false;
+      this.createBtn.textContent = "Create";
+    }
+  }
+
+  showSuccessMessage() {
+    // Create a success message element
+    const successMessage = document.createElement("div");
+    successMessage.className = "success-message";
+    successMessage.textContent = "Party created successfully!";
+
+    // Insert it at the top of the form
+    this.form.insertBefore(successMessage, this.form.firstChild);
+
+    // Remove it after 3 seconds
+    setTimeout(() => {
+      successMessage.remove();
+    }, 3000);
+  }
+
+  showErrorMessage(error) {
+    // Create an error message element
+    const errorMessage = document.createElement("div");
+    errorMessage.className = "error-message";
+    errorMessage.textContent =
+      "An error occurred while creating the party. Please try again.";
+
+    // Insert it at the top of the form
+    this.form.insertBefore(errorMessage, this.form.firstChild);
+
+    // Remove it after 3 seconds
+    setTimeout(() => {
+      errorMessage.remove();
+    }, 3000);
+
+    // Log the actual error for debugging
+    console.error("Form submission error:", error);
+  }
+
+  // Method to submit to API (implement as needed)
+  async submitToAPI(formData) {
+    // Implementation depends on your API
+    const response = await fetch("/api/parties", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      throw new Error("API submission failed");
+    }
+
+    return await response.json();
+  }
+}
+
+// Initialize the form handler
+document.addEventListener("DOMContentLoaded", () => {
+  const formHandler = new FormHandler();
 });

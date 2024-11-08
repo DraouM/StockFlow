@@ -16,13 +16,14 @@
     left: 50%;
     transform: translate(-50%, -50%);
     width: 80%;
+    max-width: 800px;
     /* Limit the height of the modal */
     max-height: 90%;
     /* Allow vertical scrolling if content is too tall */
     overflow-y: auto;
     background-color: white;
     border-radius: 8px;
-    padding: 20px;
+    padding: 1rem;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     animation: fadeIn 0.3s;
 }
