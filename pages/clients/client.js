@@ -136,35 +136,41 @@ async function displayPartiesByType(type, page = 1, limit = 50) {
 displayPartiesByType("customer");
 console.log("DONE");
 
-// Model
-
-document.addEventListener("DOMContentLoaded", () => {
+/** MODEL */
+// modal functionality
+document.addEventListener("DOMContentLoaded", function () {
+  // Model
+  const modal = document.getElementById("modal");
+  const closeModalBtn = document.querySelector(".close-modal-btn");
+  const openModalBtn = document.getElementById("open-modal-btn");
+  // Form
+  const modalForm = document.getElementById("party-form");
   const form1 = document.getElementById("form-1");
   const form2 = document.getElementById("form-2");
   const nextBtn = document.querySelector(".next-btn");
   const prevBtn = document.querySelector(".prev-btn");
   const clearBtns = document.querySelectorAll(".clear-btn");
-  const createBtn = document.querySelector(".create-btn");
 
-  // Helper function to check if we're on mobile view
-  const isMobileView = () => window.innerWidth < 768;
-
-  // Page switching logic (mobile only)
-  if (nextBtn && prevBtn) {
-    nextBtn.addEventListener("click", () => {
-      if (isMobileView()) {
-        form1.classList.add("hidden");
-        form2.classList.remove("hidden");
-      }
-    });
-
-    prevBtn.addEventListener("click", () => {
-      if (isMobileView()) {
-        form2.classList.add("hidden");
-        form1.classList.remove("hidden");
-      }
-    });
+  // Handling open and close functionallities
+  function openModal() {
+    modal.style.display = "flex";
   }
+  function closeModal() {
+    modal.style.display = "none";
+  }
+
+  // Event listeners for openning the modal
+  openModalBtn.addEventListener("click", openModal);
+
+  // Event listeners for closing the modal
+  closeModalBtn.addEventListener("click", closeModal);
+
+  // Close modal if clicking outside of content
+  window.addEventListener("click", function (event) {
+    if (event.target === modal) {
+      closeModal();
+    }
+  });
 
   // Clear form functionality
   clearBtns.forEach((btn) => {
@@ -180,96 +186,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // // Handle form submission
-  // if (createBtn) {
-  //   createBtn.addEventListener("click", () => {
-  //     // Collect data from both forms
-  //     const formData = {
-  //       personalInfo: {
-  //         fullName: document.getElementById("full-name").value,
-  //         address: document.getElementById("address").value,
-  //         phoneNumber: document.getElementById("phone-number").value,
-  //         type: document.getElementById("type").value,
-  //       },
-  //       commerceDetails: {
-  //         nrc: document.getElementById("nrc").value,
-  //         nif: document.getElementById("nif").value,
-  //         ia: document.getElementById("ia").value,
-  //         nis: document.getElementById("nis").value,
-  //       },
-  //     };
+  /* MOBILE VIEW */
+  // Helper function to check if we're on mobile view
+  const isMobileView = () => window.innerWidth < 768;
 
-  //     // Validate the forms
-  //     if (validateForms(formData)) {
-  //       // Handle the submission
-  //       console.log("Form data:", formData);
-  //       // You can add your API call or other submission logic here
-  //       // alert("Form submitted successfully!");
-  //       console.log("Form submitted successfully!");
-  //     }
-  //   });
-  // }
+  // Initial setup
+  if (!isMobileView()) {
+    form1.classList.remove("hidden");
+    form2.classList.remove("hidden");
+  }
 
-  // // Form validation
-  // function validateForms(data) {
-  //   console.log("Data for Validation ", data);
-
-  //   // Check if required fields are filled
-  //   const required = [
-  //     { field: "fullName", label: "Full Name" },
-  //     { field: "type", label: "Type" },
-  //   ];
-
-  //   for (const item of required) {
-  //     const value = item.field in data.personalInfo;
-  //     console.log("Value to Check ", value);
-
-  //     if (!value || typeof value !== "string" || value.trim() === "") {
-  //       // alert(`${item.label} is required`);
-  //       console.log(`${item.label} is required`);
-
-  //       return false;
-  //     }
-  //   }
-
-  //   // Validate party type
-  //   if (!["customer", "supplier", "both"].includes(data.personalInfo.type)) {
-  //     alert("Party type must be 'customer', 'supplier', or 'both'");
-  //     return false;
-  //   }
-
-  //   // Validate optional fields
-  //   const optionalFields = [
-  //     { field: "phone", label: "Phone" },
-  //     { field: "address", label: "Address" },
-  //     { field: "nrc", label: "NRC", validator: validateNRC },
-  //     { field: "nif", label: "NIF", validator: validateNIF },
-  //     { field: "ia", label: "IA" },
-  //   ];
-
-  //   for (const item of optionalFields) {
-  //     const value = data.personalInfo[item.field];
-
-  //     if (value && !item.validator?.(value)) {
-  //       alert(`${item.label} is invalid`);
-  //       return false;
-  //     }
-  //   }
-
-  //   return true;
-  // }
-
-  // function validateNRC(nrc) {
-  //   // Implement NRC validation logic here
-  //   return nrc.match(/^[0-9]{2}\/[0-9]{2}-[0-9]{7}[A-Z][0-9]{2}$/);
-  // }
-
-  // function validateNIF(nif) {
-  //   // Implement NIF validation logic here
-  //   return nif.match(/^[0-9]{15}$/);
-  // }
-
-  // Handle resize events to manage visibility
+  //Handle resize events to manage visibility
   window.addEventListener("resize", () => {
     if (!isMobileView()) {
       // Remove hidden class from both forms on desktop
@@ -282,297 +209,210 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Initial setup
-  if (!isMobileView()) {
-    form1.classList.remove("hidden");
-    form2.classList.remove("hidden");
+  // Page switching logic (mobile only)
+  if (nextBtn && prevBtn) {
+    nextBtn.addEventListener("click", () => {
+      if (isMobileView() && validatePersonalInfo()) {
+        clearAllErrors(); // if exists
+        form1.classList.add("hidden");
+        form2.classList.remove("hidden");
+      }
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (isMobileView()) {
+        form2.classList.add("hidden");
+        form1.classList.remove("hidden");
+      }
+    });
   }
+
+  modalForm.addEventListener("submit", (e) => {
+    e.preventDefault(); // Prevent form from submitting
+
+    const formValidationResult = validateForm();
+    if (formValidationResult.isValid) {
+      const formData = formValidationResult.formData;
+      // Proceed with processing formData
+      console.log("Form Data Collected:", formData);
+
+      // Process the form data
+      // You can now send this data to the server, close the modal, or display a success message
+      submitForm();
+    } else {
+      // Handle invalid form, as errors are displayed
+    }
+  });
 });
 
-// Form validation rules and messages
-const VALIDATION_RULES = {
-  personalInfo: {
-    fullName: {
-      required: true,
-      minLength: 2,
-      pattern: /^[a-zA-Z\s-']+$/,
-      message:
-        "Full name must contain only letters, spaces, hyphens, and apostrophes",
-    },
-    phoneNumber: {
-      required: false,
-      pattern: /^[0-9\s+()-]{8,}$/,
-      message: "Please enter a valid phone number",
-    },
-    type: {
-      required: true,
-      enum: ["customer", "supplier", "both"],
-      message: "Type must be customer, supplier, or both",
-    },
-  },
-  commerceDetails: {
-    nrc: {
-      required: false,
-      pattern: /^[0-9]{2}\/[0-9]{2}-[0-9]{7}[A-Z][0-9]{2}$/,
-      message: "Invalid NRC format. Expected format: XX/XX-XXXXXXXAXX",
-    },
-    nif: {
-      required: false,
-      pattern: /^[0-9]{15}$/,
-      message: "NIF must be exactly 15 digits",
-    },
-    ia: {
-      required: false,
-      pattern: /^[0-9A-Z]{10,}$/,
-      message: "Invalid IA format",
-    },
-    nis: {
-      required: false,
-      pattern: /^[0-9]{20}$/,
-      message: "NIS must be exactly 20 digits",
-    },
-  },
-};
+function submitForm() {
+  console.log("Form submitted successefully");
+}
+function validateForm() {
+  const isPersonalInfoValid = validatePersonalInfo();
+  const isCommerceDetailsValid = validateCommerceDetails();
 
-class FormHandler {
-  constructor() {
-    this.form = document.getElementById("partyCreationForm");
-    this.createBtn = document.querySelector(".create-btn");
-    this.personalInfoSection = document.getElementById("form-1");
-    this.commerceDetailsSection = document.getElementById("form-2");
-
-    this.modal = document.getElementById("newPartyModal");
-
-    this.setupEventListeners();
-  }
-
-  setupEventListeners() {
-    // Handle form submission
-    this.form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      this.handleSubmission();
-    });
-
-    // Real-time validation on input
-    this.form.addEventListener("input", (e) => {
-      if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") {
-        this.validateField(e.target);
-      }
-    });
-  }
-
-  collectFormData() {
-    return {
-      personalInfo: {
-        fullName: document.getElementById("full-name").value,
-        address: document.getElementById("address").value,
-        phoneNumber: document.getElementById("phone-number").value,
-        type: document.getElementById("type").value,
-      },
-      commerceDetails: {
-        nrc: document.getElementById("nrc").value,
-        nif: document.getElementById("nif").value,
-        ia: document.getElementById("ia").value,
-        nis: document.getElementById("nis").value,
-      },
-    };
-  }
-
-  validateField(field) {
-    // const fieldName = field.id.replace("-", ""); // Convert 'full-name' to 'fullName'
-    const fieldName = field.id.replace(/-(.)/g, (_, c) => c.toUpperCase()); // Convert 'full-name' to 'fullName'
-
-    console.log("Field Name ", fieldName);
-
-    const section =
-      field.closest("section").id === "form-1"
-        ? "personalInfo"
-        : "commerceDetails";
-    const rules = VALIDATION_RULES[section]?.[fieldName];
-
-    if (!rules) return true;
-
-    const value = field.value.trim();
-
-    // Check required
-    if (rules.required && !value) {
-      this.showFieldError(field, `${fieldName} is required`);
-      return false;
-    }
-
-    // Check minimum length
-    if (rules.minLength && value.length < rules.minLength) {
-      this.showFieldError(
-        field,
-        `Minimum length is ${rules.minLength} characters`
-      );
-      return false;
-    }
-
-    // Check pattern
-    if (rules.pattern && value && !rules.pattern.test(value)) {
-      this.showFieldError(field, rules.message);
-      return false;
-    }
-
-    // Check enum values
-    if (rules.enum && !rules.enum.includes(value)) {
-      this.showFieldError(field, rules.message);
-      return false;
-    }
-
-    this.clearFieldError(field);
-    return true;
-  }
-
-  showFieldError(field, message) {
-    // Remove any existing error message
-    this.clearFieldError(field);
-
-    // Add error class to field
-    field.classList.add("error");
-
-    // Create and insert error message
-    const errorDiv = document.createElement("div");
-    errorDiv.className = "error-message";
-    errorDiv.textContent = message;
-    field.parentNode.appendChild(errorDiv);
-  }
-
-  clearFieldError(field) {
-    field.classList.remove("error");
-    const existingError = field.parentNode.querySelector(".error-message");
-    if (existingError) {
-      existingError.remove();
-    }
-  }
-
-  validateForm(data) {
-    let isValid = true;
-    const fields = this.form.querySelectorAll("input, select");
-
-    fields.forEach((field) => {
-      if (!this.validateField(field)) {
-        isValid = false;
-      }
-    });
-
-    // Explicitly check the full name field
-    const fullNameField = this.form.querySelector("#full-name");
-    if (!this.validateField(fullNameField)) {
-      isValid = false;
-    }
-
-    return isValid;
-  }
-
-  async handleSubmission() {
-    try {
-      const formData = this.collectFormData();
-
-      // Validate the form
-      if (!this.validateForm(formData)) {
-        // Automatically switch to the first section if there are errors
-        this.showSection(this.personalInfoSection);
-        return;
-      }
-
-      // Disable submit button and show loading state
-      this.createBtn.disabled = true;
-      this.createBtn.textContent = "Creating...";
-
-      // Here you would typically make an API call
-      // For example:
-      // await this.submitToAPI(formData);
-
-      // Show success message after the modal is hidden
-      this.hideModal();
-      this.showSuccessMessage();
-
-      // Reset form
-      this.form.reset();
-
-      // Close modal (assuming you have a closeModal function)
-      // closeModal();
-    } catch (error) {
-      this.showErrorMessage(error);
-    } finally {
-      // Re-enable submit button
-      this.createBtn.disabled = false;
-      this.createBtn.textContent = "Create";
-    }
-  }
-
-  showSection(section) {
-    // Hide all sections
-    this.personalInfoSection.classList.add("hidden");
-    this.personalInfoSection.classList.remove("active");
-    this.commerceDetailsSection.classList.add("hidden");
-    this.commerceDetailsSection.classList.remove("active");
-
-    // Show the specified section
-    section.classList.remove("hidden");
-    section.classList.add("active");
-  }
-
-  hideModal() {
-    this.modal.classList.add("hidden");
-  }
-
-  showSuccessMessage() {
-    // Create a success message element
-    const successMessage = document.createElement("div");
-    successMessage.className = "success-message";
-    successMessage.textContent = "Party created successfully!";
-
-    // Insert it at the top of the form
-    this.form.insertBefore(successMessage, this.form.firstChild);
-
-    // Remove it after 3 seconds
-    setTimeout(() => {
-      successMessage.remove();
-    }, 3000);
-  }
-
-  showErrorMessage(error) {
-    // Create an error message element
-    const errorMessage = document.createElement("div");
-    errorMessage.className = "error-message";
-    errorMessage.textContent =
-      "An error occurred while creating the party. Please try again.";
-
-    // Insert it at the top of the form
-    this.form.insertBefore(errorMessage, this.form.firstChild);
-
-    // Remove it after 3 seconds
-    setTimeout(() => {
-      errorMessage.remove();
-    }, 3000);
-
-    // Log the actual error for debugging
-    console.error("Form submission error:", error);
-  }
-
-  // Method to submit to API (implement as needed)
-  async submitToAPI(formData) {
-    // Implementation depends on your API
-    const response = await fetch("/api/parties", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-      throw new Error("API submission failed");
-    }
-
-    return await response.json();
+  if (isPersonalInfoValid && isCommerceDetailsValid) {
+    const formData = { ...isPersonalInfoValid, ...isCommerceDetailsValid };
+    return { isValid: true, formData }; // Form is valid, return data
+  } else {
+    showSummaryError("Please fix the highlighted errors.");
+    return { isValid: false }; // Form is invalid, no data to return
   }
 }
 
-// Initialize the form handler
-document.addEventListener("DOMContentLoaded", () => {
-  const formHandler = new FormHandler();
-});
+function validatePersonalInfo() {
+  // Personal Info Form inputs
+  const name = document.getElementById("full-name").value.trim();
+  const address = document.getElementById("address").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const type = document.getElementById("type").value.trim();
+
+  // Run all individual validators
+  const isNameValid = validateName(name);
+  const isAddressValid = validateAddress(address);
+  const isPhoneValid = validatePhone(phone);
+  const isTypeValid = validateType(type);
+
+  if (isNameValid && isAddressValid && isPhoneValid && isTypeValid) {
+    return { name, address, phone, type }; // Form is valid
+  } else {
+    showSummaryError("Please fix the highlighted errors.");
+    return false; // Prevent form submission
+  }
+}
+
+function validateCommerceDetails() {
+  // Commerce Details Form inputs
+  const nrc = document.getElementById("nrc").value.trim();
+  const nif = document.getElementById("nif").value.trim();
+  const ia = document.getElementById("ia").value.trim();
+  const nis = document.getElementById("nis").value.trim();
+
+  // Run all individual validators
+  const isNRC_valid = validateNRC(nrc);
+  const isNIF_valid = validateNIF(nif);
+  const isIA_valid = validateIA(ia);
+  const isNIS_valid = validateNIS(nis);
+
+  if (isNRC_valid && isNIF_valid && isIA_valid && isNIS_valid) {
+    return { nrc, nif, ia, nis }; // Form is valid
+  } else {
+    showSummaryError("Please fix the highlighted errors.");
+    return false; // Prevent form submission
+  }
+}
+
+function validateName(name) {
+  if (name.trim() === "") {
+    showError("full-name", "Party Full Name is required");
+    return false;
+  }
+  if (name.length < 3) {
+    showError("full-name", "Full Name must be at least 3 characters.");
+    return false;
+  }
+  removeError("full-name");
+  return true;
+}
+
+function validateAddress(address) {
+  if (address.trim() !== "" && address.length <= 4) {
+    showError("address", "Address is to short must be >= 4 ");
+    return false;
+  }
+  removeError("address");
+  return true;
+}
+
+function validatePhone(phone) {
+  const phoneRegex = /^[0-9]{10}$/; // Adjust pattern as needed
+  if (!phoneRegex.test(phone)) {
+    showError(
+      "phone",
+      `Phone number must be 10 digits. Yours is ${phone.length} `
+    );
+    return false;
+  }
+  removeError("phone");
+  return true;
+}
+
+function validateType(type) {
+  const validTypes = ["customer", "supplier", "both"];
+  if (!validTypes.includes(type)) {
+    showError(
+      "type",
+      "Invalid type. Must be 'customer', 'supplier', or 'both'."
+    );
+    return true;
+  }
+  removeError("type");
+  return true;
+}
+
+function validateNRC(nrc) {
+  const nrcPattern = /^[0-9]{2}\/[0-9]{2}-[0-9]{7}[A-Z][0-9]{2}$/;
+  if (nrc && !nrcPattern.test(nrc)) {
+    showError("nrc", "Invalid NRC format. Expected format: XX/XX-XXXXXXXAXX");
+    return false;
+  }
+  removeError("nrc");
+  return true;
+}
+
+function validateNIF(nif) {
+  const nifPattern = /^[0-9]{15}$/;
+  if (nif && !nifPattern.test(nif)) {
+    showError("nif", "Invalid NIF format. Expected format: 15 digits.");
+    return false;
+  }
+  removeError("nif");
+  return true;
+}
+
+function validateIA(ia) {
+  const iaPattern = /^[0-9]{11}$/;
+  if (ia && !iaPattern.test(ia)) {
+    showError("ia", "Invalid IA format. Expected format: 11 digits.");
+    return false;
+  }
+  removeError("ia");
+  return true;
+}
+
+function validateNIS(nis) {
+  const nisPattern = /^[0-9]{12}$/;
+  if (nis && !nisPattern.test(nis)) {
+    showError("nis", "Invalid NIS format. Expected format: 12 digits.");
+    return false;
+  }
+  removeError("nis");
+  return true;
+}
+
+/** Error Display/Removal Functions */
+function showError(fieldId, message) {
+  const errorDiv = document.getElementById(`${fieldId}-error`);
+  errorDiv.innerText = message;
+  errorDiv.style.display = "block";
+}
+
+function removeError(fieldId) {
+  const errorDiv = document.getElementById(`${fieldId}-error`);
+  errorDiv.innerText = "";
+  errorDiv.style.display = "none";
+}
+
+function showSummaryError(message) {
+  const summaryErrorDiv = document.getElementById("summary-error");
+  summaryErrorDiv.innerText = message;
+  summaryErrorDiv.style.display = "block";
+}
+
+function clearAllErrors() {
+  document.querySelectorAll(".error-message").forEach((errorDiv) => {
+    errorDiv.innerText = "";
+    errorDiv.style.display = "none";
+  });
+}

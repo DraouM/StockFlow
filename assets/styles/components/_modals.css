@@ -28,6 +28,25 @@
     animation: fadeIn 0.3s;
 }
 
+/* modal Title */
+.modal-title {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+}
+
+/* Modal Body */
+.modal-body {
+    font-size: 1em;
+    margin-bottom: 20px;
+}
+
+/* Modal Footer */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
 /* Close Button */
 .close-modal-btn {
     position: absolute;

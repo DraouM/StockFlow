@@ -26,6 +26,7 @@
           />
         </div>
         <button
+          id="open-modal-btn"
           data-modal="newPartyModel"
           class="button button-medium button-primary"
         >
@@ -52,215 +53,198 @@
         <img src="../assets/empty-table.png" alt="Empty table" />
       </div>
 
-      <!-- Modal Trigger Button -->
-      <button class="open-modal-btn" aria-haspopup="dialog">
-        Create New Party
-      </button>
-
-      <!-- Modal -->
-      <div
-        class="modal"
-        id="newPartyModal"
-        role="dialog"
-        aria-labelledby="modalTitle"
-        aria-modal="true"
-        hidden
-      >
+      <div id="modal" class="modal">
         <div class="modal-content">
-          <!-- Close button -->
-          <button class="close" id="close-modal-btn" aria-label="Close modal">
-            ×
-          </button>
+          <span class="close-modal-btn">&times;</span>
+          <h2 class="modal-title">modal Title</h2>
+          <div class="modal-body">
+            <!-- modal content goes here -->
+            <form action="" method="post" id="party-form">
+              <!-- PERSONAL INFO -->
+              <section class="personal-info" id="form-1">
+                <div class="number-indicator">1</div>
+                <h3 class="section-title">Personal Info</h3>
 
-          <!-- Form wrapper -->
-          <form id="partyCreationForm" class="container" novalidate>
-            <!-- PERSONAL INFO -->
-            <section class="personal-info" id="form-1">
-              <div class="number-indicator" aria-hidden="true">1</div>
-              <h3 class="section-title" id="modalTitle">Personal Info</h3>
-
-              <div class="form-group">
-                <label for="full-name">Full Name</label>
-                <input
-                  type="text"
-                  id="full-name"
-                  name="full-name"
-                  required
-                  autocomplete="name"
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="address">Address</label>
-                <input
-                  type="text"
-                  id="address"
-                  name="address"
-                  autocomplete="street-address"
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="phone-number">Phone Number</label>
-                <input
-                  type="tel"
-                  id="phone-number"
-                  name="phone-number"
-                  pattern="[0-9\s]{10,}"
-                  autocomplete="tel"
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="type">Type</label>
-                <div class="select-wrapper">
-                  <select id="type" name="type" required>
-                    <option value="">Select a type</option>
-                    <option value="customer">Customer</option>
-                    <option value="supplier">Supplier</option>
-                    <option value="both">Both</option>
-                  </select>
+                <div class="form-group">
+                  <label for="full-name">Full Name</label>
+                  <input
+                    type="text"
+                    id="full-name"
+                    name="full-name"
+                    value="Mohamed"
+                    required
+                  />
+                  <span class="error-message" id="full-name-error">hello</span>
                 </div>
-              </div>
 
-              <button
-                type="button"
-                class="clear-btn button button-small button-secondary"
-              >
-                Clear
-              </button>
-
-              <div
-                class="page-indicators"
-                role="progressbar"
-                aria-valuenow="1"
-                aria-valuemin="1"
-                aria-valuemax="2"
-              >
-                <span class="page-indicator active" aria-hidden="true"></span>
-                <span class="page-indicator" aria-hidden="true"></span>
-              </div>
-
-              <button
-                type="button"
-                class="next-btn button button-small button-primary"
-              >
-                Next
-              </button>
-            </section>
-
-            <!-- COMMERCE DETAILS -->
-            <section class="commerce_details hidden" id="form-2">
-              <div class="number-indicator" aria-hidden="true">2</div>
-              <h3 class="section-title">Commerce Details</h3>
-
-              <div class="form-group">
-                <div class="label-with-info">
-                  <label for="nrc">NRC</label>
-                  <button
-                    type="button"
-                    class="info-icon"
-                    aria-label="NRC Information"
-                    data-tooltip="Numéro Registre Commerce: A unique identification number assigned to your business by the commercial registry"
-                  >
-                    <i class="bx bx-info-circle" aria-hidden="true"></i>
-                  </button>
+                <div class="form-group">
+                  <label for="address">Address</label>
+                  <input
+                    type="text"
+                    id="address"
+                    name="address"
+                    value="123 address lorem"
+                  />
+                  <span id="address-error" class="error-message">
+                    Please enter a valid address.
+                  </span>
                 </div>
-                <input type="text" id="nrc" name="nrc" pattern="[\d-]{15,20}" />
-              </div>
 
-              <div class="form-group">
-                <div class="label-with-info">
-                  <label for="nif">NIF</label>
-                  <button
-                    type="button"
-                    class="info-icon"
-                    aria-label="NIF Information"
-                    data-tooltip="Numéro d'Identification Fiscale"
-                  >
-                    <i class="bx bx-info-circle" aria-hidden="true"></i>
-                  </button>
+                <div class="form-group">
+                  <label for="phone">Phone Number</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    maxlength="10"
+                    value="06 65 78 94 25"
+                  />
+                  <span class="error-message" id="phone-error"></span>
                 </div>
-                <input
-                  type="text"
-                  id="nif"
-                  name="nif"
-                  pattern="[\d\s]{15,20}"
-                />
-              </div>
 
-              <div class="form-group">
-                <div class="label-with-info">
-                  <label for="ia">IA</label>
-                  <button
-                    type="button"
-                    class="info-icon"
-                    aria-label="IA Information"
-                    data-tooltip="Identifiant Administratif"
-                  >
-                    <i class="bx bx-info-circle" aria-hidden="true"></i>
-                  </button>
+                <div class="form-group">
+                  <label for="type">Type</label>
+                  <div class="select-wrapper">
+                    <select id="type" name="type" required>
+                      <option value="customer" selected>Customer</option>
+                      <option value="supplier">Supplier</option>
+                      <option value="both">Both</option>
+                    </select>
+                  </div>
+                  <span class="error-message" id="type-error"></span>
                 </div>
-                <input type="text" id="ia" name="ia" />
-              </div>
 
-              <div class="form-group">
-                <div class="label-with-info">
-                  <label for="nis">NIS</label>
-                  <button
-                    type="button"
-                    class="info-icon"
-                    aria-label="NIS Information"
-                    data-tooltip="Numéro d'Identification Sociale"
-                  >
-                    <i class="bx bx-info-circle" aria-hidden="true"></i>
-                  </button>
-                </div>
-                <input type="text" id="nis" name="nis" />
-              </div>
-
-              <button
-                type="button"
-                class="clear-btn button button-small button-secondary"
-              >
-                Clear
-              </button>
-
-              <div
-                class="page-indicators"
-                role="progressbar"
-                aria-valuenow="2"
-                aria-valuemin="1"
-                aria-valuemax="2"
-              >
-                <span class="page-indicator" aria-hidden="true"></span>
-                <span class="page-indicator active" aria-hidden="true"></span>
-              </div>
-
-              <div class="form-actions">
                 <button
                   type="button"
-                  class="prev-btn button button-small button-secondary"
+                  id="clear-btn-1"
+                  class="clear-btn tertiary-btn"
                 >
-                  Previous
+                  Clear
                 </button>
+
+                <div class="page-indicators">
+                  <span class="page-indicator active"></span>
+                  <span class="page-indicator"></span>
+                </div>
+
+                <button type="button" class="next-btn secondary-btn">
+                  Next
+                </button>
+              </section>
+
+              <!-- COMMERCE DETAILS -->
+              <section class="personal-info hidden" id="form-2">
+                <div class="number-indicator">2</div>
+                <h3 class="section-title">Commerce Details</h3>
+
+                <div class="form-group">
+                  <div class="label-with-info">
+                    <label for="nrc">NRC</label>
+                    <button
+                      class="info-icon"
+                      data-tooltip="Numéro Registre Commerce: A unique identification number assigned to your business by the commercial registry"
+                    >
+                      <i class="bx bx-info-circle"></i>
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    id="nrc"
+                    name="nrc"
+                    placeholder="format: XX/XX-XXXXXXXAXX"
+                  />
+                  <span class="error-message" id="nrc-error"></span>
+                </div>
+
+                <div class="form-group">
+                  <div class="label-with-info">
+                    <label for="nif">NIF</label>
+                    <button
+                      class="info-icon"
+                      data-tooltip="Numéro d'Identification Fiscale"
+                    >
+                      <i class="bx bx-info-circle"></i>
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    id="nif"
+                    name="nif"
+                    value="654 256 879 254 368"
+                  />
+                  <span class="error-message" id="nif-error"></span>
+                </div>
+
+                <div class="form-group">
+                  <div class="label-with-info">
+                    <label for="ia">IA</label>
+                    <button
+                      class="info-icon"
+                      data-tooltip="Identifiant Administratif"
+                    >
+                      <i class="bx bx-info-circle"></i>
+                    </button>
+                  </div>
+                  <input type="text" id="ia" name="ia" value="06 65 78 94 25" />
+                  <span class="error-message" id="ia-error"></span>
+                </div>
+
+                <div class="form-group">
+                  <div class="label-with-info">
+                    <label for="nis">NIS</label>
+                    <button
+                      class="info-icon"
+                      data-tooltip="Numéro d'Identification Sociale"
+                    >
+                      <i class="bx bx-info-circle"></i>
+                    </button>
+                  </div>
+                  <input type="text" id="nis" name="nis" value="Customer" />
+                  <span class="error-message" id="nis-error"></span>
+                </div>
+
                 <button
-                  type="submit"
-                  class="create-btn button button-small button-primary"
+                  type="button"
+                  id="clear-btn-2"
+                  class="clear-btn tertiary-btn"
                 >
-                  Create
+                  Clear
                 </button>
-              </div>
-            </section>
-          </form>
+
+                <div class="page-indicators">
+                  <span class="page-indicator"></span>
+                  <span class="page-indicator active"></span>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="prev-btn secondary-btn">
+                    Previous
+                  </button>
+                  <button type="submit" class="create-btn primary-btn">
+                    Create
+                  </button>
+                </div>
+              </section>
+            </form>
+          </div>
+
+          <div class="error-message" id="summary-error"></div>
+          <!-- <div class="modal-footer">
+          <button class="modal-close">Close</button>
+          <button class="modal-action">Confirm</button>
+          </div> -->
         </div>
+      </div>
+      <!-- Success message popup -->
+      <div id="successMessage" class="success-message">
+        Form submitted successfully!
       </div>
     </div>
 
     <script src="../../scripts/common/EnhancedTable.js"></script>
     <script src="../../scripts/common/LoadingSpinner.js"></script>
     <script src="../common/sidebar.js"></script>
-    <script src="../../assets/js/modal.js"></script>
+    <!-- <script src="../../assets/js/modal.js"></script> -->
     <script src="client.js"></script>
   </body>
 </html>

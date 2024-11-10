@@ -1,29 +1,32 @@
-/* Container Styles */
-.modal {
-    max-width: 450px;
+body {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
 }
 
-.container {
-    width: 100%;
-    background-color: #f1f1f1;
-    padding: 20px;
-    border-radius: 4px;
-    position: relative;
-}
-
-.container section {
-    width: 100%;
-    min-width: 220px;
+/* Helper Classes Style */
+.flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .hidden {
     display: none;
 }
 
-.flex {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* Form Styles */
+form {
+    max-width: 400px;
+    background-color: #f1f1f1;
+    padding: 20px;
+    border-radius: 4px;
+    margin: 0 auto;
+    position: relative;
+}
+
+form section {
+    width: 100%;
+    min-width: 220px;
 }
 
 /* Form Sections */
@@ -39,58 +42,39 @@
     margin-bottom: 1rem;
 }
 
-.section-title.active {
-    color: #4CAF50;
-}
-
-.page-indicator.active {
-    background-color: #4CAF50;
-}
-
-/* Positioning */
-.form-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-
-/* Number Indicator */
-.number-indicator {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 24px;
-    height: 24px;
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.form-group label {
+    display: block;
+    color: #666;
     font-size: 14px;
-    font-style: italic;
-    font-weight: 500;
+    margin-bottom: 4px;
 }
 
-/* Page Indicators */
-.page-indicators {
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Label with Info */
+.label-with-info {
+    position: relative;
     display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin: 16px 0;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
 }
 
-.page-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #ccc;
+.label-with-info label {
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+    margin: 0;
 }
 
-.page-indicator.active {
-    background-color: #4CAF50;
-}
 
 /* Info Icon and Tooltip */
 .info-icon {
@@ -151,31 +135,173 @@
     visibility: visible;
 }
 
-/* Label with Info */
-.label-with-info {
+
+/* Select Wrapper */
+.select-wrapper {
     position: relative;
+    width: 100%;
+}
+
+.select-wrapper::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 30px;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 24px;
+    background-color: #ccc;
+}
+
+.select-wrapper select {
+    width: 100%;
+    padding: 8px 12px;
+    padding-right: 40px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    appearance: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    cursor: pointer;
+}
+
+.select-wrapper select:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+
+/* Buttons */
+/* Primary Button */
+.primary-btn {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.primary-btn:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
+
+/* Secondary Button */
+.secondary-btn {
+    background-color: #E0E0E0;
+    color: #4CAF50;
+    font-weight: medium;
+    padding: 8px 16px;
+    border: 1px solid #4CAF50;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.2s ease;
+}
+
+.secondary-btn:hover {
+    background-color: #A5D6A7;
+    border-color: #388E3C;
+}
+
+/* Tertiary Button */
+.tertiary-btn {
+    background: none;
+    border: none;
+    color: #666;
+    font-weight: normal;
+    padding: 8px;
+    font-style: italic;
+    cursor: pointer;
+    transition: color 0.3s ease, text-decoration 0.2s ease;
+}
+
+.tertiary-btn:hover {
+    color: #4CAF50;
+    text-decoration: underline;
+}
+
+
+/* Number Indicator */
+.number-indicator {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 24px;
+    height: 24px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    gap: 4px;
-    margin-bottom: 4px;
-}
-
-.label-with-info label {
-    display: inline-flex;
-    align-items: center;
+    justify-content: center;
     font-size: 14px;
-    color: #666;
-    margin: 0;
+    font-style: italic;
+    font-weight: 500;
 }
 
-/* Make the model responsive */
+/* Page Indicators */
+.page-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 16px 0;
+}
+
+.page-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #ccc;
+}
+
+.page-indicator.active {
+    background-color: #4CAF50;
+}
+
+.success-message {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    /* Green */
+    color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: none;
+    /* Initially hidden */
+}
+
+.error-message {
+    color: #d9534f;
+    /* Red color for errors */
+    font-size: 0.9em;
+    display: none;
+    /* Hidden by default */
+    margin-top: 4px;
+}
+
+
 /* Add this to your existing CSS */
 @media screen and (min-width: 768px) {
-
-    .container {
+    form {
+        max-width: 700px;
+        margin: 0 auto;
         display: flex;
         gap: 2rem;
         justify-content: space-between;
+    }
+
+    .personal-info,
+    .commerce-details {
+        max-width: 300px;
+        margin: 0;
+        flex: 1;
     }
 
     /* Remove the hidden class styles for larger screens */
