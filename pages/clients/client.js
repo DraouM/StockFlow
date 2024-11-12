@@ -253,60 +253,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-// In your renderer process
-// async function handleCreateParty(partyData) {
-//   try {
-//     const result = await window.partiesAPI.createParty(partyData);
-
-//     if (!result.success) {
-//       console.log("Result Status ", result.status);
-
-//       if (result.status === 409) {
-//         // Unique constraint violation
-//         showError("full-name", result.error.message);
-//         // Optionally focus the name field
-//         document.querySelector("#name").focus();
-//       } else if (result.status === 400) {
-//         // Handle validation error
-//         console.log("ERROR ", result);
-
-//         if (result.error.field) {
-//           // Set field-specific error
-//           console.log(" XXX ", result.error.field, result.error.message);
-
-//           showError(result.error.field, result.error.message);
-//         } else {
-//           // Set form-level validation error
-//           showSummaryError(result.error.message);
-//         }
-//       } else {
-//         // Handle system error
-//         showErrorNotification(result.error.message);
-//       }
-//       return result;
-//     }
-
-//     // Handle success
-//     showSuccessMessage(result.message);
-//     return result;
-//   } catch (error) {
-//     // Handle unexpected IPC errors
-//     console.error("IPC communication error:", error);
-//     showSummaryError(
-//       "Failed to communicate with the application. Please try again."
-//     );
-//     return {
-//       success: false,
-//       status: 500,
-//       error: {
-//         type: "SystemError",
-//         message: "Communication error occurred.",
-//         field: null,
-//       },
-//     };
-//   }
-// }
-
 async function handleCreateParty(partyData) {
   try {
     clearAllErrors(); // Clear any existing errors
@@ -511,7 +457,6 @@ function showSummaryError(message) {
   summaryErrorDiv.innerText = message;
   summaryErrorDiv.style.display = "block";
 }
-showSummaryError;
 
 function clearAllErrors() {
   document.querySelectorAll(".error-message").forEach((errorDiv) => {
