@@ -9,29 +9,29 @@ async function fetchAllParties() {
 }
 fetchAllParties();
 // Client-side usage:
-async function displayPartiesByType(type, page = 1, limit = 50) {
-  try {
-    const response = await window.partiesAPI.getPartiesByType({
-      type,
-      page,
-      limit,
-    });
+// async function displayPartiesByType(type, page = 1, limit = 50) {
+//   try {
+//     const response = await window.partiesAPI.getPartiesByType({
+//       type,
+//       page,
+//       limit,
+//     });
 
-    console.log("Response:", response);
+//     console.log("Response:", response);
 
-    if (response.success) {
-      const { data, pagination } = response;
-      // Handle the data...
-    } else {
-      console.error("Error:", response.error);
-    }
-  } catch (error) {
-    console.error("Error fetching parties by type:", error);
-  }
-}
+//     if (response.success) {
+//       const { data, pagination } = response;
+//       // Handle the data...
+//     } else {
+//       console.error("Error:", response.error);
+//     }
+//   } catch (error) {
+//     console.error("Error fetching parties by type:", error);
+//   }
+// }
 
 // Usage examples:
-displayPartiesByType("customer"); // Basic usage
+// displayPartiesByType("customer"); // Basic usage
 // displayPartiesByType("supplier", 2); // With page
 // displayPartiesByType("both", 1, 25); // With page and limit
 
@@ -133,7 +133,7 @@ async function displayPartiesByType(type, page = 1, limit = 50) {
     // Handle unexpected errors...
   }
 }
-displayPartiesByType("customer");
+// displayPartiesByType("customer");
 console.log("DONE");
 
 /** MODEL */
@@ -236,18 +236,120 @@ document.addEventListener("DOMContentLoaded", function () {
       // Proceed with processing formData
       console.log("Form Data Collected:", formData);
 
-      // Process the form data
       // You can now send this data to the server, close the modal, or display a success message
-      submitForm();
+      handleCreateParty(formData);
+
+      // Show a success message, clear the form and close the modal
+      // showSuccessMessage();
+      // resetForm();
+      // closeModal();
+
+      // Reload table with the new data
+      // loadAndDisplayData();
     } else {
       // Handle invalid form, as errors are displayed
+      showSummaryError("Please fix the highlighted errors.");
     }
   });
 });
 
-function submitForm() {
-  console.log("Form submitted successefully");
+// In your renderer process
+// async function handleCreateParty(partyData) {
+//   try {
+//     const result = await window.partiesAPI.createParty(partyData);
+
+//     if (!result.success) {
+//       console.log("Result Status ", result.status);
+
+//       if (result.status === 409) {
+//         // Unique constraint violation
+//         showError("full-name", result.error.message);
+//         // Optionally focus the name field
+//         document.querySelector("#name").focus();
+//       } else if (result.status === 400) {
+//         // Handle validation error
+//         console.log("ERROR ", result);
+
+//         if (result.error.field) {
+//           // Set field-specific error
+//           console.log(" XXX ", result.error.field, result.error.message);
+
+//           showError(result.error.field, result.error.message);
+//         } else {
+//           // Set form-level validation error
+//           showSummaryError(result.error.message);
+//         }
+//       } else {
+//         // Handle system error
+//         showErrorNotification(result.error.message);
+//       }
+//       return result;
+//     }
+
+//     // Handle success
+//     showSuccessMessage(result.message);
+//     return result;
+//   } catch (error) {
+//     // Handle unexpected IPC errors
+//     console.error("IPC communication error:", error);
+//     showSummaryError(
+//       "Failed to communicate with the application. Please try again."
+//     );
+//     return {
+//       success: false,
+//       status: 500,
+//       error: {
+//         type: "SystemError",
+//         message: "Communication error occurred.",
+//         field: null,
+//       },
+//     };
+//   }
+// }
+
+async function handleCreateParty(partyData) {
+  try {
+    clearAllErrors(); // Clear any existing errors
+
+    const result = await window.partiesAPI.createParty(partyData);
+
+    if (!result.success) {
+      console.log("RESULT STATUS ", result.status);
+
+      switch (result.status) {
+        case 409: // Unique constraint violation (duplicate name)
+          showError("full-name", result.error.message);
+          document.querySelector("#full-name")?.focus();
+          break;
+
+        case 400: // Validation error
+          if (result.error.field) {
+            showError(result.error.field, result.error.message);
+            document.querySelector(`#${result.error.field}`)?.focus();
+          } else {
+            showSummaryError(result.error.message);
+          }
+          break;
+
+        case 500: // System error
+        default:
+          showSummaryError(result.error.message);
+          break;
+      }
+      return false;
+    }
+
+    showSuccessMessage(result.message);
+    return true;
+  } catch (error) {
+    console.error("IPC communication error:", error);
+    showSummaryError(
+      "Failed to communicate with the application. Please try again."
+    );
+    return false;
+  }
 }
+
 function validateForm() {
   const isPersonalInfoValid = validatePersonalInfo();
   const isCommerceDetailsValid = validateCommerceDetails();
@@ -409,10 +511,28 @@ function showSummaryError(message) {
   summaryErrorDiv.innerText = message;
   summaryErrorDiv.style.display = "block";
 }
+showSummaryError;
 
 function clearAllErrors() {
   document.querySelectorAll(".error-message").forEach((errorDiv) => {
     errorDiv.innerText = "";
     errorDiv.style.display = "none";
   });
+}
+
+function resetForm() {
+  document
+    .querySelectorAll("input, select")
+    .forEach((input) => (input.value = ""));
+  clearAllErrors(); // Clear all error messages
+}
+
+function showSuccessMessage() {
+  const successMessage = document.getElementById("successMessage");
+  successMessage.style.display = "block";
+
+  // Hide success message after 3 seconds
+  setTimeout(() => {
+    successMessage.style.display = "none";
+  }, 3000);
 }
