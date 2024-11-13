@@ -35,52 +35,15 @@ fetchAllParties();
 // displayPartiesByType("supplier", 2); // With page
 // displayPartiesByType("both", 1, 25); // With page and limit
 
-//
 document.addEventListener("DOMContentLoaded", async () => {
   const spinner = new LoadingSpinner("clientTable", {
-    message: "Loading products...",
+    message: "Loading parties...",
   });
 
   try {
     spinner.show(); // Show spinner before data fetching
 
-    // Fetch all parties using the exposed API
-    const { data, pagination, success } =
-      await window.partiesAPI.getAllParties();
-
-    // Get the table body element
-    const tableBody = document.querySelector("#clientTable tbody");
-
-    // Clear any existing rows
-    tableBody.innerHTML = "";
-
-    // Use a document fragment to improve performance
-    const fragment = document.createDocumentFragment();
-
-    // Iterate over each product and add a row to the fragment
-    if (success) {
-      data.forEach((party) => {
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-          <td>${party.id}</td>
-          <td>${party.name}</td>
-          <td>${party.phone}</td>
-          <td>${party.address}</td>
-          <td>${party.type}</td>
-          <td>${party.credit_balance}</td>
-          <td>
-            <button class="button button-small button-secondary edit-button" data-id="${party.id}">Edit</button>
-            <button class="button button-small button-secondary delete-button" data-id="${party.id}">Delete</button>
-          </td>
-        `;
-
-        fragment.appendChild(row);
-      });
-    }
-
-    // Append the fragment to the table body
-    tableBody.appendChild(fragment);
+    await loadAndDisplayData();
 
     spinner.hide(); // Hide spinner after data fetching is done
 
@@ -89,16 +52,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       searchable: true,
       sortable: true,
       searchInputId: "table-search-input", // Link the search input by ID
-      emptyMessage: "No Item found",
+      emptyMessage: "No parties found",
       emptyImageSrc: "../assets/empty-table.png",
     });
-    // Optionally handle the case where no CLIENT is available
-    if (data.length === 0) {
+
+    // Optionally handle the case where no parties are available
+    const tableBody = document.querySelector("#clientTable tbody");
+    if (tableBody.childElementCount === 0) {
       clientTable.checkTableEmpty(0);
     }
-    console.log("Pagination:", pagination);
   } catch (error) {
-    console.error("Error fetching parties:", error);
+    console.error("Error fetching or rendering parties:", error);
 
     spinner.hide(); // Hide spinner in case of an error
 
@@ -237,21 +201,74 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("Form Data Collected:", formData);
 
       // You can now send this data to the server, close the modal, or display a success message
-      handleCreateParty(formData);
+      const success = handleCreateParty(formData);
+      if (success) {
+        // Show a success message, clear the form and close the modal
+        // showSuccessMessage();
+        // resetForm();
+        // closeModal();
 
-      // Show a success message, clear the form and close the modal
-      // showSuccessMessage();
-      // resetForm();
-      // closeModal();
-
-      // Reload table with the new data
-      // loadAndDisplayData();
+        // Reload table with the new data
+        loadAndDisplayData();
+      }
     } else {
       // Handle invalid form, as errors are displayed
       showSummaryError("Please fix the highlighted errors.");
     }
   });
 });
+
+async function loadAndDisplayData() {
+  try {
+    const data = await fetchDataFromDatabase();
+    if (data) {
+      renderDataInTable(data);
+    }
+  } catch (error) {
+    console.error("Error fetching or rendering data:", error);
+    // Add a user-friendly error message or fallback UI
+  }
+}
+async function fetchDataFromDatabase() {
+  try {
+    const { data, pagination, success } =
+      await window.partiesAPI.getAllParties();
+    if (success) {
+      return data;
+    } else {
+      throw new Error("Failed to fetch data from database");
+    }
+  } catch (error) {
+    console.error("Error fetching data from database:", error);
+    throw error;
+  }
+}
+
+function renderDataInTable(data) {
+  const tableBody = document.querySelector("#clientTable tbody");
+  tableBody.innerHTML = "";
+
+  const fragment = document.createDocumentFragment();
+
+  data.forEach((party) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${party.id}</td>
+      <td>${party.name}</td>
+      <td>${party.phone}</td>
+      <td>${party.address}</td>
+      <td>${party.type}</td>
+      <td>${party.credit_balance}</td>
+      <td>
+        <button class="button button-small button-secondary edit-button" data-id="${party.id}">Edit</button>
+        <button class="button button-small button-secondary delete-button" data-id="${party.id}">Delete</button>
+      </td>
+    `;
+    fragment.appendChild(row);
+  });
+
+  tableBody.appendChild(fragment);
+}
 
 async function handleCreateParty(partyData) {
   try {
