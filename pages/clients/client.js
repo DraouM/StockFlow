@@ -202,11 +202,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // You can now send this data to the server, close the modal, or display a success message
       const success = handleCreateParty(formData);
+      console.log("success ", success);
+
       if (success) {
         // Show a success message, clear the form and close the modal
-        // showSuccessMessage();
-        // resetForm();
-        // closeModal();
+        showSuccessMessage();
+        resetForm();
+        closeModal();
 
         // Reload table with the new data
         loadAndDisplayData();
