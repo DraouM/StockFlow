@@ -1,23 +1,90 @@
-table {
+/* Container for the table */
+.table-container {
+    position: relative;
+    max-height: 75dvh;
+    /* Adjust this value based on your needs */
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+}
+
+/* Style for the table */
+.table-container table {
     width: 100%;
     border-collapse: collapse;
+    background-color: white;
 }
 
-table th,
-table td {
-    padding: 0.75rem;
+
+/* Fixed header styles */
+.table-container thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #f9fafb;
+}
+
+
+/* Header cell styles */
+.table-container th {
+    padding: 0.75rem 1rem;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    font-weight: 600;
+    border-bottom: 1px solid #e5e7eb;
 }
 
-table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
+
+/* Table body styles */
+.table-container tbody tr {
+    border-bottom: 1px solid #e5e7eb;
 }
 
-table tr:nth-child(even) {
+/* Table cell styles */
+.table-container td {
+    padding: 0.75rem 1rem;
+    white-space: nowrap;
+}
+
+/* Hover effect on rows */
+.table-container tbody tr:hover {
+    background-color: #f5f5f5;
+    cursor: pointer;
+}
+
+.table-container tbody tr:hover td {
+    background-color: #f5f5f5;
+}
+
+/*  */
+.table-container tbody tr:nth-child(even) {
     background-color: #f9f9f9;
 }
+
+/* Scrollbar styling for webkit browsers */
+.table-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* For Firefox */
+.table-container {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+}
+
 
 .sortable {
     cursor: pointer;
