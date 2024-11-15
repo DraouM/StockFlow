@@ -230,25 +230,161 @@ function renderDataInTable(data) {
       <td>${party.type}</td>
       <td>${party.credit_balance}</td>
       <td>
-        <button class="button button-small button-secondary edit-button" data-id="${party.id}">Edit</button>
-        <button class="button button-small button-secondary delete-button" data-id="${party.id}">Delete</button>
+        <button data-action="edit" class="button button-small button-secondary edit-button" data-id="${party.id}">Edit</button>
+        <button data-action="delete" class="button button-small button-secondary delete-button" data-id="${party.id}">Delete</button>
       </td>
     `;
     fragment.appendChild(row);
   });
 
   tableBody.appendChild(fragment);
-  // Accessing data-id in Event Handlers
-  tableBody.addEventListener("click", (event) => {
-    const row = event.target.closest("tr");
-    if (row) {
-      const recordId = row.getAttribute("data-id");
-      console.log("Selected Record ID:", recordId);
-      // Perform operations based on the ID, such as fetching details or editing
-    }
-  });
+
+  // Remove any existing event listeners (if re-rendering)
+  tableBody.removeEventListener("click", handleTableActions);
+
+  // Add the event listener for all table actions
+  tableBody.addEventListener("click", handleTableActions);
+
+  // // Accessing data-id in Event Handlers
+  // tableBody.addEventListener("click", (event) => {
+  //   const row = event.target.closest("tr");
+  //   if (row) {
+  //     const recordId = row.getAttribute("data-id");
+  //     console.log("Selected Record ID:", recordId);
+  //     // Perform operations based on the ID, such as fetching details or editing
+  //   }
+  // });
 }
 
+function handleTableActions(event) {
+  const target = event.target;
+
+  // Check if a button was clicked
+  if (target.matches("button[data-action]")) {
+    const row = target.closest("tr");
+    const recordId = row.dataset.id;
+    const action = target.dataset.action;
+
+    switch (action) {
+      case "edit":
+        handleEdit(recordId, row);
+        break;
+      case "delete":
+        handleDelete(recordId, row);
+        break;
+      default:
+        console.log("Unknown action:", action);
+    }
+  } else if (target.closest("tr")) {
+    // Handle row click (if needed)
+    const row = target.closest("tr");
+    const recordId = row.dataset.id;
+    handleRowClick(recordId, row);
+  }
+}
+
+// Separate handlers for each action
+// Modified handle functions to show loading states
+async function handleEdit(recordId, row) {
+  try {
+    tableHelpers.setRowLoading(row, true);
+
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    const response = await window.partiesAPI.getPartyById(recordId);
+    if (response.success) {
+      openEditModal(response.data);
+    }
+  } catch (error) {
+    console.error("Error editing record:", error);
+  } finally {
+    tableHelpers.setRowLoading(row, false);
+  }
+}
+
+async function handleDelete(recordId, row) {
+  try {
+    console.log("Deleting record:", recordId);
+    // Show confirmation dialog
+    if (confirm("Are you sure you want to delete this record?")) {
+      const response = await window.partiesAPI.deleteParty(recordId);
+      if (response.success) {
+        // Remove row from table
+        row.remove();
+        // Show success message
+      }
+    }
+  } catch (error) {
+    console.error("Error deleting record:", error);
+    // Show error message to user
+  }
+}
+
+function handleRowClick(recordId, row) {
+  console.log("Row clicked:", recordId);
+  // Handle row click logic (if needed)
+  // For example, show details, highlight row, etc.
+}
+
+// Example edit modal function
+function openEditModal(partyData) {
+  // Implementation of edit modal/form
+  console.log("Opening edit modal with data:", partyData);
+  // You would typically:
+  // 1. Show a modal/form
+  // 2. Populate it with partyData
+  // 3. Handle form submission
+}
+
+// Helper functions for common tasks
+const tableHelpers = {
+  // Show loading state for a row
+  setRowLoading(row, isLoading) {
+    if (!row) return;
+    // Toggle loading class on row
+    row.classList.toggle("row-loading", isLoading);
+
+    // Disable/enable all buttons in the row
+    const buttons = row.querySelectorAll("button");
+    buttons.forEach((button) => {
+      button.disabled = isLoading;
+      button.classList.toggle("button-loading", isLoading);
+    });
+
+    return row; // Return for chaining
+  },
+
+  // Test the loading state
+  async simulateLoading(row, duration = 2000) {
+    this.setRowLoading(row, true);
+    await new Promise((resolve) => setTimeout(resolve, duration));
+    this.setRowLoading(row, false);
+  },
+
+  // Show success/error message
+  showMessage(message, type = "success") {
+    // Implementation depends on your UI library
+    console.log(`${type}: ${message}`);
+  },
+
+  // Highlight a row temporarily
+  highlightRow(row, duration = 2000) {
+    row.classList.add("highlight");
+    setTimeout(() => row.classList.remove("highlight"), duration);
+  },
+
+  // Update row data
+  updateRowData(row, newData) {
+    row.querySelector("td:nth-child(1)").textContent = newData.name;
+    row.querySelector("td:nth-child(2)").textContent = newData.phone;
+    row.querySelector("td:nth-child(3)").textContent = newData.address;
+    row.querySelector("td:nth-child(4)").textContent = newData.type;
+    row.querySelector("td:nth-child(5)").textContent = newData.credit_balance;
+  },
+};
+
+/**  */
 async function handleCreateParty(partyData) {
   try {
     clearAllErrors(); // Clear any existing errors
