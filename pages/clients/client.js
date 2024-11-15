@@ -244,16 +244,6 @@ function renderDataInTable(data) {
 
   // Add the event listener for all table actions
   tableBody.addEventListener("click", handleTableActions);
-
-  // // Accessing data-id in Event Handlers
-  // tableBody.addEventListener("click", (event) => {
-  //   const row = event.target.closest("tr");
-  //   if (row) {
-  //     const recordId = row.getAttribute("data-id");
-  //     console.log("Selected Record ID:", recordId);
-  //     // Perform operations based on the ID, such as fetching details or editing
-  //   }
-  // });
 }
 
 function handleTableActions(event) {
