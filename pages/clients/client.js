@@ -1,40 +1,37 @@
-// Fetch all parties
-async function fetchAllParties() {
+// client.js
+async function displayPartiesByType(type, page = 1, limit = 50) {
   try {
-    const parties = await window.partiesAPI.getAllParties();
-    console.log("All parties:", parties);
+    console.log("Requesting parties of type:", type);
+
+    const response = await window.partiesAPI.getPartiesByType({
+      type,
+      page,
+      limit,
+    });
+
+    console.log("Response from IPC:", response);
+
+    if (response.success) {
+      const { data, pagination } = response;
+      console.log("Parties data:", data);
+
+      // Handle the data...
+    } else {
+      console.error("Error from server:", response.error);
+      // Handle the error...
+    }
   } catch (error) {
-    console.error("Error fetching parties:", error);
+    console.error("Client error:", error);
+    // Handle unexpected errors...
   }
 }
-fetchAllParties();
-// Client-side usage:
-// async function displayPartiesByType(type, page = 1, limit = 50) {
-//   try {
-//     const response = await window.partiesAPI.getPartiesByType({
-//       type,
-//       page,
-//       limit,
-//     });
 
-//     console.log("Response:", response);
-
-//     if (response.success) {
-//       const { data, pagination } = response;
-//       // Handle the data...
-//     } else {
-//       console.error("Error:", response.error);
-//     }
-//   } catch (error) {
-//     console.error("Error fetching parties by type:", error);
-//   }
-// }
-
-// Usage examples:
+// // Usage examples:
 // displayPartiesByType("customer"); // Basic usage
 // displayPartiesByType("supplier", 2); // With page
 // displayPartiesByType("both", 1, 25); // With page and limit
 
+/** TABLE */
 document.addEventListener("DOMContentLoaded", async () => {
   const spinner = new LoadingSpinner("clientTable", {
     message: "Loading parties...",
@@ -69,36 +66,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Optionally, display an error message to the user
   }
 });
-
-// client.js
-async function displayPartiesByType(type, page = 1, limit = 50) {
-  try {
-    console.log("Requesting parties of type:", type);
-
-    const response = await window.partiesAPI.getPartiesByType({
-      type,
-      page,
-      limit,
-    });
-
-    console.log("Response from IPC:", response);
-
-    if (response.success) {
-      const { data, pagination } = response;
-      console.log("Parties data:", data);
-
-      // Handle the data...
-    } else {
-      console.error("Error from server:", response.error);
-      // Handle the error...
-    }
-  } catch (error) {
-    console.error("Client error:", error);
-    // Handle unexpected errors...
-  }
-}
-// displayPartiesByType("customer");
-console.log("DONE");
 
 /** MODEL */
 // modal functionality
@@ -254,8 +221,9 @@ function renderDataInTable(data) {
 
   data.forEach((party) => {
     const row = document.createElement("tr");
+    row.setAttribute("data-id", party.id); // Assign the ID
+
     row.innerHTML = `
-      <td>${party.id}</td>
       <td>${party.name}</td>
       <td>${party.phone}</td>
       <td>${party.address}</td>
@@ -270,6 +238,15 @@ function renderDataInTable(data) {
   });
 
   tableBody.appendChild(fragment);
+  // Accessing data-id in Event Handlers
+  tableBody.addEventListener("click", (event) => {
+    const row = event.target.closest("tr");
+    if (row) {
+      const recordId = row.getAttribute("data-id");
+      console.log("Selected Record ID:", recordId);
+      // Perform operations based on the ID, such as fetching details or editing
+    }
+  });
 }
 
 async function handleCreateParty(partyData) {
