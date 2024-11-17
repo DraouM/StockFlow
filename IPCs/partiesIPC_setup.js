@@ -12,23 +12,6 @@ function setupPartiesIPC() {
     partiesController.getPartyById(partyId)
   );
 
-  // ipcMain.handle("parties:create", async (event, partyData) => {
-  //   try {
-  //     // Attempt to create the party using the controller function
-  //     const response = await partiesController.createParty(partyData);
-  //     return response; // If successful, return response to the frontend
-  //   } catch (error) {
-  //     console.error("Error creating party:", error); // Log the error for debugging
-
-  //     // Return a structured error response to the frontend
-  //     return {
-  //       success: false,
-  //       error: error.message || "Failed to create party",
-  //     };
-  //   }
-  // });
-
-  // In main.js or your IPC handlers file
   ipcMain.handle("parties:create", async (event, partyData) => {
     try {
       const result = await partiesController.createParty(partyData);
