@@ -86,6 +86,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function openModal() {
     modal.style.display = "flex";
   }
+
   function closeModal() {
     modal.style.display = "none";
   }
@@ -96,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Event listeners for closing the modal
   closeModalBtn.addEventListener("click", closeModal);
 
-  // Close modal if clicking outside of content
+  // Close modal if clicking out  side of content
   window.addEventListener("click", function (event) {
     if (event.target === modal) {
       closeModal();
@@ -167,18 +168,31 @@ document.addEventListener("DOMContentLoaded", function () {
       // Proceed with processing formData
       console.log("Form Data Collected:", formData);
 
-      // You can now send this data to the server, close the modal, or display a success message
-      const success = handleCreateParty(formData);
-      console.log("success ", success);
+      const partyId = modal.dataset.partyId;
+      console.log("Edit Index ID XXX ", partyId);
 
-      if (success) {
-        // Show a success message, clear the form and close the modal
-        showSuccessMessage();
-        resetForm();
+      if (partyId !== undefined) {
+        // // Update existing Party
+        const success = handleUpdateParty(partyId, formData);
+        console.log("updating success ", success);
+
+        delete modal.dataset.partyId;
+        showSuccessMessage("updated");
         closeModal();
+      } else {
+        // You can now send this data to the server, close the modal, or display a success message
+        const success = handleCreateParty(formData);
+        console.log("creation success ", success);
 
-        // Reload table with the new data
-        loadAndDisplayData();
+        if (success) {
+          // Show a success message, clear the form and close the modal
+          showSuccessMessage("created");
+          resetForm();
+          closeModal();
+
+          // Reload table with the new data
+          loadAndDisplayData();
+        }
       }
     } else {
       // Handle invalid form, as errors are displayed
@@ -252,15 +266,15 @@ function handleTableActions(event) {
   // Check if a button was clicked
   if (target.matches("button[data-action]")) {
     const row = target.closest("tr");
-    const recordId = row.dataset.id;
+    const partyId = row.dataset.id;
     const action = target.dataset.action;
 
     switch (action) {
       case "edit":
-        handleEdit(recordId, row);
+        handleEditParty(partyId, row);
         break;
       case "delete":
-        handleDelete(recordId, row);
+        handleDeleteParty(partyId, row);
         break;
       default:
         console.log("Unknown action:", action);
@@ -275,14 +289,14 @@ function handleTableActions(event) {
 
 // Separate handlers for each action
 // Modified handle functions to show loading states
-async function handleEdit(recordId, row) {
+async function handleEditParty(partyId, row) {
   try {
     tableHelpers.setRowLoading(row, true);
 
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    const response = await window.partiesAPI.getPartyById(recordId);
+    const response = await window.partiesAPI.getPartyById(partyId);
     if (response.success) {
       openEditModal(response.data);
     }
@@ -293,12 +307,12 @@ async function handleEdit(recordId, row) {
   }
 }
 
-async function handleDelete(recordId, row) {
+async function handleDeleteParty(partyId, row) {
   try {
-    console.log("Deleting record:", recordId);
+    console.log("Deleting party:", partyId);
     // Show confirmation dialog
-    if (confirm("Are you sure you want to delete this record?")) {
-      const response = await window.partiesAPI.deleteParty(recordId);
+    if (confirm("Are you sure you want to delete this Party?")) {
+      const response = await window.partiesAPI.deleteParty(partyId);
       if (response.success) {
         // Remove row from table
         row.remove();
@@ -311,8 +325,8 @@ async function handleDelete(recordId, row) {
   }
 }
 
-function handleRowClick(recordId, row) {
-  console.log("Row clicked:", recordId);
+function handleRowClick(partyId, row) {
+  console.log("Row clicked:", partyId);
   // Handle row click logic (if needed)
   // For example, show details, highlight row, etc.
 }
@@ -325,6 +339,33 @@ function openEditModal(partyData) {
   // 1. Show a modal/form
   // 2. Populate it with partyData
   // 3. Handle form submission
+
+  const partyToEdit = partyData;
+
+  // Open modal
+  const modal = document.getElementById("modal");
+  modal.style.display = "flex";
+
+  // Change modal title
+  const modalTitle = modal.querySelector(".modal-title"); // Add class to your title
+  modalTitle.textContent = "Edit Party";
+
+  // Populate form fields
+  document.getElementById("full-name").value = partyToEdit.name;
+  document.getElementById("address").value = partyToEdit.address;
+  document.getElementById("phone").value = partyToEdit.phone;
+  document.getElementById("type").value = partyToEdit.type;
+
+  // Change submit button text and style
+  const submitBtn = modal.querySelector('button[type="submit"]');
+  submitBtn.textContent = "Modify";
+  submitBtn.classList.remove("bg-blue-500", "hover:bg-blue-600"); // Remove create button classes
+  submitBtn.classList.add("bg-green-500", "hover:bg-green-600"); // Add edit button classes
+
+  // Store ID for later use when saving
+  console.log("Party To Edit ID ", partyToEdit.id);
+
+  modal.dataset.partyId = partyToEdit.id;
 }
 
 // Helper functions for common tasks
@@ -374,15 +415,15 @@ const tableHelpers = {
   },
 };
 
-/**  */
-async function handleCreateParty(partyData) {
+/** Party UPDATING Handler */
+async function handleUpdateParty(partyId, partyData) {
   try {
     clearAllErrors(); // Clear any existing errors
 
-    const result = await window.partiesAPI.createParty(partyData);
+    const result = await window.partiesAPI.updateParty(partyId, partyData);
 
     if (!result.success) {
-      console.log("RESULT STATUS ", result.status);
+      console.log("UPDATING RESULT STATUS ", result.status);
 
       switch (result.status) {
         case 409: // Unique constraint violation (duplicate name)
@@ -418,6 +459,51 @@ async function handleCreateParty(partyData) {
   }
 }
 
+/** Party CREATEION Handler */
+async function handleCreateParty(partyData) {
+  try {
+    clearAllErrors(); // Clear any existing errors
+
+    const result = await window.partiesAPI.createParty(partyData);
+
+    if (!result.success) {
+      console.log("CREATION RESULT STATUS ", result.status);
+
+      switch (result.status) {
+        case 409: // Unique constraint violation (duplicate name)
+          showError("full-name", result.error.message);
+          document.querySelector("#full-name")?.focus();
+          break;
+
+        case 400: // Validation error
+          if (result.error.field) {
+            showError(result.error.field, result.error.message);
+            document.querySelector(`#${result.error.field}`)?.focus();
+          } else {
+            showSummaryError(result.error.message);
+          }
+          break;
+
+        case 500: // System error
+        default:
+          showSummaryError(result.error.message);
+          break;
+      }
+      return false;
+    }
+
+    showSuccessMessage(result.message);
+    return true;
+  } catch (error) {
+    console.error("IPC communication error:", error);
+    showSummaryError(
+      "Failed to communicate with the application. Please try again."
+    );
+    return false;
+  }
+}
+
+/** Form Validations Functions */
 function validateForm() {
   const isPersonalInfoValid = validatePersonalInfo();
   const isCommerceDetailsValid = validateCommerceDetails();
@@ -473,6 +559,7 @@ function validateCommerceDetails() {
   }
 }
 
+/** Fields Validations */
 function validateName(name) {
   if (name.trim() === "") {
     showError("full-name", "Party Full Name is required");
@@ -561,7 +648,7 @@ function validateNIS(nis) {
   return true;
 }
 
-/** Error Display/Removal Functions */
+/** Error/Success Display/Removal Functions */
 function showError(fieldId, message) {
   const errorDiv = document.getElementById(`${fieldId}-error`);
   errorDiv.innerText = message;
@@ -594,12 +681,17 @@ function resetForm() {
   clearAllErrors(); // Clear all error messages
 }
 
-function showSuccessMessage() {
+function showSuccessMessage(action = "created") {
   const successMessage = document.getElementById("successMessage");
+  const message =
+    action === "created"
+      ? "Party created successfully!"
+      : "Party updated successfully!";
+  successMessage.innerText = message;
   successMessage.style.display = "block";
 
   // Hide success message after 3 seconds
   setTimeout(() => {
     successMessage.style.display = "none";
   }, 3000);
-}
+} /** End of Error/Success Display/Removal Functions */
