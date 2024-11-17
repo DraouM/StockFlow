@@ -48,118 +48,69 @@ class PartiesController {
     }
   }
 
-  // Create a new party
   async createParty(partyData) {
     try {
       const result = await this.partiesModel.create(partyData);
       return {
         success: true,
+        status: 201, // Created
         data: result,
         message: `Party ${partyData.name} created successfully`,
       };
     } catch (error) {
-      console.error("Error creating party:", error);
-      throw {
-        success: false,
-        error: error.message || "Failed to create party",
-      };
-    }
-  }
-
-  // Update a party
-  async updateParty(partyId, updateData) {
-    try {
-      const result = await this.partiesModel.update(partyId, updateData);
-      return {
-        success: true,
-        data: result,
-        message: `Party updated successfully`,
-      };
-    } catch (error) {
-      console.error(`Error updating party with ID ${partyId}:`, error);
-      throw {
-        success: false,
-        error: error.message || "Failed to update party",
-      };
-    }
-  }
-
-  // Delete a party
-  async deleteParty(partyId) {
-    try {
-      const result = await this.partiesModel.delete(partyId);
-      return {
-        success: true,
-        data: result,
-        message: "Party deleted successfully",
-      };
-    } catch (error) {
-      console.error(`Error deleting party with ID ${partyId}:`, error);
-      throw {
-        success: false,
-        error: error.message || "Failed to delete party",
-      };
-    }
-  }
-
-  // Search parties
-  async searchParties(req) {
-    try {
-      const { type, searchTerm } = req.query;
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 50;
-
-      const parties = await this.partiesModel.search(
-        type,
-        searchTerm,
-        page,
-        limit
-      );
-
-      return {
-        success: true,
-        data: parties,
-        pagination: {
-          page,
-          limit,
-          total: parties.length,
-        },
-      };
-    } catch (error) {
-      console.error("Error searching parties:", error);
-      throw {
-        success: false,
-        error: error.message || "Failed to search parties",
-      };
-    }
-  }
-
-  // Get parties by type
-  async getPartiesByType(params) {
-    try {
-      const { type } = params;
-      console.log("Processing type in controller:", type);
-
-      // Get data from model
-      const data = await this.partiesModel.getByType(type);
-      console.log("Data from model:", data); // Debug log
-
-      // Always return a structured response
-      return {
-        success: true,
-        data: data || [], // Ensure data is at least an empty array
-        pagination: {
-          // your pagination details
-        },
-      };
-    } catch (error) {
-      console.error("Controller error:", error);
-      // Return error response rather than throwing
-      return {
-        success: false,
+      console.error("Error creating party:", {
+        data: partyData,
         error: error.message,
-        data: [],
-        pagination: {},
+        stack: error.stack,
+      });
+
+      // Check if it's a unique constraint error (name already exists)
+      console.log("YXY ", error);
+
+      if (error.message.includes("UNIQUE constraint")) {
+        throw {
+          success: false,
+          status: 409, // Conflict
+          error: {
+            type: "UniqueConstraintError",
+            message: `Party with name "${partyData.name}" already exists.`,
+            field: "name",
+          },
+        };
+      }
+
+      // Determine if this is a validation error
+      const isValidationError =
+        error.message.includes("Invalid") ||
+        error.message.includes("required") ||
+        error.message.includes("format");
+
+      // Check for other SQLite constraint errors
+      if (error.code === "SQLITE_CONSTRAINT") {
+        throw {
+          success: false,
+          status: isValidationError ? 400 : 500,
+          error: {
+            type: isValidationError ? "ValidationError" : "SystemError",
+            message: error.message || "Failed to create party",
+            field: isValidationError
+              ? extractFieldFromSQLiteError(error.message)
+              : null,
+          },
+        };
+      }
+
+      // Default error handling for unknown errors
+      throw {
+        success: false,
+        status: isValidationError ? 400 : 500, // Validation or system error
+        error: {
+          type: isValidationError ? "ValidationError" : "SystemError",
+          message: error.message || "Failed to create party",
+          field: isValidationError
+            ? extractFieldFromSQLiteError(error.message)
+            : null,
+        },
       };
     }
   }
@@ -184,6 +135,101 @@ class PartiesController {
     }
   }
 
+  async updateParty(partyId, partyData) {
+    try {
+      const result = await this.partiesModel.update(partyId, partyData);
+      return {
+        success: true,
+        status: 200, // OK
+        data: result,
+        message: `Party ${
+          partyData.name || "#" + partyId
+        } updated successfully`,
+      };
+    } catch (error) {
+      console.error("Error updating party:", {
+        id: partyId,
+        data: partyData,
+        error: error.message,
+        stack: error.stack,
+      });
+
+      // Check if it's a unique constraint error (name already exists)
+      if (error.message.includes("UNIQUE constraint")) {
+        throw {
+          success: false,
+          status: 409, // Conflict
+          error: {
+            type: "UniqueConstraintError",
+            message: `Party with name "${partyData.name}" already exists.`,
+            field: "name",
+          },
+        };
+      }
+
+      // Handle party not found error
+      if (error.message.includes("not found")) {
+        throw {
+          success: false,
+          status: 404,
+          error: {
+            type: "NotFoundError",
+            message: `Party with ID ${partyId} not found`,
+            field: "id",
+          },
+        };
+      }
+
+      // Handle invalid party type error
+      if (error.message.includes("Invalid party type")) {
+        throw {
+          success: false,
+          status: 400,
+          error: {
+            type: "ValidationError",
+            message: error.message,
+            field: "type",
+          },
+        };
+      }
+
+      // Determine if this is a validation error
+      const isValidationError =
+        error.message.includes("Invalid") ||
+        error.message.includes("required") ||
+        error.message.includes("format") ||
+        error.message.includes("No fields provided");
+
+      // Check for other SQLite constraint errors
+      if (error.code === "SQLITE_CONSTRAINT") {
+        throw {
+          success: false,
+          status: isValidationError ? 400 : 500,
+          error: {
+            type: isValidationError ? "ValidationError" : "SystemError",
+            message: error.message || "Failed to update party",
+            field: isValidationError
+              ? extractFieldFromSQLiteError(error.message)
+              : null,
+          },
+        };
+      }
+
+      // Default error handling for unknown errors
+      throw {
+        success: false,
+        status: isValidationError ? 400 : 500,
+        error: {
+          type: isValidationError ? "ValidationError" : "SystemError",
+          message: error.message || "Failed to update party",
+          field: isValidationError
+            ? extractFieldFromSQLiteError(error.message)
+            : null,
+        },
+      };
+    }
+  }
+
   // Cleanup method to close database connection
   cleanup() {
     try {
@@ -193,6 +239,19 @@ class PartiesController {
       throw error;
     }
   }
+}
+
+// Helper function to extract field name from validation error messages
+function extractFieldFromSQLiteError(errorMessage) {
+  const lowercaseMsg = errorMessage.toLowerCase();
+  if (lowercaseMsg.includes("nrc")) return "nrc";
+  if (lowercaseMsg.includes("nif")) return "nif";
+  if (lowercaseMsg.includes("nis")) return "nis";
+  if (lowercaseMsg.includes("ia")) return "ia";
+  if (lowercaseMsg.includes("phone")) return "phone";
+  if (lowercaseMsg.includes("name")) return "name";
+  if (lowercaseMsg.includes("type")) return "type";
+  return null;
 }
 
 // Create a singleton instance

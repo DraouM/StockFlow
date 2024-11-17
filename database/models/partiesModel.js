@@ -68,19 +68,36 @@ class PartiesModel {
 
   // Create a new party
   async create({ name, type, phone, address, nrc, nif, ia, nis }) {
-    // Format validations
-    if (nrc && !nrc.match(/^[0-9]{2}\/[0-9]{2}-[0-9]{7}[A-Z][0-9]{2}$/)) {
-      throw new Error("Invalid NRC format.");
-    }
-    if (nif && !nif.match(/^[0-9]{15}$/)) {
-      throw new Error("Invalid NIF format.");
-    }
-    if (nis && !nis.match(/^[0-9]{12}$/)) {
-      throw new Error("Invalid NIS format.");
-    }
-    if (ia && !ia.match(/^[0-9]{11}$/)) {
-      throw new Error("Invalid IA format.");
-    }
+    // First check if name exists
+    // const existingParty = await this.db.get(
+    //   "SELECT name FROM parties WHERE name = ?",
+    //   [name]
+    // );
+
+    // if (existingParty) {
+    //   throw new Error(`A party with the name "${name}" already exists.`);
+    // }
+
+    // Convert empty strings to null for optional fields
+    nrc = nrc?.trim() || null;
+    nif = nif?.trim() || null;
+    ia = ia?.trim() || null;
+    nis = nis?.trim() || null;
+    address = address?.trim() || null;
+
+    // // Format validations
+    // if (nrc && !nrc.match(/^[0-9]{2}\/[0-9]{2}-[0-9]{7}[A-Z][0-9]{2}$/)) {
+    //   throw new Error("Invalid NRC format.");
+    // }
+    // if (nif && !nif.match(/^[0-9]{15}$/)) {
+    //   throw new Error("Invalid NIF format.");
+    // }
+    // if (nis && !nis.match(/^[0-9]{12}$/)) {
+    //   throw new Error("Invalid NIS format.");
+    // }
+    // if (ia && !ia.match(/^[0-9]{11}$/)) {
+    //   throw new Error("Invalid IA format.");
+    // }
 
     // Rest of the function remains the same
     const query = `
@@ -137,25 +154,25 @@ class PartiesModel {
     partyId,
     { name, type, phone, address, credit_balance, nrc, nif, ia, nis }
   ) {
-    if (type && !["customer", "supplier", "both"].includes(type)) {
-      throw new Error(
-        "Invalid party type. Must be customer, supplier, or both."
-      );
-    }
+    // if (type && !["customer", "supplier", "both"].includes(type)) {
+    //   throw new Error(
+    //     "Invalid party type. Must be customer, supplier, or both."
+    //   );
+    // }
 
-    // Format validations
-    if (nrc && !nrc.match(/^[0-9]{2}\/[0-9]{2}-[0-9]{7}[A-Z][0-9]{2}$/)) {
-      throw new Error("Invalid NRC format.");
-    }
-    if (nif && !nif.match(/^[0-9]{15}$/)) {
-      throw new Error("Invalid NIF format.");
-    }
-    if (nis && !nis.match(/^[0-9]{12}$/)) {
-      throw new Error("Invalid NIS format.");
-    }
-    if (ia && !ia.match(/^[0-9]{11}$/)) {
-      throw new Error("Invalid IA format.");
-    }
+    // // Format validations
+    // if (nrc && !nrc.match(/^[0-9]{2}\/[0-9]{2}-[0-9]{7}[A-Z][0-9]{2}$/)) {
+    //   throw new Error("Invalid NRC format.");
+    // }
+    // if (nif && !nif.match(/^[0-9]{15}$/)) {
+    //   throw new Error("Invalid NIF format.");
+    // }
+    // if (nis && !nis.match(/^[0-9]{12}$/)) {
+    //   throw new Error("Invalid NIS format.");
+    // }
+    // if (ia && !ia.match(/^[0-9]{11}$/)) {
+    //   throw new Error("Invalid IA format.");
+    // }
 
     const updates = [];
     const params = [];
@@ -197,9 +214,9 @@ class PartiesModel {
       params.push(nis);
     }
 
-    if (updates.length === 0) {
-      throw new Error("No fields provided for update");
-    }
+    // if (updates.length === 0) {
+    //   throw new Error("No fields provided for update");
+    // }
 
     updates.push("updated_at = CURRENT_TIMESTAMP");
     params.push(partyId);
