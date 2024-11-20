@@ -1,0 +1,11 @@
+body {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+}
+
+/* Helper Classes Style */
+.flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
