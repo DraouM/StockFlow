@@ -4,6 +4,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 const { contextBridge, ipcRenderer } = require("electron");
+
 contextBridge.exposeInMainWorld("electronAPI", {
   products: {
     getAll: () => ipcRenderer.invoke("products-get-all"),
@@ -55,17 +56,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     getUnsettled: (partyId = null) =>
       ipcRenderer.invoke("transactions-get-unsettled", partyId),
   },
-  parties: {
-    getAll: () => ipcRenderer.invoke("parties-get-all"),
-    getById: (id) => ipcRenderer.invoke("parties-get-by-id", id),
-    create: (partyData) => ipcRenderer.invoke("parties:create", partyData),
-    update: (id, partyData) =>
-      ipcRenderer.invoke("parties:update", id, partyData),
-    delete: (id) => ipcRenderer.invoke("parties:delete", id),
-    getTotalDebt: (id) => ipcRenderer.invoke("parties-get-total-debt", id),
-    searchParty: (partyType, searchTerm) =>
-      ipcRenderer.invoke("search", partyType, searchTerm), // <--- NEW LINE ADDED HERE
-  },
 });
 
 // Expose parties API to renderer process
@@ -84,4 +74,11 @@ contextBridge.exposeInMainWorld("partiesAPI", {
 
   getPartyDebt: (partyId) => ipcRenderer.invoke("parties:getDebt", partyId),
   cleanup: () => ipcRenderer.invoke("parties:cleanup"),
+});
+
+// Expose parties API to renderer process
+contextBridge.exposeInMainWorld("productsAPI", {
+  createProduct: (productData) =>
+    ipcRenderer.invoke("create-product", productData),
+  listProducts: (filters) => ipcRenderer.invoke("list-products", filters),
 });
