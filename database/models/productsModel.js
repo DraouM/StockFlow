@@ -46,7 +46,7 @@ class ProductModel {
     });
   }
 
-  async getQuery(sql, params = []) {
+  async fetchSingle(sql, params = []) {
     return new Promise((resolve, reject) => {
       this.db.get(sql, params, (err, row) => {
         if (err) reject(err);
@@ -55,7 +55,7 @@ class ProductModel {
     });
   }
 
-  async allQuery(sql, params = []) {
+  async fetchQuery(sql, params = []) {
     return new Promise((resolve, reject) => {
       this.db.all(sql, params, (err, rows) => {
         if (err) reject(err);
@@ -67,7 +67,7 @@ class ProductModel {
   async createProduct({ name, subunit_in_unit = 1, tax_rate = 0 }) {
     try {
       const query = `INSERT INTO products (name, subunit_in_unit, tax_rate) VALUES (?, ?, ?)`;
-      return await runQuery(query, [name, subunit_in_unit, tax_rate]);
+      return await this.runQuery(query, [name, subunit_in_unit, tax_rate]);
     } catch (error) {
       if (error.message.includes("UNIQUE constraint")) {
         throw new ProductError("DUPLICATE_NAME", "Product name already exists");
@@ -79,22 +79,21 @@ class ProductModel {
     }
   }
 
-  async listProducts({
-    limit = 50,
-    offset = 0,
-    sortBy = "name",
-    sortOrder = "ASC",
-  }) {
-    const query = `
-        SELECT * FROM products 
-        ORDER BY ${sortBy} ${sortOrder} 
-        LIMIT ? OFFSET ?
-    `;
+  async listProducts(options = {}) {
+    const {
+      limit = 50,
+      offset = 0,
+      sortBy = "name",
+      sortOrder = "ASC",
+    } = options;
+
+    const query = `SELECT * FROM products ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`;
 
     try {
-      return await fetchQuery(query, [limit, offset]);
+      return await this.fetchQuery(query, [limit, offset]);
     } catch (error) {
-      throw new ProductError("FETCH_ERROR", "Failed to retrieve products");
+      console.error("Database Error:", error); // Add this for debugging
+      throw new ProductError(`Failed to retrieve products: ${error.message}`);
     }
   }
 
