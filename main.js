@@ -2,16 +2,6 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 
-// Import Product handlers
-const {
-  getAllProducts,
-  getProductById,
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  searchProducts,
-} = require("./controllers/productController");
-
 // Import Transaction handlers
 const {
   getAllTransactions,
@@ -65,22 +55,6 @@ app.on("activate", () => {
 
 // --------- IPC Handlers: Grouped by Functionality ---------
 
-// Products IPC Handlers
-ipcMain.handle("products-get-all", getAllProducts);
-ipcMain.handle("products-get-by-id", (event, productId) =>
-  getProductById(productId)
-);
-ipcMain.handle("products-create", (event, productData) =>
-  createProduct(productData)
-);
-ipcMain.handle("products-update", (event, id, productData) =>
-  updateProduct(id, productData)
-);
-ipcMain.handle("products-delete", (event, id) => deleteProduct(id));
-ipcMain.handle("products.search", (event, searchTerm) =>
-  searchProducts(searchTerm)
-);
-
 // Transactions IPC Handlers
 ipcMain.handle("transactions-get-all", getAllTransactions);
 ipcMain.handle("transactions-get-by-id", (event, transactionId) => {
@@ -110,9 +84,13 @@ ipcMain.handle("transactions-get-unsettled", (event, partyId) =>
   getUnsettledTransactions(partyId)
 );
 
+/** IPCs handlers setups */
 const { setupPartiesIPC } = require("./IPCs/partiesIPC_setup"); //path-to-ipc-setup
 // Call this after creating your electron window
 setupPartiesIPC();
+
+const { setupProductsIPC } = require("./IPCs/productsIPC_setup");
+setupProductsIPC();
 
 // Optional: Handle graceful shutdowns
 // process.on('SIGINT', () => {
