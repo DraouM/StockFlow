@@ -1,72 +1,43 @@
-const Product = require("../models/productsModel");
+// Sample products to seed
+const seedData = [
+  {
+    name: "Product D",
+    units: 2,
+    taxRate: 5,
+  },
+  {
+    name: "Product E",
+    units: 1,
+    taxRate: 10,
+  },
+  {
+    name: "Product F",
+    units: 10,
+    taxRate: 3.75,
+  },
+];
 
-async function manageProducts() {
-  const product = new Product();
-
+async function seedProducts(productsModel) {
   try {
-    await product.createTable();
+    console.log("Seeding products...");
 
-    // Add a new product
-    const newId = await product.addNewProduct("Chocolate Box", 12, 0.1);
-    console.log(`New product added with ID: ${newId}`);
+    // Drop existing data
+    // await productsModel.runQuery("DELETE FROM prodcuts", []);
 
-    // Get the product
-    const newProduct = await product.getProduct(newId);
-    console.log("New product:", newProduct);
+    // Insert seed data
+    for (const product of seedData) {
+      await productsModel.create(product); // Assuming `create` is the function in your model
+      console.log(`Seeded: ${product.name}`);
+    }
 
-    // Update the product
-    await product.updateProduct(newId, { stock_quantity: 72 });
-    console.log("Product updated");
-
-    // Calculate some values
-    const productValue = Product.calculateProductValue(
-      newProduct.stock_quantity,
-      newProduct.unit_price
-    );
-    console.log(`Product Value: $${productValue.toFixed(2)}`);
+    console.log("Product seeding completed successfully.");
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error("Seeders => Error seeding products:", error.message);
+    throw error;
   }
 }
 
-// manageProducts();
-
-async function manageProducts2() {
-  const product = new Product();
-
-  try {
-    await product.connect();
-    // await product.createTable();
-
-    // Add a new product
-    const newId = await product.addNewProduct("Smartphone", 1, 70, 250, 0.7);
-    console.log(`New product added with ID: ${newId}`);
-
-    // Get the product
-    const newProduct = await product.getProduct(newId);
-    console.log("New product:", newProduct);
-
-    // Update the product
-    await product.updateProduct(newId, { stock_quantity: 35 });
-    console.log("Product updated");
-
-    // Get calculated values
-    const productValue = product.getProductValue(newId);
-    const totalWithTax = product.getTotalWithTax(newId);
-    const stockUnits = product.getStockUnits(newId);
-
-    console.log(`Product Value: $${productValue}`);
-    console.log(`Total with Tax: $${totalWithTax}`);
-    console.log(`Stock Units: ${stockUnits}`);
-
-    // List all products
-    const allProducts = await product.listProducts();
-    console.log("All products:", allProducts);
-  } catch (error) {
-    console.error("An error occurred:", error);
-  } finally {
-    await product.close();
-  }
-}
-
-manageProducts2();
+module.exports = {
+  seedProducts,
+  seedData, // Export seed data for testing purposes
+};
