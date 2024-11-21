@@ -11,6 +11,10 @@ function setupProductsIPC() {
   ipcMain.handle("list-products", async (event, filters) => {
     return await productsController.listProductsController(filters);
   });
+
+  ipcMain.handle("update-product", async (event, data) => {
+    return await productsController.handleUpdate(data);
+  });
 }
 
 // Export the setup function

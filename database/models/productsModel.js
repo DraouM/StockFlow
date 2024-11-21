@@ -102,37 +102,142 @@ class ProductModel {
   //   return this.getQuery(sql, [productId]);
   // }
 
-  // async updateProduct(productId, updates) {
-  //   const allowedFields = [
-  //     "name",
-  //     "product_unit",
-  //     "stock_quantity",
-  //     "unit_price",
-  //     "tax_rate",
-  //   ];
-  //   const updateFields = [];
-  //   const values = [];
+  async updateProduct(updateData) {
+    const id = updateData.id;
+    // Validate input
+    console.log("XXX ", id);
 
-  //   for (const [key, value] of Object.entries(updates)) {
-  //     if (allowedFields.includes(key)) {
-  //       updateFields.push(`${key} = ?`);
-  //       values.push(value);
-  //     }
-  //   }
+    if (!id) {
+      throw new ProductError(
+        "INVALID_INPUT",
+        "Product ID is required for updating"
+      );
+    }
 
-  //   if (updateFields.length === 0) return;
+    // Allowed fields for update
+    const allowedFields = [
+      "name",
+      "total_stock",
+      "subunit_in_unit",
+      "buying_price",
+      "selling_price",
+      "average_price",
+      "tax_rate",
+      "reorder_level",
+      "status",
+    ];
 
-  //   values.push(new Date().toISOString());
-  //   values.push(productId);
+    // Filter out any fields not allowed to be updated
+    const filteredData = Object.keys(updateData)
+      .filter((key) => allowedFields.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = updateData[key];
+        return obj;
+      }, {});
 
-  //   const sql = `
-  //     UPDATE products
-  //     SET ${updateFields.join(", ")}, updated_at = ?
-  //     WHERE id = ?
-  //   `;
+    // If no valid fields to update
+    if (Object.keys(filteredData).length === 0) {
+      throw new ProductError(
+        "INVALID_INPUT",
+        "No valid fields provided for update"
+      );
+    }
 
-  //   return this.runQuery(sql, values);
-  // }
+    // Validate data types and constraints
+    this.validateUpdateData(filteredData);
+
+    // Construct dynamic update query
+    const updateFields = Object.keys(filteredData)
+      .map((key) => `${key} = ?`)
+      .join(", ");
+
+    const values = [...Object.values(filteredData), id];
+
+    const query = `
+      UPDATE products 
+      SET ${updateFields}
+      WHERE id = ?
+  `;
+
+    try {
+      const result = await this.runQuery(query, values);
+
+      if (result.changes === 0) {
+        throw new ProductError("NOT_FOUND", `No product found with ID ${id}`);
+      }
+
+      return {
+        success: true,
+        message: "Product updated successfully",
+        updatedFields: Object.keys(filteredData),
+      };
+    } catch (error) {
+      // Handle SQLite unique constraint violation
+      if (error.message.includes("UNIQUE constraint")) {
+        throw new ProductError("DUPLICATE_NAME", "Product name already exists");
+      }
+
+      // If it's already a ProductError, rethrow it
+      if (error instanceof ProductError) {
+        throw error;
+      }
+
+      // For any other database errors
+      console.error("Update product error:", error);
+      throw new ProductError("DATABASE_ERROR", "Failed to update product");
+    }
+  }
+  // Helper method to validate update data
+  validateUpdateData(data) {
+    if (data.subunit_in_unit && data.subunit_in_unit < 1) {
+      throw new ProductError(
+        "INVALID_INPUT",
+        "Subunit in unit must be 1 or more"
+      );
+    }
+
+    if (data.buying_price && data.buying_price < 0) {
+      throw new ProductError(
+        "INVALID_INPUT",
+        "Buying price cannot be negative"
+      );
+    }
+
+    if (data.selling_price && data.selling_price < 0) {
+      throw new ProductError(
+        "INVALID_INPUT",
+        "Selling price cannot be negative"
+      );
+    }
+
+    if (data.average_price && data.average_price < 0) {
+      throw new ProductError(
+        "INVALID_INPUT",
+        "Average price cannot be negative"
+      );
+    }
+
+    if (data.tax_rate && (data.tax_rate < 0 || data.tax_rate > 100)) {
+      throw new ProductError(
+        "INVALID_INPUT",
+        "Tax rate must be between 0 and 100"
+      );
+    }
+
+    if (data.reorder_level && data.reorder_level < 0) {
+      throw new ProductError(
+        "INVALID_INPUT",
+        "Reorder level cannot be negative"
+      );
+    }
+
+    if (
+      data.status &&
+      !["available", "out_of_stock", "inactive"].includes(data.status)
+    ) {
+      throw new ProductError("INVALID_INPUT", "Invalid product status");
+    }
+  }
 
   // async deleteProduct(productId) {
   //   const sql = "DELETE FROM products WHERE id = ?";

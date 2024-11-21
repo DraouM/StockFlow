@@ -29,6 +29,7 @@ class ProductDatabase {
         subunit_in_unit INTEGER NOT NULL DEFAULT 1 CHECK (subunit_in_unit >= 1), -- Must be 1 or more
         buying_price REAL NOT NULL CHECK (buying_price >= 0) DEFAULT 0,      -- Allow default price of 0
         selling_price REAL NOT NULL CHECK (selling_price >= 0) DEFAULT 0,    -- Allow default price of 0
+        average_price REAL NOT NULL CHECK (average_price >= 0) DEFAULT 0,    -- Tracking product cost variations over time
         tax_rate REAL CHECK (tax_rate >= 0 AND tax_rate <= 100) DEFAULT 0, -- Tax rate between 0 and 100
         reorder_level INTEGER DEFAULT 0 CHECK (reorder_level >= 0), -- Minimum stock level before reordering is required
         status TEXT NOT NULL CHECK (status IN ('available', 'out_of_stock', 'inactive')) DEFAULT 'out_of_stock', -- Default product status

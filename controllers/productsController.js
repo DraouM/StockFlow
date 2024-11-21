@@ -1,6 +1,13 @@
 const ProductModel = require("../database/models/productsModel");
 const productModel = new ProductModel();
 
+class ProductError extends Error {
+  constructor(type, message) {
+    super(message);
+    this.type = type;
+  }
+}
+
 class ProductsController {
   async createProductController(data) {
     try {
@@ -27,6 +34,81 @@ class ProductsController {
         error: {
           type: error.type || "UNKNOWN_ERROR",
           message: error.message,
+        },
+      };
+    }
+  }
+
+  async handleUpdate(data) {
+    const id = data.id;
+    try {
+      console.log("Received update data:", data); // Debug log
+
+      // Validate required fields in request
+      if (!id) {
+        return {
+          status: "error",
+          error: {
+            type: "INVALID_INPUT",
+            message: "Product ID is required",
+          },
+        };
+      }
+
+      // Remove any undefined or null values
+      const updateData = Object.fromEntries(
+        Object.entries(data).filter(
+          ([key, value]) =>
+            value !== undefined && value !== null && key !== "id"
+        )
+      );
+
+      console.log("Filtered update data:", updateData); // Debug log
+
+      // Perform the update
+      const result = await productModel.updateProduct(data);
+
+      return {
+        status: "success",
+        data: result,
+      };
+    } catch (error) {
+      // Enhanced error logging
+      console.error("Detailed error information:", {
+        message: error.message,
+        type: error.type,
+        stack: error.stack,
+      });
+
+      // Handle known error types
+      if (error instanceof ProductError) {
+        return {
+          status: "error",
+          error: {
+            type: error.type,
+            message: error.message,
+          },
+        };
+      }
+
+      // More specific error for database-related issues
+      if (error.code) {
+        // SQL errors usually have a code
+        return {
+          status: "error",
+          error: {
+            type: "DATABASE_ERROR",
+            message: `Database error: ${error.message}`,
+          },
+        };
+      }
+
+      // Handle unexpected errors with more detail
+      return {
+        status: "error",
+        error: {
+          type: "UNKNOWN_ERROR",
+          message: error.message || "An unexpected error occurred",
         },
       };
     }

@@ -205,8 +205,8 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("Edit Index ID XXX ", productId);
       if (productId !== undefined) {
         // UPDATE existing Product
-        const success = handleUpdateParty(productId, formData);
-        console.log("Product updated successefully ", success);
+        handleProductUpdating(productId, formData);
+        console.log("Product updated successefully ");
 
         delete modal.dataset.productId;
         showSuccessMessage("updated");
@@ -228,7 +228,46 @@ function handleEditClick() {
   modalManager.setType("edit");
 }
 
-/** Party CREATEION Handler */
+//
+
+// Example frontend usage
+async function updateProduct(productData) {
+  try {
+    console.log("Sending update request with data:", productData); // Debug log
+
+    const result = await window.productsAPI.updateProduct({
+      id: 6,
+      name: "Updated Product 3",
+      selling_price: 29.99,
+      status: "available",
+    });
+    console.log("Received result:", result); // Debug log
+
+    if (result.status === "success") {
+      console.log("Product updated successfully:", result.data);
+      // Handle success (e.g., show success message, refresh product list)
+      return result.data;
+    } else {
+      console.error("Update failed:", result.error);
+      throw new Error(result.error.message);
+    }
+  } catch (error) {
+    console.error("Update error:", error);
+    throw error; // Re-throw to handle in the calling function
+  }
+}
+
+updateProduct(null);
+/** Product UPDATING Handler */
+function handleProductUpdating(productId, productData) {
+  console.log("Updating Product with ID: ", productId);
+  // Update Product logic here
+  // Example: Update Product in database
+  // const updatedProduct = await updateProductInDatabase(productId, formData);
+  // console.log("Updated Product: ", updatedProduct);
+}
+
+/** Product CREATION Handler */
 async function handleProductCreation(productData) {
   try {
     const response = await window.productsAPI.createProduct(productData);
