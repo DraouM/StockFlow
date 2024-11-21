@@ -39,6 +39,50 @@ class ProductsController {
     }
   }
 
+  async handleFetchSingle(productId) {
+    try {
+      // Validate input
+      if (!productId) {
+        return {
+          status: "error",
+          error: {
+            type: "INVALID_INPUT",
+            message: "Product ID is required",
+          },
+        };
+      }
+
+      // Fetch the product
+      const product = await productModel.fetchSingleProduct(productId);
+
+      return {
+        status: "success",
+        data: product,
+      };
+    } catch (error) {
+      // Handle known error types
+      if (error instanceof ProductError) {
+        return {
+          status: "error",
+          error: {
+            type: error.type,
+            message: error.message,
+          },
+        };
+      }
+
+      // Handle unexpected errors
+      console.error("Fetch single product error:", error);
+      return {
+        status: "error",
+        error: {
+          type: "UNKNOWN_ERROR",
+          message: "An unexpected error occurred while fetching the product",
+        },
+      };
+    }
+  }
+
   async handleUpdate(data) {
     const id = data.id;
     try {

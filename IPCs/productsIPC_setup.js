@@ -12,6 +12,10 @@ function setupProductsIPC() {
     return await productsController.listProductsController(filters);
   });
 
+  ipcMain.handle("fetch-single-product", async (event, productId) => {
+    return await productsController.handleFetchSingle(productId);
+  });
+
   ipcMain.handle("update-product", async (event, data) => {
     return await productsController.handleUpdate(data);
   });

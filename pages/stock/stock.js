@@ -258,7 +258,28 @@ async function updateProduct(productData) {
 }
 
 updateProduct(null);
+
+async function fetchSingleProduct(productId) {
+  try {
+    console.log("Fetching product with ID:", productId);
+
+    const result = await window.productsAPI.fetchSingleProduct(productId);
+
+    if (result.status === "success") {
+      console.log("Product fetched successfully:", result.data);
+      return result.data;
+    } else {
+      console.error("Fetch failed:", result.error);
+      throw new Error(result.error.message);
+    }
+  } catch (error) {
+    console.error("Fetch product error:", error);
+    throw error;
+  }
+}
+fetchSingleProduct(6); // Example usage
 /** Product UPDATING Handler */
+
 function handleProductUpdating(productId, productData) {
   console.log("Updating Product with ID: ", productId);
   // Update Product logic here

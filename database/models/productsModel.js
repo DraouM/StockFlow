@@ -97,10 +97,36 @@ class ProductModel {
     }
   }
 
-  // async getProductById(productId) {
-  //   const sql = "SELECT * FROM products WHERE id = ?";
-  //   return this.getQuery(sql, [productId]);
-  // }
+  async fetchSingleProduct(id) {
+    // Validate input
+    if (!id) {
+      throw new ProductError("INVALID_INPUT", "Product ID is required");
+    }
+
+    const query = `
+        SELECT * FROM products 
+        WHERE id = ?
+    `;
+
+    try {
+      const product = await this.fetchSingle(query, [id]);
+
+      if (!product) {
+        throw new ProductError("NOT_FOUND", `Product with ID ${id} not found`);
+      }
+
+      return product;
+    } catch (error) {
+      // If it's already a ProductError, rethrow it
+      if (error instanceof ProductError) {
+        throw error;
+      }
+
+      // For any other database errors
+      console.error("Fetch product error:", error);
+      throw new ProductError("DATABASE_ERROR", "Failed to fetch product");
+    }
+  }
 
   async updateProduct(updateData) {
     const id = updateData.id;

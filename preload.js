@@ -82,4 +82,5 @@ contextBridge.exposeInMainWorld("productsAPI", {
     ipcRenderer.invoke("create-product", productData),
   listProducts: (filters) => ipcRenderer.invoke("list-products", filters),
   updateProduct: (data) => ipcRenderer.invoke("update-product", data),
+  fetchSingleProduct: (id) => ipcRenderer.invoke("fetch-single-product", id),
 });
