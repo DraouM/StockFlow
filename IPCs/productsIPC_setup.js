@@ -19,7 +19,26 @@ function setupProductsIPC() {
   ipcMain.handle("update-product", async (event, data) => {
     return await productsController.handleUpdate(data);
   });
+
+  ipcMain.handle("search-products", async (event, searchTerm) => {
+    return await productsController.searchProducts(searchTerm);
+  });
 }
 
 // Export the setup function
 module.exports = { setupProductsIPC };
+
+/** For Later (error cheking) */
+// ipcMain.handle('search-products', async (event, searchTerm) => {
+//   try {
+//     return await productController.searchProducts(searchTerm);
+//   } catch (error) {
+//     console.error('IPC search products error:', error);
+//     return {
+//       success: false,
+//       error: {
+//         type: 'IPC_ERROR',
+//         message: 'Failed to process product search'
+//       }
+//     };
+//   }

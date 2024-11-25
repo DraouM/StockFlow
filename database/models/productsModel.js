@@ -270,14 +270,28 @@ class ProductModel {
   //   return this.runQuery(sql, [productId]);
   // }
 
-  // // Method to fetch products by search term
-  // async searchProducts(searchTerm) {
-  //   const sql = `SELECT * FROM products WHERE name LIKE ?`;
-  //   console.log("AAA ", searchTerm);
+  // Method to fetch products by search term
+  async searchProducts(searchTerm) {
+    // Validate search term
+    if (!searchTerm || typeof searchTerm !== "string") {
+      throw new ProductError(
+        "INVALID_INPUT",
+        "Search term must be a non-empty string"
+      );
+    }
 
-  //   const params = [`%${searchTerm}%`];
-  //   return this.allQuery(sql, params); // Use the helper method
-  // }
+    const sql = `SELECT * FROM products WHERE name LIKE ?`;
+    const params = [`%${searchTerm}%`];
+
+    try {
+      return await this.fetchQuery(sql, params);
+    } catch (error) {
+      throw new ProductError(
+        "DATABASE_ERROR",
+        `Failed to search products: ${error.message}`
+      );
+    }
+  }
 
   // getProductValue(productId) {
   //   return new Promise((resolve, reject) => {

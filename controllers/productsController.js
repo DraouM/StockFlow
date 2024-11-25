@@ -157,6 +157,26 @@ class ProductsController {
       };
     }
   }
+
+  async searchProducts(searchTerm) {
+    try {
+      const products = await productModel.searchProducts(searchTerm);
+      return {
+        success: true,
+        data: products,
+        message: `Found ${products.length} product(s)`,
+      };
+    } catch (error) {
+      console.error("Search products error:", error);
+      return {
+        success: false,
+        error: {
+          type: error.type || "UNKNOWN_ERROR",
+          message: error.message,
+        },
+      };
+    }
+  }
 }
 
 module.exports = new ProductsController();
