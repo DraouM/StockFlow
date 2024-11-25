@@ -1,7 +1,24 @@
+async function performProductSearch(searchTerm) {
+  try {
+    const result = await window.productsApi.searchProducts(searchTerm);
+
+    if (result.success) {
+      // Handle successful search
+      displayProducts(result.data);
+      // return result.data;
+    } else {
+      // Handle error
+      showErrorMessage(result.error.message);
+    }
+  } catch (error) {
+    console.error("Search failed:", error);
+  }
+}
+
 /*PRODUCTS SEARCHING*/
 document.addEventListener("DOMContentLoaded", () => {
   const fetchProducts = async (searchTerm) => {
-    return await window.electronAPI.products.searchProducts(searchTerm);
+    return await window.productsAPI.searchProduct(searchTerm);
   };
 
   const onProductSelected = (selectedProduct) => {
