@@ -46,12 +46,16 @@ class Searchbar {
   }
 
   async fetchResults(searchTerm) {
+    console.log("Search.. ", searchTerm);
+
     try {
       const results = await this.fetchFunction(searchTerm);
+      console.log("Result from fetching..", results);
+
       if (results.length === 0) {
         this.displayNoResultsMessage();
       } else {
-        this.displayResults(results);
+        this.displayResults(results.data);
       }
     } catch (error) {
       this.displayErrorMessage("An error occurred while fetching results.");
