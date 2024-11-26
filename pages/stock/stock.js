@@ -36,19 +36,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       row.innerHTML = `
         <td>${product.id}</td>
         <td>${product.name}</td>
-        <td>${product.product_unit}</td>
-        <td>${product.stock_quantity}</td>
-        <td>${product.stock_quantity / product.product_unit}</td>
-        <td>${product.unit_price}</td>
-        <td>${product.product_value}</td>
+        <td>${product.subunit_in_unit}</td>
+        <td>${product.h}</td>
+        <td>${product.total_stock}</td>
+        <td>${product.selling_price}</td>
+        <td>${product.buying_price}</td>
         <td>${product.tax_rate}</td>
+        <td>${product.updated_at}</td>
         <td>
-          <button class="button button-small button-secondary edit-button" data-id="${
-            product.id
-          }">Edit</button>
-          <button class="button button-small button-secondary delete-button" data-id="${
-            product.id
-          }">Delete</button>
+          <button class="button button-small button-secondary edit-button" data-id="${product.id}">Edit</button>
+          <button class="button button-small button-secondary delete-button" data-id="${product.id}">Delete</button>
         </td>
       `;
 
@@ -257,7 +254,7 @@ async function updateProduct(productData) {
   }
 }
 
-updateProduct(null);
+// updateProduct(null);
 
 async function fetchSingleProduct(productId) {
   try {
