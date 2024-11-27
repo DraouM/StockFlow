@@ -13,18 +13,50 @@ const formManager = {
     }
   },
 
+  populate(formId, data) {
+    const form = document.getElementById(formId);
+
+    Object.keys(data).forEach((key) => {
+      const input = form.querySelector(`[name="${key}"]`);
+      if (input) {
+        input.value = data[key];
+      }
+    });
+  },
+
   validate(formId) {
     const { rules } = this.forms[formId];
     let isValid = true;
-    // Iterate and validate fields based on rules
+
     Object.keys(rules).forEach((fieldName) => {
       const input = document.querySelector(`[name="${fieldName}"]`);
       const rule = rules[fieldName];
-      if (rule.required && !input.value.trim()) {
+      const value = input.value.trim();
+
+      // Clear previous errors
+      input.classList.remove("invalid");
+      const existingError = input.parentElement.querySelector(".error-message");
+      if (existingError) existingError.remove();
+
+      // Required check
+      if (rule.required && !value) {
         isValid = false;
         this.showError(input, `${fieldName} is required`);
       }
+
+      // Min length check
+      if (rule.minLength && value.length < rule.minLength) {
+        isValid = false;
+        this.showError(input, `Minimum ${rule.minLength} characters required`);
+      }
+
+      // Min value check for numeric fields
+      if (rule.min !== undefined && Number(value) < rule.min) {
+        isValid = false;
+        this.showError(input, `Minimum value is ${rule.min}`);
+      }
     });
+
     return isValid;
   },
 
@@ -73,32 +105,73 @@ document.addEventListener("DOMContentLoaded", function () {
 
   formManager.init(productFormId, {
     rules: {
-      productName: { required: true },
-      quantity: { required: true },
-      subUnits: { required: true },
-      price: { required: true },
+      productName: { required: true, minLength: 2 },
+      quantity: { required: true, min: 1 },
+      subUnits: { required: true, min: 1 },
+      unitPrice: { required: true, min: 0.01 },
     },
-    onSubmit: (data) => {
+    onSubmit: (formData) => {
+      // Convert FormData to plain object
+      const data = Object.fromEntries(formData);
+      console.log(data);
+      // Now you can use the data object
       productFormOnSubmit(data);
     },
-
-    getData() {
-      const form = this.forms[formId];
-      if (!form) {
-        console.error(`Form with ID "${formId}" is not registered.`);
-        return {};
-      }
-
-      const formData = {};
-      const inputs = form.querySelectorAll("[name]");
-
-      inputs.forEach((input) => {
-        formData[input.name] = input.value.trim();
-      });
-
-      console.log(formData);
-    },
   });
+
+  const productDataEx = {
+    productName: "Test",
+    quantity: "150",
+    subUnits: "150",
+    unitPrice: "150.00",
+    subTotal: "1500.00",
+  };
+
+  formManager.populate(productFormId, productDataEx);
 });
 
-function productFormOnSubmit(data) {}
+function productFormOnSubmit(data) {
+  console.log("form submited!!");
+  addProductToList(data);
+  console.log("product added !!");
+}
+
+function addProductToList(product) {
+  const tableBody = document.querySelector("#shopping-list tbody");
+  const rowCount = tableBody.children.length;
+  // Create a new row
+  const newRow = document.createElement("tr");
+  // Populate row cells
+  newRow.innerHTML = `
+      <td><span class="number-circle">${rowCount + 1}</span></td>
+      <td>${product.productName}</td>
+      <td>
+      <span class="main-quantity">${product.quantity}</span>
+      <span class="sub-quantity highlight">${product.quantityUnit}</span>
+      </td> <!-- Quantity -->
+      <td>${
+        product.subUnits ? product.subUnits : "N/A"
+      }</td> <!-- Sub-unit or units (if there's a separate value) -->
+      <td>${
+        product.unitPrice ? product.unitPrice : "N/A"
+      }</td> <!-- Unit Price -->
+      <td>${
+        product.subTotal ? product.subTotal : "N/A"
+      }</td> <!-- Total Price -->
+      <td>
+        <button class="edit button button-secondary button-small">Edit</button>
+        <button class="del button button-danger button-small">Del</button>
+      </td>
+  `;
+
+  // Add row to the product list
+  tableBody.appendChild(newRow);
+
+  // Add event listeners for Edit and Delete buttons
+  // newRow
+  //   .querySelector(".edit")
+  //   .addEventListener("click", () => editProduct(newRow));
+  newRow
+    .querySelector(".del")
+    .addEventListener("click", () => deleteProduct(newRow));
+}
