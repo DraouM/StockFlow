@@ -6,6 +6,163 @@
     <title>Document</title>
     <link rel="stylesheet" href="../../../assets/styles/main.css" />
     <link rel="stylesheet" href="selling.css" />
+
+    <style>
+      /* Table Styles */
+      .table_container {
+        width: 95%;
+        max-height: calc(89% - 1.6rem);
+        background-color: #fffb;
+        margin: 0.8rem auto;
+        border-radius: 0.6rem;
+        overflow: auto;
+        overflow: overlay;
+      }
+
+      .table_container::-webkit-scrollbar {
+        width: 0.5rem;
+        height: 0.5rem;
+      }
+
+      .table_container::-webkit-scrollbar-thumb {
+        border-radius: 0.5rem;
+        background-color: #0004;
+        visibility: hidden;
+      }
+
+      .table_container:hover::-webkit-scrollbar-thumb {
+        visibility: visible;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      table,
+      th,
+      td {
+        border-collapse: collapse;
+        padding: 0.5rem;
+        text-align: right;
+      }
+
+      thead th {
+        position: sticky;
+        top: 0;
+        left: 0;
+        background-color: #d5d1defe;
+        cursor: pointer;
+        text-transform: capitalize;
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: #0000000b;
+      }
+
+      tbody tr {
+        --delay: 0.1s;
+        transition: 0.5s ease-in-out var(--delay), background-color 0s;
+      }
+
+      tbody tr.hide {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+
+      tbody tr:hover {
+        background-color: #fff6 !important;
+      }
+
+      tbody tr td,
+      tbody tr td p {
+        transition: 0.2s ease-in-out;
+      }
+
+      tbody tr.hide td,
+      tbody tr.hide td p {
+        padding: 0;
+        font: 0 / 0 sans-serif;
+        transition: 0.2s ease-in-out 0.5s;
+      }
+
+      thead th span.icon-arrow {
+        display: inline-block;
+        width: 1.3rem;
+        height: 1.3rem;
+        border-radius: 50%;
+        border: 1.4px solid transparent;
+
+        text-align: center;
+        font-size: 1rem;
+
+        margin-left: 0.5rem;
+        transition: 0.2s ease-in-out;
+      }
+
+      thead th:hover span.icon-arrow {
+        border: 1.4px solid #6c00bd;
+      }
+
+      thead th:hover {
+        color: #6c00bd;
+      }
+
+      thead th.active span.icon-arrow {
+        background-color: #6c00bd;
+        color: #fff;
+      }
+
+      thead th.asc span.icon-arrow {
+        transform: rotate(180deg);
+      }
+
+      thead th.active,
+      tbody td.active {
+        color: #6c00bd;
+      }
+
+      /* first row */
+      .number-circle {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #adbdc7;
+        text-align: center;
+        line-height: 30px;
+        font-size: 16px;
+      }
+
+      /* Quantity Column Styling */
+      .quantity {
+        display: flex;
+        align-items: center;
+        /* Center-align both parts vertically */
+        justify-content: flex-end;
+        /* Space between main and sub-quantity */
+        gap: 8px;
+      }
+
+      /* Main Quantity */
+      .main-quantity {
+        font-size: 16px;
+        font-weight: normal;
+        color: #333;
+      }
+
+      /* Sub Quantity */
+      .sub-quantity {
+        font-size: 12px;
+        font-weight: bold;
+        color: red;
+        border: 1px solid red;
+        background-color: white;
+        /* Highlighted background */
+        padding: 2px 4px;
+        border-radius: 5px;
+        /* Rounded corners */
+      }
+    </style>
   </head>
   <body>
     <header>
@@ -22,7 +179,7 @@
 
     <button id="open-modal-btn" class="button">Add New Product</button>
 
-    <div id="modal" class="modal">
+    <div id="product-modal" class="modal">
       <div class="modal-content">
         <span class="close-modal-btn">&times;</span>
         <h2 class="modal-title">Add Product</h2>
@@ -61,11 +218,11 @@
             </div>
 
             <div class="form-group">
-              <label for="product-name">Product Name</label>
+              <label for="productName">Product Name</label>
               <input
                 type="text"
-                id="product-name"
-                name="product-name"
+                id="productName"
+                name="productName"
                 value="Product A"
               />
             </div>
@@ -84,11 +241,11 @@
                 </div>
                 <span>* <span id="quantityUnit">12</span> =</span>
                 <div class="quantity-col">
-                  <label for="sub-unit">Sub-units</label>
+                  <label for="subUnits">Sub Units</label>
                   <input
                     type="text"
-                    id="sub-unit"
-                    name="sub-unit"
+                    id="subUnits"
+                    name="subUnits"
                     value="121"
                   />
                 </div>
@@ -127,41 +284,85 @@
       </div>
     </div>
 
+    <!-- Shopping List -->
+    <section class="table_container">
+      <table id="shopping-list">
+        <thead>
+          <tr>
+            <th>Num</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Units</th>
+            <th>Unit Price</th>
+            <th>Sub Total</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Table Rows -->
+          <tr>
+            <td><span class="number-circle">1</span></td>
+            <td>Product A</td>
+            <td class="quantity">
+              <span class="main-quantity">5 & 6</span>
+              <span class="sub-quantity highlight">08</span>
+            </td>
+            <td>46</td>
+            <td>23.26</td>
+            <td>1069.96</td>
+            <td>
+              <button class="edit button button-secondary button-small">
+                EDIT
+              </button>
+              <button class="del button button-danger button-small">DEL</button>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="number-circle">2</span></td>
+            <td>Product A</td>
+            <td class="quantity">
+              <span class="main-quantity">3 & 8</span>
+              <span class="sub-quantity highlight">10</span>
+            </td>
+            <td>38</td>
+            <td>126.50</td>
+            <td>4807.00</td>
+            <td>
+              <button class="edit button button-secondary button-small">
+                EDIT
+              </button>
+              <button class="del button button-danger button-small">DEL</button>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="number-circle">2</span></td>
+            <td>Product C</td>
+            <td class="quantity">
+              <span class="main-quantity">4</span>
+              <span class="sub-quantity highlight">01</span>
+            </td>
+            <td>4</td>
+            <td>326.50</td>
+            <td>1302.00</td>
+            <td>
+              <button class="edit button button-secondary button-small">
+                EDIT
+              </button>
+              <button class="del button button-danger button-small">DEL</button>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4" class="total-label">Total</td>
+            <td class="total-value" colspan="2">12548896 DA</td>
+          </tr>
+        </tfoot>
+      </table>
+    </section>
+
     <div class="main-container">
       <div class="product-section">
-        <!-- Your product search form here -->
-        <div class="search-container">
-          <form id="search-form" class="search-form">
-            <input
-              type="text"
-              class="search-input"
-              id="search-input"
-              placeholder="Search for a Product"
-              autocomplete="off"
-            />
-            <button type="submit" id="search-btn" class="search-btn">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="22"
-                height="23"
-                viewBox="0 0 22 23"
-                fill="none"
-              >
-                <path
-                  d="M16.4998 16.9997L13.2515 13.7513M13.2515 13.7513C13.7728 13.2299 14.1864 12.611 14.4686 11.9298C14.7508 11.2486 14.896 10.5184 14.896 9.7811C14.896 9.04376 14.7508 8.31364 14.4686 7.63243C14.1864 6.95121 13.7728 6.33225 13.2515 5.81087C12.7301 5.28949 12.1111 4.87592 11.4299 4.59375C10.7487 4.31158 10.0186 4.16635 9.28125 4.16635C8.54391 4.16635 7.81379 4.31158 7.13258 4.59375C6.45137 4.87592 5.8324 5.28949 5.31102 5.81087C4.25806 6.86384 3.6665 8.29197 3.6665 9.7811C3.6665 11.2702 4.25806 12.6984 5.31102 13.7513C6.36399 14.8043 7.79213 15.3958 9.28125 15.3958C10.7704 15.3958 12.1985 14.8043 13.2515 13.7513Z"
-                  stroke="#5B5B5B"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </button>
-          </form>
-          <div id="search-results" class="search-results hidden">
-            <ul id="results-list"></ul>
-          </div>
-        </div>
-
         <!-- Your product details form here -->
         <form id="product-details-form" class="product-details-form">
           <!-- Product Name -->
@@ -406,7 +607,7 @@
       </div>
     </div>
 
-    <script src="selling.js"></script>
+    <script type="module" src="selling2.js"></script>
     <script src="../../../scripts/common/Searchbar.js"></script>
 
     <!-- Client form handler -->
@@ -696,6 +897,7 @@
       });
     </script>
 
+    <!-- Porduct Form Handler -->
     <script></script>
   </body>
 </html>
