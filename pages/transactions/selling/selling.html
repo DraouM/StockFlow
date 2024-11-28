@@ -219,12 +219,7 @@
 
             <div class="form-group">
               <label for="productName">Product Name</label>
-              <input
-                type="text"
-                id="productName"
-                name="productName"
-                value="Product A"
-              />
+              <input type="text" id="productName" name="productName" />
             </div>
 
             <div class="form-group quantity-group">
@@ -232,22 +227,12 @@
               <div class="quantity-row">
                 <div class="quantity-col">
                   <label for="quantity">Quantity</label>
-                  <input
-                    type="text"
-                    id="quantity"
-                    name="quantity"
-                    value="18 & 5"
-                  />
+                  <input type="text" id="quantity" name="quantity" />
                 </div>
-                <span>* <span id="quantityUnit">12</span> =</span>
+                <span>* <span id="quantityUnit">01</span> =</span>
                 <div class="quantity-col">
                   <label for="subUnits">Sub Units</label>
-                  <input
-                    type="text"
-                    id="subUnits"
-                    name="subUnits"
-                    value="121"
-                  />
+                  <input type="text" id="subUnits" name="subUnits" />
                 </div>
               </div>
             </div>
@@ -255,13 +240,8 @@
             <div class="form-group">
               <label for="unitPrice">Price</label>
               <div class="price-row">
-                <input
-                  type="text"
-                  id="unitPrice"
-                  name="unitPrice"
-                  value="123.26"
-                />
-                <span>* <span id="subunits-span">121</span> =</span>
+                <input type="text" id="unitPrice" name="unitPrice" />
+                <span>* <span id="subunits-span">00</span> =</span>
                 <input type="text" id="subTotal" name="subTotal" readonly />
               </div>
             </div>
@@ -378,11 +358,11 @@
           </div>
 
           <!-- Product Quantity -->
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label for="quantity">Quantity</label>
             <input type="number" id="quantity" name="quantity" required />
             <small class="form-text">Enter the quantity of the product.</small>
-          </div>
+          </div> -->
 
           <!-- Unit Price -->
           <div class="form-group">
@@ -934,7 +914,7 @@
           subUnitsSpan: null,
           priceInput: null,
           subTotalInput: null,
-          quantityUnit: null,
+          quantityUnitSpan: null,
         },
 
         // Initialize the manager
@@ -946,10 +926,7 @@
             subUnitsSpan: document.getElementById("subunits-span"),
             priceInput: document.getElementById("unitPrice"),
             subTotalInput: document.getElementById("subTotal"),
-            quantityUnit: parseInt(
-              document.getElementById("quantityUnit").textContent,
-              10
-            ),
+            quantityUnitSpan: document.getElementById("quantityUnit"),
           };
 
           // Validate that all elements exist
@@ -963,6 +940,11 @@
           this.setupEventListeners();
           this.initializeValues();
           return true;
+        },
+
+        // Fetch the latest value of quantityUnit
+        getQuantityUnit() {
+          return parseInt(this.elements.quantityUnitSpan.textContent, 10);
         },
 
         // Set up all event listeners
@@ -1077,23 +1059,27 @@
 
             // Validate sub-units don't exceed unit size
             const validSubUnits =
-              subUnits >= this.elements.quantityUnit
-                ? this.elements.quantityUnit - 1
+              subUnits >= this.getQuantityUnit()
+                ? this.getQuantityUnit() - 1
                 : subUnits;
 
-            return units * this.elements.quantityUnit + validSubUnits;
+            return units * this.this.getQuantityUnit() + validSubUnits;
           }
 
           const units = parseInt(cleaned, 10);
-          return isNaN(units) ? 0 : units * this.elements.quantityUnit;
+          return isNaN(units) ? 0 : units * this.getQuantityUnit();
         },
 
         // Convert sub-units back to quantity string
         convertSubUnitsToQuantity(subUnits) {
+          console.log("Subunits ", subUnits, this.getQuantityUnit());
+
           if (!subUnits) return "0";
 
-          const units = Math.floor(subUnits / this.elements.quantityUnit);
-          const remainingSubUnits = subUnits % this.elements.quantityUnit;
+          const units = Math.floor(subUnits / this.getQuantityUnit());
+          const remainingSubUnits = subUnits % this.getQuantityUnit();
+
+          console.log("Check this ", units, remainingSubUnits);
 
           // If we only have sub-units (less than one full unit)
           if (units === 0) {
