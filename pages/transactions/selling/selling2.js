@@ -24,7 +24,7 @@ const formManager = {
         input.value = data[key];
       }
     });
-    document.getElementById("quantityUnit").innerText = data.quantityUnit;
+    document.getElementById("quantityUnit").textContent = data.quantityUnit;
   },
 
   validate(formId) {
@@ -122,14 +122,6 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   });
 
-  const productDataEx = {
-    productName: "Test",
-    quantity: "150",
-    subUnits: "150",
-    unitPrice: "150.00",
-    subTotal: "1500.00",
-  };
-
   //   formManager.populate(productFormId, productDataEx);
 
   const fetchProducts = async (searchTerm) => {
@@ -141,8 +133,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // For example, you might want to fill another input field or redirect the user.
     const productDataEx = {
       productName: selectedProduct.name,
-      quantity: selectedProduct.total_stock,
-      subUnits: selectedProduct.subunit_in_unit,
+      //   quantity: selectedProduct.total_stock,
+      //   subUnits: selectedProduct.subunit_in_unit,
       unitPrice: selectedProduct.selling_price,
       quantityUnit: selectedProduct.subunit_in_unit,
       //   subTotal: subUnits * unitPrice,
