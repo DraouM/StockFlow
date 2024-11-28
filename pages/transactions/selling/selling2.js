@@ -14,6 +14,8 @@ const formManager = {
   },
 
   populate(formId, data) {
+    console.log("Data to populate ", data);
+
     const form = document.getElementById(formId);
 
     Object.keys(data).forEach((key) => {
@@ -22,6 +24,7 @@ const formManager = {
         input.value = data[key];
       }
     });
+    document.getElementById("quantityUnit").innerText = data.quantityUnit;
   },
 
   validate(formId) {
@@ -127,7 +130,34 @@ document.addEventListener("DOMContentLoaded", function () {
     subTotal: "1500.00",
   };
 
-  formManager.populate(productFormId, productDataEx);
+  //   formManager.populate(productFormId, productDataEx);
+
+  const fetchProducts = async (searchTerm) => {
+    return await window.productsAPI.searchProduct(searchTerm);
+  };
+  const onProductSelected = (selectedProduct) => {
+    console.log("Product selected:", selectedProduct);
+    // You can add custom behavior for what happens when a product is selected.
+    // For example, you might want to fill another input field or redirect the user.
+    const productDataEx = {
+      productName: selectedProduct.name,
+      quantity: selectedProduct.total_stock,
+      subUnits: selectedProduct.subunit_in_unit,
+      unitPrice: selectedProduct.selling_price,
+      quantityUnit: selectedProduct.subunit_in_unit,
+      //   subTotal: subUnits * unitPrice,
+    };
+    formManager.populate(productFormId, productDataEx);
+  };
+  // Create an instance of the Searchbar class
+  const productSearchbar = new Searchbar(
+    "search-product-input", // Input field ID
+    "product-results-list", // Results list ID
+    "search-product-form", // Search form ID
+    "search-product-results", // Results div ID
+    fetchProducts, // Fetch function for searching products
+    onProductSelected // Callback when a product is selected
+  );
 });
 
 function productFormOnSubmit(data) {
