@@ -24,7 +24,6 @@ const formManager = {
         input.value = data[key];
       }
     });
-    document.getElementById("quantityUnit").textContent = data.quantityUnit;
   },
 
   validate(formId) {
@@ -114,19 +113,22 @@ document.addEventListener("DOMContentLoaded", function () {
       unitPrice: { required: true, min: 0.01 },
     },
     onSubmit: (formData) => {
+      // Manually append the span value
+      const quantityUnit = document.getElementById("quantityUnit").textContent;
+      formData.append("quantityUnit", quantityUnit);
+
       // Convert FormData to plain object
       const data = Object.fromEntries(formData);
-      console.log(data);
+      console.log("Data ", data);
       // Now you can use the data object
       productFormOnSubmit(data);
     },
   });
 
-  //   formManager.populate(productFormId, productDataEx);
-
   const fetchProducts = async (searchTerm) => {
     return await window.productsAPI.searchProduct(searchTerm);
   };
+
   const onProductSelected = (selectedProduct) => {
     console.log("Product selected:", selectedProduct);
     // You can add custom behavior for what happens when a product is selected.
@@ -139,8 +141,15 @@ document.addEventListener("DOMContentLoaded", function () {
       quantityUnit: selectedProduct.subunit_in_unit,
       //   subTotal: subUnits * unitPrice,
     };
+
+    // Add quantityUnit dynamically (because it is NOT an input)
+    // ensure the value of quantityUnit is always displayed as a two-digit format (e.g., 08, 01, or 12)
+    document.getElementById("quantityUnit").textContent =
+      productDataEx.quantityUnit.toString().padStart(2, "0");
+    // Populate the other input with the form
     formManager.populate(productFormId, productDataEx);
   };
+
   // Create an instance of the Searchbar class
   const productSearchbar = new Searchbar(
     "search-product-input", // Input field ID
@@ -153,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function productFormOnSubmit(data) {
-  console.log("form submited!!");
+  console.log("form submited!! ", data);
   addProductToList(data);
   console.log("product added !!");
 }
