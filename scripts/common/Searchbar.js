@@ -52,7 +52,7 @@ class Searchbar {
       const results = await this.fetchFunction(searchTerm);
       console.log("Result from fetching..", results);
 
-      if (results.length === 0) {
+      if (results.data.length === 0) {
         this.displayNoResultsMessage();
       } else {
         this.displayResults(results.data);
