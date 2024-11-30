@@ -84,6 +84,146 @@ const formManager = {
   },
 };
 
+const ShoppingListManager = {
+  // Store items in an array
+  shoppingList: [],
+  // Create a utility function
+  getId(item) {
+    return item.id || item.productId || item.userId;
+  },
+
+  // Add a new item
+  addItem(product) {
+    console.log("Item added ", product);
+
+    // Check if the product is already in the list
+    const existingItem = this.shoppingList.find(
+      (item) => item.productId === this.getId(product)
+    );
+    console.log("Existing Item ", existingItem);
+    // row.dataset.id = item.id; // Store unique identifier
+
+    if (existingItem) {
+      this.updateItem(this.getId(product), {
+        quantity: existingItem.quantity + product.quantity,
+        price: product.price,
+      });
+    } else {
+      console.log("Shopping List ", this.shoppingList);
+
+      this.shoppingList.push(product);
+    }
+    this.renderList();
+  },
+
+  //   // Update an existing item
+  // updateItem(productId, updates) {
+  //   const item = this.items.find((item) => item.id === productId);
+  //   if (item) {
+  //     Object.assign(item, updates); // Merge updates into the existing item
+  //   }
+  //   this.renderList();
+  // },
+
+  // Delete an item
+  editItem(productId) {
+    console.log("Item edited ", productId);
+  },
+
+  // Render the shopping list in the UI
+  renderList() {
+    const tableBody = document.querySelector("#shopping-list tbody");
+    tableBody.innerHTML = ""; // Clear the table body
+
+    this.shoppingList.forEach((item) => {
+      const rowCount = tableBody.children.length;
+      // Create a new row
+      const newRow = document.createElement("tr");
+      newRow.dataset.id = this.getId(item); // Store unique identifier
+
+      // Populate row cells
+      newRow.innerHTML = `
+            <td><span class="number-circle">${rowCount + 1}</span></td>
+            <td>${item.productName}</td>
+            <td>
+            <span class="main-quantity">${item.quantity}</span>
+            <span class="sub-quantity highlight">${item.quantityUnit}</span>
+            </td> <!-- Quantity -->
+            <td>${
+              item.subUnits ? item.subUnits : "N/A"
+            }</td> <!-- Sub-unit or units (if there's a separate value) -->
+            <td>${
+              item.unitPrice
+                ? UtilityHelpers.formatNumber(item.unitPrice)
+                : "N/A"
+            }</td> <!-- Unit Price -->
+            <td>${
+              item.subTotal ? UtilityHelpers.formatNumber(item.subTotal) : "N/A"
+            }</td> <!-- Total Price -->
+            <td>
+              <button  onclick="ShoppingListManager.editItem(${this.getId(
+                item
+              )})" class="edit button button-secondary button-small">Edit</button>
+              <button onclick="ShoppingListManager.deleteItem(${this.getId(
+                item
+              )})"  class="del button button-danger button-small">Del</button>
+            </td>
+        `;
+      // Add row to the product list
+      tableBody.appendChild(newRow);
+    });
+  },
+
+  deleteItem(id) {
+    console.log("item deleted ", id);
+
+    this.shoppingList = this.shoppingList.filter((item) => {
+      console.log(this.shoppingList, this.getId(item), id);
+
+      return this.getId(item) != id;
+    });
+    this.renderList(); // Re-render list after deletion
+  },
+  //   // Prompt user for updates
+  //   updateItemPrompt(productId) {
+  //     const item = this.items.find((item) => item.id === productId);
+  //     if (item) {
+  //       const newQuantity = parseInt(
+  //         prompt(`Enter new quantity for ${item.name}:`, item.quantity),
+  //         10
+  //       );
+  //       const newPrice = parseFloat(
+  //         prompt(`Enter new price for ${item.name}:`, item.price)
+  //       );
+  //       this.updateItem(productId, { quantity: newQuantity, price: newPrice });
+  //     }
+  //   },
+
+  //   // Clear the entire list
+  //   clearList() {
+  //     this.items = [];
+  //     this.renderList();
+  //   },
+};
+// Make it globally accessible
+window.ShoppingListManager = ShoppingListManager;
+
+// // Example Usage
+// ShoppingListManager.addItem({
+//   id: 1,
+//   name: "Product A",
+//   quantity: 2,
+//   price: 10,
+// });
+// ShoppingListManager.addItem({
+//   id: 2,
+//   name: "Product B",
+//   quantity: 1,
+//   price: 15,
+// });
+// ShoppingListManager.updateItem(1, { quantity: 3 });
+// ShoppingListManager.deleteItem(2);
+
 document.addEventListener("DOMContentLoaded", function () {
   /** MODAL */
   // Select open and close buttons
@@ -134,6 +274,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // You can add custom behavior for what happens when a product is selected.
     // For example, you might want to fill another input field or redirect the user.
     const productDataEx = {
+      productId: selectedProduct.id,
       productName: selectedProduct.name,
       //   quantity: selectedProduct.total_stock,
       //   subUnits: selectedProduct.subunit_in_unit,
@@ -163,46 +304,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function productFormOnSubmit(data) {
   console.log("form submited!! ", data);
-  addProductToList(data);
+  ShoppingListManager.addItem(data);
+
   console.log("product added !!");
-}
-
-function addProductToList(product) {
-  const tableBody = document.querySelector("#shopping-list tbody");
-  const rowCount = tableBody.children.length;
-  // Create a new row
-  const newRow = document.createElement("tr");
-  // Populate row cells
-  newRow.innerHTML = `
-      <td><span class="number-circle">${rowCount + 1}</span></td>
-      <td>${product.productName}</td>
-      <td>
-      <span class="main-quantity">${product.quantity}</span>
-      <span class="sub-quantity highlight">${product.quantityUnit}</span>
-      </td> <!-- Quantity -->
-      <td>${
-        product.subUnits ? product.subUnits : "N/A"
-      }</td> <!-- Sub-unit or units (if there's a separate value) -->
-      <td>${
-        product.unitPrice ? product.unitPrice : "N/A"
-      }</td> <!-- Unit Price -->
-      <td>${
-        product.subTotal ? product.subTotal : "N/A"
-      }</td> <!-- Total Price -->
-      <td>
-        <button class="edit button button-secondary button-small">Edit</button>
-        <button class="del button button-danger button-small">Del</button>
-      </td>
-  `;
-
-  // Add row to the product list
-  tableBody.appendChild(newRow);
-
-  // Add event listeners for Edit and Delete buttons
-  // newRow
-  //   .querySelector(".edit")
-  //   .addEventListener("click", () => editProduct(newRow));
-  newRow
-    .querySelector(".del")
-    .addEventListener("click", () => deleteProduct(newRow));
 }
