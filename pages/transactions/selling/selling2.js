@@ -1,88 +1,5 @@
 import modalManager from "../modalManager.js";
-
-const formManager = {
-  forms: {}, // Store forms and their configurations
-
-  init(formId, config) {
-    this.forms[formId] = config; // Register form with its config
-    const form = document.getElementById(formId);
-    if (form) {
-      form.addEventListener("submit", (event) =>
-        this.handleSubmit(event, formId)
-      );
-    }
-  },
-
-  populate(formId, data) {
-    console.log("Data to populate ", data);
-
-    const form = document.getElementById(formId);
-
-    Object.keys(data).forEach((key) => {
-      const input = form.querySelector(`[name="${key}"]`);
-      if (input) {
-        input.value = data[key];
-      }
-    });
-  },
-
-  validate(formId) {
-    const { rules } = this.forms[formId];
-    let isValid = true;
-
-    Object.keys(rules).forEach((fieldName) => {
-      const input = document.querySelector(`[name="${fieldName}"]`);
-      const rule = rules[fieldName];
-      const value = input.value.trim();
-
-      // Clear previous errors
-      input.classList.remove("invalid");
-      const existingError = input.parentElement.querySelector(".error-message");
-      if (existingError) existingError.remove();
-
-      // Required check
-      if (rule.required && !value) {
-        isValid = false;
-        this.showError(input, `${fieldName} is required`);
-      }
-
-      // Min length check
-      if (rule.minLength && value.length < rule.minLength) {
-        isValid = false;
-        this.showError(input, `Minimum ${rule.minLength} characters required`);
-      }
-
-      // Min value check for numeric fields
-      if (rule.min !== undefined && Number(value) < rule.min) {
-        isValid = false;
-        this.showError(input, `Minimum value is ${rule.min}`);
-      }
-    });
-
-    return isValid;
-  },
-
-  handleSubmit(event, formId) {
-    event.preventDefault();
-    if (this.validate(formId)) {
-      const { onSubmit } = this.forms[formId];
-      if (onSubmit) onSubmit(new FormData(event.target));
-    }
-  },
-
-  // Display an error message for a specific input
-  showError(input, message) {
-    const errorElement = input.nextElementSibling;
-    if (errorElement && errorElement.classList.contains("error-message")) {
-      errorElement.textContent = message;
-    } else {
-      const newErrorElement = document.createElement("div");
-      newErrorElement.className = "error-message";
-      newErrorElement.textContent = message;
-      input.parentNode.insertBefore(newErrorElement, input.nextSibling);
-    }
-  },
-};
+import formManager from "../formsManager.js";
 
 const ShoppingListManager = {
   // Store items in an array
@@ -92,44 +9,144 @@ const ShoppingListManager = {
     return item.id || item.productId || item.userId;
   },
 
+  // Notification system
+  showNotification(message, type = "info") {
+    // Create notification container if it doesn't exist
+    let notificationContainer = document.getElementById(
+      "notification-container"
+    );
+    if (!notificationContainer) {
+      notificationContainer = document.createElement("div");
+      notificationContainer.id = "notification-container";
+      notificationContainer.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        max-width: 300px;
+      `;
+      document.body.appendChild(notificationContainer);
+    }
+
+    // Create notification element
+    const notification = document.createElement("div");
+    notification.style.cssText = `
+      background-color: ${
+        type === "warning"
+          ? "#ffcc00"
+          : type === "error"
+          ? "#ff4444"
+          : "#4CAF50"
+      };
+      color: white;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    `;
+    notification.textContent = message;
+
+    // Add to container
+    notificationContainer.appendChild(notification);
+
+    // Trigger reflow to enable transition
+    notification.offsetHeight;
+
+    // Fade in
+    notification.style.opacity = "1";
+
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+      notification.style.opacity = "0";
+      setTimeout(() => {
+        notificationContainer.removeChild(notification);
+
+        // Remove container if no notifications
+        if (notificationContainer.children.length === 0) {
+          document.body.removeChild(notificationContainer);
+        }
+      }, 300);
+    }, 3000);
+  },
+
   // Add a new item
   addItem(product) {
     console.log("Item added ", product);
 
-    // Check if the product is already in the list
-    const existingItem = this.shoppingList.find(
-      (item) => item.productId === this.getId(product)
+    // Calculate subtotal
+    const subTotal = product.quantity * product.unitPrice;
+
+    // Always create a new item with a unique ID
+    const newItem = {
+      ...product,
+      id: this.getId(product), // Generate unique ID
+      subTotal: subTotal,
+    };
+
+    // Add the new item to the list
+    this.shoppingList.push(newItem);
+
+    // Render the list
+    this.renderList();
+
+    // Show notification
+    this.showNotification(
+      `Added ${product.quantity} ${product.productName}`,
+      "info"
     );
-    console.log("Existing Item ", existingItem);
-    // row.dataset.id = item.id; // Store unique identifier
 
-    if (existingItem) {
-      this.updateItem(this.getId(product), {
-        quantity: existingItem.quantity + product.quantity,
-        price: product.price,
-      });
-    } else {
-      console.log("Shopping List ", this.shoppingList);
+    // Optional: Check if this is a duplicate product
+    const similarProducts = this.shoppingList.filter(
+      (item) => item.productName === product.productName
+    );
 
-      this.shoppingList.push(product);
+    if (similarProducts.length > 1) {
+      this.showNotification(
+        `Note: You've added multiple entries for ${product.productName}`,
+        "warning"
+      );
+    }
+  },
+
+  // Update an existing item
+  updateItem(productId, updates) {
+    const item = this.items.find((item) => item.id == productId);
+    if (item) {
+      Object.assign(item, updates); // Merge updates into the existing item
     }
     this.renderList();
   },
 
-  //   // Update an existing item
-  // updateItem(productId, updates) {
-  //   const item = this.items.find((item) => item.id === productId);
-  //   if (item) {
-  //     Object.assign(item, updates); // Merge updates into the existing item
-  //   }
-  //   this.renderList();
-  // },
+  // Edit an item
+  editItem(itemId) {
+    const itemIndex = this.shoppingList.findIndex((item) => item.id == itemId);
+    if (itemIndex !== -1) {
+      const itemToEdit = this.shoppingList[itemIndex];
+      console.log("Item to Edit ", itemToEdit);
 
-  // Delete an item
-  editItem(productId) {
-    console.log("Item edited ", productId);
+      // Populate form with the selected item
+      formManager.populate("selling-form", itemToEdit);
+
+      // Handle form submission
+      document.getElementById("selling-form").onsubmit = (event) => {
+        event.preventDefault();
+        const updatedData = formManager.getData("selling-form");
+
+        // Update the specific item
+        this.shoppingList[itemIndex] = { ...itemToEdit, ...updatedData };
+
+        // Re-render the shopping list
+        this.renderList();
+      };
+
+      // Show the modal for editing
+      openProductModal();
+    } else {
+      console.error("Item not found for editing");
+    }
   },
-
   // Render the shopping list in the UI
   renderList() {
     const tableBody = document.querySelector("#shopping-list tbody");
@@ -175,14 +192,23 @@ const ShoppingListManager = {
   },
 
   deleteItem(id) {
-    console.log("item deleted ", id);
+    // Find the index of the item with the specific ID
+    const indexToRemove = this.shoppingList.findIndex((item) => item.id == id);
+    console.log("Index To remove ", indexToRemove);
 
-    this.shoppingList = this.shoppingList.filter((item) => {
-      console.log(this.shoppingList, this.getId(item), id);
+    if (indexToRemove !== -1) {
+      // Store the product name for notification
+      const removedProduct = this.shoppingList[indexToRemove].productName;
 
-      return this.getId(item) != id;
-    });
-    this.renderList(); // Re-render list after deletion
+      // Remove only the specific item using its unique ID
+      this.shoppingList.splice(indexToRemove, 1);
+
+      // Render the updated list
+      this.renderList();
+
+      // Show notification
+      this.showNotification(`Removed ${removedProduct}`, "info");
+    }
   },
   //   // Prompt user for updates
   //   updateItemPrompt(productId) {
@@ -234,10 +260,10 @@ document.addEventListener("DOMContentLoaded", function () {
   modalManager.init("product-modal");
 
   // Open modal button logic
-  openModalBtn.addEventListener("click", (event) => modalManager.open(event));
+  openModalBtn.addEventListener("click", openProductModal);
 
   // Close modal button logic
-  closeModalBtn.addEventListener("click", (event) => modalManager.close(event));
+  closeModalBtn.addEventListener("click", closeProductModal);
 
   // The overlay click is already handled in modalManager (window.addEventListener inside init).
 
@@ -252,6 +278,7 @@ document.addEventListener("DOMContentLoaded", function () {
       subUnits: { required: true, min: 1 },
       unitPrice: { required: true, min: 0.01 },
     },
+
     onSubmit: (formData) => {
       // Manually append the span value
       const quantityUnit = document.getElementById("quantityUnit").textContent;
@@ -307,4 +334,12 @@ function productFormOnSubmit(data) {
   ShoppingListManager.addItem(data);
 
   console.log("product added !!");
+}
+
+function openProductModal() {
+  modalManager.open("product-modal"); // Opens the modal
+}
+
+function closeProductModal() {
+  modalManager.close("product-modal"); // Closes the modal
 }

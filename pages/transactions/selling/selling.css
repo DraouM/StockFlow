@@ -280,3 +280,34 @@ header {
     justify-content: space-between;
     margin-top: 1rem;
 }
+
+/* NOTIFICATION */
+#notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 300px;
+}
+
+#notification-container>div {
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease-in-out;
+}
+
+#notification-container .info {
+    background-color: #4CAF50;
+}
+
+#notification-container .warning {
+    background-color: #ffcc00;
+    color: black;
+}
+
+#notification-container .error {
+    background-color: #ff4444;
+}
