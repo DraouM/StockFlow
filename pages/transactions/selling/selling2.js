@@ -81,7 +81,7 @@ const ShoppingListManager = {
     // Always create a new item with a unique ID
     const newItem = {
       ...product,
-      id: this.getId(product), // Generate unique ID
+      id: Date.now().toString(), // Generate unique ID
       subTotal: subTotal,
     };
 
@@ -111,11 +111,24 @@ const ShoppingListManager = {
   },
 
   // Update an existing item
-  updateItem(productId, updates) {
-    const item = this.items.find((item) => item.id == productId);
-    if (item) {
-      Object.assign(item, updates); // Merge updates into the existing item
-    }
+
+  updateItem(updatedItem) {
+    console.log("Item Update ", updatedItem);
+    console.log("Shopping List ", this.shoppingList);
+
+    this.shoppingList = this.shoppingList.map(
+      (item) => {
+        if (item.id === updatedItem.id) {
+          console.log("Match found for ID:", item.id);
+          return updatedItem;
+        } else {
+          console.log("Match not found for ID:", item.id);
+
+          return item;
+        }
+      }
+      // item.id === updatedItem.id ? updatedItem : item
+    );
     this.renderList();
   },
 
@@ -128,18 +141,9 @@ const ShoppingListManager = {
 
       // Populate form with the selected item
       formManager.populate("selling-form", itemToEdit);
-
+      const form = document.getElementById("selling-form");
+      form.setAttribute("data-operation", "update");
       // Handle form submission
-      document.getElementById("selling-form").onsubmit = (event) => {
-        event.preventDefault();
-        const updatedData = formManager.getData("selling-form");
-
-        // Update the specific item
-        this.shoppingList[itemIndex] = { ...itemToEdit, ...updatedData };
-
-        // Re-render the shopping list
-        this.renderList();
-      };
 
       // Show the modal for editing
       openProductModal();
@@ -156,7 +160,7 @@ const ShoppingListManager = {
       const rowCount = tableBody.children.length;
       // Create a new row
       const newRow = document.createElement("tr");
-      newRow.dataset.id = this.getId(item); // Store unique identifier
+      newRow.dataset.id = item.id; // Store unique identifier
 
       // Populate row cells
       newRow.innerHTML = `
@@ -279,16 +283,31 @@ document.addEventListener("DOMContentLoaded", function () {
       unitPrice: { required: true, min: 0.01 },
     },
 
-    onSubmit: (formData) => {
-      // Manually append the span value
-      const quantityUnit = document.getElementById("quantityUnit").textContent;
-      formData.append("quantityUnit", quantityUnit);
+    // onSubmit: (formData) => {
+    //   // Manually append the span value
+    //   const quantityUnit = document.getElementById("quantityUnit").textContent;
+    //   formData.append("quantityUnit", quantityUnit);
 
-      // Convert FormData to plain object
-      const data = Object.fromEntries(formData);
-      console.log("Data ", data);
-      // Now you can use the data object
-      productFormOnSubmit(data);
+    //   // Convert FormData to plain object
+    //   const data = Object.fromEntries(formData);
+    //   console.log("Data ", data);
+    //   // Now you can use the data object
+    //   productFormOnSubmit(data);
+    // },
+    onAdd: (data) => {
+      // Include the span value in the data object
+      const quantityUnit = document.getElementById("quantityUnit").textContent;
+      data.quantityUnit = quantityUnit;
+
+      console.log("Adding item: ", data);
+      ShoppingListManager.addItem(data);
+
+      // Use the data object to add the new item
+      // productFormOnSubmit(data); // Assuming this handles adding the item
+    },
+
+    onUpdate: (product) => {
+      ShoppingListManager.updateItem(product);
     },
   });
 
