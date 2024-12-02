@@ -62,9 +62,26 @@ const formManager = {
 
   handleSubmit(event, formId) {
     event.preventDefault();
+
+    // Validate the form before proceeding
     if (this.validate(formId)) {
-      const { onSubmit } = this.forms[formId];
-      if (onSubmit) onSubmit(new FormData(event.target));
+      const form = event.target;
+      const operation = form.getAttribute("data-operation") || "add"; // Default to "add"
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData); // Convert FormData to an object
+
+      // Handle based on the operation type
+      if (operation === "add") {
+        const { onAdd } = this.forms[formId];
+        if (onAdd) onAdd(data);
+      } else if (operation === "update") {
+        const { onUpdate } = this.forms[formId];
+        if (onUpdate) onUpdate(data);
+      }
+
+      // Reset the form and set operation back to "add"
+      this.reset(formId);
+      console.log("Operation ", operation);
     }
   },
 
