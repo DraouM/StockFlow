@@ -112,15 +112,14 @@ const ShoppingListManager = {
 
   // Update an existing item
 
-  updateItem(updatedItem) {
-    console.log("Item Update ", updatedItem);
+  updateItem(itemId, updatedItem) {
     console.log("Shopping List ", this.shoppingList);
 
     this.shoppingList = this.shoppingList.map(
       (item) => {
-        if (item.id === updatedItem.id) {
+        if (item.id === itemId) {
           console.log("Match found for ID:", item.id);
-          return updatedItem;
+          return { ...item, ...updatedItem }; // Use spread to keep the existing ID;
         } else {
           console.log("Match not found for ID:", item.id);
 
@@ -130,20 +129,25 @@ const ShoppingListManager = {
       // item.id === updatedItem.id ? updatedItem : item
     );
     this.renderList();
+    console.log(" Update 2 ", { itemId, updatedItem });
   },
 
   // Edit an item
   editItem(itemId) {
+    console.log({ itemId });
+    console.log("Shopping List ", this.shoppingList);
+
     const itemIndex = this.shoppingList.findIndex((item) => item.id == itemId);
     if (itemIndex !== -1) {
       const itemToEdit = this.shoppingList[itemIndex];
-      console.log("Item to Edit ", itemToEdit);
+
+      const form = document.getElementById("selling-form");
+
+      form.setAttribute("data-operation", "update");
+      form.setAttribute("data-item-id", itemId); // Store the specific ID
 
       // Populate form with the selected item
       formManager.populate("selling-form", itemToEdit);
-      const form = document.getElementById("selling-form");
-      form.setAttribute("data-operation", "update");
-      // Handle form submission
 
       // Show the modal for editing
       openProductModal();
@@ -182,9 +186,9 @@ const ShoppingListManager = {
               item.subTotal ? UtilityHelpers.formatNumber(item.subTotal) : "N/A"
             }</td> <!-- Total Price -->
             <td>
-              <button  onclick="ShoppingListManager.editItem(${this.getId(
-                item
-              )})" class="edit button button-secondary button-small">Edit</button>
+              <button  onclick="ShoppingListManager.editItem(${
+                item.id
+              })" class="edit button button-secondary button-small">Edit</button>
               <button onclick="ShoppingListManager.deleteItem(${this.getId(
                 item
               )})"  class="del button button-danger button-small">Del</button>
@@ -307,7 +311,13 @@ document.addEventListener("DOMContentLoaded", function () {
     },
 
     onUpdate: (product) => {
-      ShoppingListManager.updateItem(product);
+      // Retrieve the ID from the form
+      const form = document.getElementById("selling-form");
+      const itemId = form.getAttribute("data-item-id");
+      ShoppingListManager.updateItem(itemId, product);
+      // Reset the form operation
+      form.setAttribute("data-operation", "add");
+      // form.removeAttribute("data-item-id");
     },
   });
 
