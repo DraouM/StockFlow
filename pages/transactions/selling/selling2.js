@@ -1,6 +1,76 @@
 import modalManager from "../modalManager.js";
 import formManager from "../formsManager.js";
 
+document.addEventListener("DOMContentLoaded", () => {
+  // const searchInput = document.getElementById("search-input-client");
+  // const resultsList = document.getElementById("results-list-client");
+  // searchInput.addEventListener("input", async () => {
+  //   const searchTerm = searchInput.value;
+  //   if (searchTerm.length > 1) {
+  //     const clients = await fetchClients(searchTerm); // Function to fetch clients
+  //     displayClientResults(clients);
+  //   } else {
+  //     resultsList.innerHTML = ""; // Clear results if input is less than 2 characters
+  //   }
+  // });
+  // resultsList.addEventListener("click", (event) => {
+  //   if (event.target.tagName === "LI") {
+  //     const selectedClient = JSON.parse(event.target.dataset.client);
+  //     displaySelectedClient(selectedClient);
+  //     closeClientModal(); // Close the modal after selection
+  //   }
+  // });
+});
+
+async function fetchClients(searchTerm) {
+  try {
+    const response = await window.partiesAPI.searchParties({
+      term: searchTerm,
+      type: null, // You can specify a type if needed, e.g., "customer"
+      page: 1, // Set the page number as needed
+      limit: 50, // Set the limit for pagination
+    });
+
+    return response.data; // Assuming the response structure has a data field
+  } catch (error) {
+    console.error("Error fetching clients:", error);
+    return []; // Return an empty array in case of error
+  }
+}
+// Function to fetch clients (you can replace this with your API call)
+// async function fetchClients(searchTerm) {
+//   // Simulated API call
+//   const response = await window.partiesAPI.searchParties(searchTerm);
+//   return response; // Assuming response is an array of client objects
+// }
+
+// Function to display client results
+function displayClientResults(clients) {
+  const resultsList = document.getElementById("results-list-client");
+  resultsList.innerHTML = ""; // Clear previous results
+
+  clients.forEach((client) => {
+    const li = document.createElement("li");
+    li.textContent = client.name; // Display client name
+    li.dataset.client = JSON.stringify(client); // Store client data
+    resultsList.appendChild(li);
+  });
+}
+
+// Function to display selected client information in the form
+function displaySelectedClient(client) {
+  document.getElementById("clientName").value = client.name || "";
+  document.getElementById("clientAddress").value = client.address || "";
+  document.getElementById("clientPhone").value = client.phone || "";
+  document.getElementById("clientDebt").value = client.total_debt || 0.0;
+}
+
+// Function to close the client modal
+function closeClientModal() {
+  const modal = document.getElementById("client-modal");
+  modal.style.display = "none"; // Hide the modal
+}
+
 const ShoppingListManager = {
   // Store items in an array
   shoppingList: [],
@@ -325,6 +395,15 @@ document.addEventListener("DOMContentLoaded", function () {
     return await window.productsAPI.searchProduct(searchTerm);
   };
 
+  const searchParties = async (searchTerm) => {
+    return await window.partiesAPI.searchParties({
+      term: searchTerm,
+      type: null, // You can specify a type if needed, e.g., "customer"
+      page: 1, // Set the page number as needed
+      limit: 50, // Set the limit for pagination
+    }); // You can adjust the parameters as needed
+  };
+
   const onProductSelected = (selectedProduct) => {
     console.log("Product selected:", selectedProduct);
     // You can add custom behavior for what happens when a product is selected.
@@ -347,6 +426,10 @@ document.addEventListener("DOMContentLoaded", function () {
     formManager.populate(productFormId, productDataEx);
   };
 
+  const onClientSelected = (selectedClient) => {
+    console.log("Client selected:", selectedClient);
+  };
+
   // Create an instance of the Searchbar class
   const productSearchbar = new Searchbar(
     "search-product-input", // Input field ID
@@ -355,6 +438,16 @@ document.addEventListener("DOMContentLoaded", function () {
     "search-product-results", // Results div ID
     fetchProducts, // Fetch function for searching products
     onProductSelected // Callback when a product is selected
+  );
+
+  // Create an instance of the Searchbar class
+  const clientsSearchbar = new Searchbar(
+    "search-input-client", // Input field ID
+    "search-results-client", // Results div ID
+    "client-details-form", // Search form ID
+    "results-list-client", // Results list ID
+    searchParties, // Fetch function for searching products
+    onClientSelected // Callback when a product is selected
   );
 });
 
