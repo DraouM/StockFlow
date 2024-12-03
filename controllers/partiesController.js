@@ -230,6 +230,37 @@ class PartiesController {
     }
   }
 
+  // Search parties by name or type
+  // Updated searchParties function
+  async searchParties(req) {
+    try {
+      const searchTerm = req?.query?.term || ""; // Get the search term from the query parameter
+      const type = req?.query?.type || null; // Get the party type from the query parameter
+      const page = parseInt(req?.query?.page) || 1; // Get the page number
+      const limit = parseInt(req?.query?.limit) || 50; // Get the limit for pagination
+
+      // Call the search method from the model
+      const parties = await this.partiesModel.search(
+        type,
+        searchTerm,
+        page,
+        limit
+      );
+
+      return {
+        success: true,
+        data: parties,
+        message: `Found ${parties.length} party(ies) matching the search term "${searchTerm}"`,
+      };
+    } catch (error) {
+      console.error("Error searching parties:", error);
+      throw {
+        success: false,
+        error: error.message || "Failed to search parties",
+      };
+    }
+  }
+
   // Cleanup method to close database connection
   cleanup() {
     try {
