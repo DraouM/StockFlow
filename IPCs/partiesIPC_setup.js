@@ -49,10 +49,24 @@ function setupPartiesIPC() {
   ipcMain.handle("parties:delete", (event, partyId) =>
     partiesController.deleteParty(partyId)
   );
-
-  ipcMain.handle("parties:search", (event, req) =>
-    partiesController.searchParties(req)
-  );
+  ipcMain.handle("parties:search", async (event, req) => {
+    try {
+      if (!req || !req.query) {
+        console.log({ event, req });
+      }
+      const result = await partiesController.searchParties(req);
+      return result; // Return the result from the controller
+    } catch (error) {
+      console.error("Error in parties:search IPC handler:", error);
+      // Return structured error response
+      return {
+        success: false,
+        error: error.message,
+        data: [],
+        pagination: {},
+      };
+    }
+  });
 
   // main.js
   ipcMain.handle("parties:getByType", async (event, params) => {

@@ -22,54 +22,54 @@ document.addEventListener("DOMContentLoaded", () => {
   // });
 });
 
-async function fetchClients(searchTerm) {
-  try {
-    const response = await window.partiesAPI.searchParties({
-      term: searchTerm,
-      type: null, // You can specify a type if needed, e.g., "customer"
-      page: 1, // Set the page number as needed
-      limit: 50, // Set the limit for pagination
-    });
-
-    return response.data; // Assuming the response structure has a data field
-  } catch (error) {
-    console.error("Error fetching clients:", error);
-    return []; // Return an empty array in case of error
-  }
-}
-// Function to fetch clients (you can replace this with your API call)
 // async function fetchClients(searchTerm) {
-//   // Simulated API call
-//   const response = await window.partiesAPI.searchParties(searchTerm);
-//   return response; // Assuming response is an array of client objects
+//   try {
+//     const response = await window.partiesAPI.searchParties({
+//       term: searchTerm,
+//       type: null, // You can specify a type if needed, e.g., "customer"
+//       page: 1, // Set the page number as needed
+//       limit: 50, // Set the limit for pagination
+//     });
+
+//     return response.data; // Assuming the response structure has a data field
+//   } catch (error) {
+//     console.error("Error fetching clients:", error);
+//     return []; // Return an empty array in case of error
+//   }
+// }
+// // Function to fetch clients (you can replace this with your API call)
+// // async function fetchClients(searchTerm) {
+// //   // Simulated API call
+// //   const response = await window.partiesAPI.searchParties(searchTerm);
+// //   return response; // Assuming response is an array of client objects
+// // }
+
+// // Function to display client results
+// function displayClientResults(clients) {
+//   const resultsList = document.getElementById("results-list-client");
+//   resultsList.innerHTML = ""; // Clear previous results
+
+//   clients.forEach((client) => {
+//     const li = document.createElement("li");
+//     li.textContent = client.name; // Display client name
+//     li.dataset.client = JSON.stringify(client); // Store client data
+//     resultsList.appendChild(li);
+//   });
 // }
 
-// Function to display client results
-function displayClientResults(clients) {
-  const resultsList = document.getElementById("results-list-client");
-  resultsList.innerHTML = ""; // Clear previous results
+// // Function to display selected client information in the form
+// function displaySelectedClient(client) {
+//   document.getElementById("clientName").value = client.name || "";
+//   document.getElementById("clientAddress").value = client.address || "";
+//   document.getElementById("clientPhone").value = client.phone || "";
+//   document.getElementById("clientDebt").value = client.total_debt || 0.0;
+// }
 
-  clients.forEach((client) => {
-    const li = document.createElement("li");
-    li.textContent = client.name; // Display client name
-    li.dataset.client = JSON.stringify(client); // Store client data
-    resultsList.appendChild(li);
-  });
-}
-
-// Function to display selected client information in the form
-function displaySelectedClient(client) {
-  document.getElementById("clientName").value = client.name || "";
-  document.getElementById("clientAddress").value = client.address || "";
-  document.getElementById("clientPhone").value = client.phone || "";
-  document.getElementById("clientDebt").value = client.total_debt || 0.0;
-}
-
-// Function to close the client modal
-function closeClientModal() {
-  const modal = document.getElementById("client-modal");
-  modal.style.display = "none"; // Hide the modal
-}
+// // Function to close the client modal
+// function closeClientModal() {
+//   const modal = document.getElementById("client-modal");
+//   modal.style.display = "none"; // Hide the modal
+// }
 
 const ShoppingListManager = {
   // Store items in an array
@@ -440,15 +440,15 @@ document.addEventListener("DOMContentLoaded", function () {
     onProductSelected // Callback when a product is selected
   );
 
-  // Create an instance of the Searchbar class
-  const clientsSearchbar = new Searchbar(
-    "search-input-client", // Input field ID
-    "search-results-client", // Results div ID
-    "client-details-form", // Search form ID
-    "results-list-client", // Results list ID
-    searchParties, // Fetch function for searching products
-    onClientSelected // Callback when a product is selected
-  );
+  // // Create an instance of the Searchbar class
+  // const clientsSearchbar = new Searchbar(
+  //   "search-input-client", // Input field ID
+  //   "search-results-client", // Results div ID
+  //   "client-details-form", // Search form ID
+  //   "results-list-client", // Results list ID
+  //   searchParties, // Fetch function for searching products
+  //   onClientSelected // Callback when a product is selected
+  // );
 });
 
 function productFormOnSubmit(data) {

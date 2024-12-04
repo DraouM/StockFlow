@@ -177,7 +177,7 @@
     <!-- CLIENT  -->
     <h2>Shopping</h2>
 
-    <div id="client-modal" class="modal">
+    <!-- <div id="client-modal" class="modal">
       <div class="modal-content">
         <span class="close-modal-btn">&times;</span>
         <h2 class="modal-title">Select Client</h2>
@@ -218,7 +218,7 @@
           </form>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <button id="open-modal-btn" class="button">Add New Product</button>
 
@@ -596,10 +596,14 @@
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const fetchParties = async (searchTerm) => {
-          return await window.electronAPI.parties.searchParty(
-            "client",
-            searchTerm
-          );
+          console.log({ searchTerm });
+
+          return await window.partiesAPI.searchParties({
+            searchTerm: searchTerm,
+            type: "customer", // You can specify a type if needed, e.g., "customer"
+            page: 1, // Set the page number as needed
+            limit: 50, // Set the limit for pagination
+          });
         };
 
         const onPartySelected = (selectedClient) => {

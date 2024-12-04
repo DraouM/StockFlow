@@ -282,6 +282,12 @@ class PartiesModel {
 
   // Search parties with improved search functionality
   async search(type, searchTerm, page = 1, limit = 50) {
+    // Validate and sanitize inputs
+    if (!searchTerm) {
+      throw new Error("Search term is required");
+    }
+
+    // Optional type validation
     if (type && !["customer", "supplier", "both"].includes(type)) {
       throw new Error(
         "Invalid party type. Must be customer, supplier, or both."
@@ -289,24 +295,68 @@ class PartiesModel {
     }
 
     const offset = (page - 1) * limit;
-    const query = `
+
+    // Construct dynamic query
+    let query = `
       SELECT * FROM parties 
-      WHERE (? IS NULL OR type = ?) 
-        AND (
-          name LIKE ? OR 
-          phone LIKE ? OR 
-          address LIKE ?
-        )
+      WHERE (
+        name LIKE ? OR 
+        phone LIKE ? OR 
+        address LIKE ? OR
+        nrc LIKE ? OR
+        nif LIKE ?
+      )
+    `;
+
+    // Add type filter if provided
+    const params = [];
+    const searchPattern = `%${searchTerm}%`;
+
+    if (type) {
+      query += ` AND type = ?`;
+      params.push(
+        searchPattern,
+        searchPattern,
+        searchPattern,
+        searchPattern,
+        searchPattern,
+        type
+      );
+    } else {
+      params.push(
+        searchPattern,
+        searchPattern,
+        searchPattern,
+        searchPattern,
+        searchPattern
+      );
+    }
+
+    // Add pagination
+    query += `
       ORDER BY created_at DESC 
       LIMIT ? OFFSET ?
     `;
+    params.push(limit, offset);
 
-    const searchPattern = `%${searchTerm}%`;
-    return this.fetchQuery(
-      query,
-      [type, type, searchPattern, searchPattern, searchPattern, limit, offset],
-      "Error searching parties"
-    );
+    try {
+      const results = await this.fetchQuery(
+        query,
+        params,
+        "Error searching parties"
+      );
+
+      // Additional logging for debugging
+      console.log("Search Parameters:", { type, searchTerm, page, limit });
+      console.log("Query:", query);
+      console.log("Params:", params);
+      console.log("Results:", results);
+
+      return results;
+    } catch (error) {
+      console.error("Search function error:", error);
+      throw error;
+    }
   }
 
   // Get total debt with better error handling

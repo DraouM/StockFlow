@@ -231,32 +231,83 @@ class PartiesController {
   }
 
   // Search parties by name or type
-  // Updated searchParties function
   async searchParties(req) {
     try {
-      const searchTerm = req?.query?.term || ""; // Get the search term from the query parameter
-      const type = req?.query?.type || null; // Get the party type from the query parameter
-      const page = parseInt(req?.query?.page) || 1; // Get the page number
-      const limit = parseInt(req?.query?.limit) || 50; // Get the limit for pagination
+      // Check if req is defined
+      if (!req) {
+        throw new Error("Request object is missing or malformed.");
+      }
 
-      // Call the search method from the model
-      const parties = await this.partiesModel.search(
+      const { type, searchTerm, page = 1, limit = 50 } = req;
+
+      if (!searchTerm) {
+        return {
+          success: false,
+          error: {
+            type: "INVALID_INPUT",
+            message: "Search term is required.",
+          },
+        };
+      }
+
+      const pageNumber = Math.max(1, parseInt(page));
+      const limitNumber = Math.max(1, parseInt(limit));
+
+      const results = await this.partiesModel.search(
         type,
         searchTerm,
-        page,
-        limit
+        pageNumber,
+        limitNumber
       );
+
+      // Count total results for pagination
+      const totalResults = await this.partiesModel.fetchQuery(
+        `SELECT COUNT(*) as total FROM parties WHERE (name LIKE ? OR phone LIKE ? OR address LIKE ? OR nrc LIKE ? OR nif LIKE ?) ${
+          type ? "AND type = ?" : ""
+        }`,
+        type
+          ? [
+              `%${searchTerm}%`,
+              `%${searchTerm}%`,
+              `%${searchTerm}%`,
+              `%${searchTerm}%`,
+              `%${searchTerm}%`,
+              type,
+            ]
+          : [
+              `%${searchTerm}%`,
+              `%${searchTerm}%`,
+              `%${searchTerm}%`,
+              `%${searchTerm}%`,
+              `%${searchTerm}%`,
+            ],
+        "Error counting total results"
+      );
+
+      const total = totalResults[0]?.total || 0;
+      const totalPages = Math.ceil(total / limitNumber);
 
       return {
         success: true,
-        data: parties,
-        message: `Found ${parties.length} party(ies) matching the search term "${searchTerm}"`,
+        data: results,
+        message: `Found ${results.length} party(s)`,
+        pagination: {
+          total,
+          page: pageNumber,
+          limit: limitNumber,
+          totalPages,
+          hasNextPage: pageNumber < totalPages,
+          hasPrevPage: pageNumber > 1,
+        },
       };
     } catch (error) {
-      console.error("Error searching parties:", error);
-      throw {
+      console.error("Search Parties Error:", error);
+      return {
         success: false,
-        error: error.message || "Failed to search parties",
+        error: {
+          type: "UNKNOWN_ERROR",
+          message: "An error occurred while searching parties.",
+        },
       };
     }
   }
