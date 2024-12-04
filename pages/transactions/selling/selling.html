@@ -174,51 +174,55 @@
       <a href="../buying/buying.html" class="button"> Buying </a>
     </header>
 
-    <!-- CLIENT  -->
-    <h2>Shopping</h2>
-
-    <!-- <div id="client-modal" class="modal">
+    <div id="client-modal" class="modal">
       <div class="modal-content">
         <span class="close-modal-btn">&times;</span>
         <h2 class="modal-title">Select Client</h2>
         <div class="modal-body">
           <div class="search-container">
-            <input
-              type="text"
-              id="search-input-client"
-              placeholder="Search for a Client"
-              autocomplete="off"
-            />
+            <form id="search-form-client" class="search-form">
+              <input
+                type="text"
+                class="search-input"
+                id="search-input-client"
+                placeholder="Search for a Client"
+                autocomplete="off"
+              />
+              <button type="submit" id="search-btn-client" class="search-btn">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22"
+                  height="23"
+                  viewBox="0 0 22 23"
+                  fill="none"
+                >
+                  <path
+                    d="M16.4998 16.9997L13.2515 13.7513M13.2515 13.7513C13.7728 13.2299 14.1864 12.611 14.4686 11.9298C14.7508 11.2486 14.896 10.5184 14.896 9.7811C14.896 9.04376 14.7508 8.31364 14.4686 7.63243C14.1864 6.95121 13.7728 6.33225 13.2515 5.81087C12.7301 5.28949 12.1111 4.87592 11.4299 4.59375C10.7487 4.31158 10.0186 4.16635 9.28125 4.16635C8.54391 4.16635 7.81379 4.31158 7.13258 4.59375C6.45137 4.87592 5.8324 5.28949 5.31102 5.81087C4.25806 6.86384 3.6665 8.29197 3.6665 9.7811C3.6665 11.2702 4.25806 12.6984 5.31102 13.7513C6.36399 14.8043 7.79213 15.3958 9.28125 15.3958C10.7704 15.3958 12.1985 14.8043 13.2515 13.7513Z"
+                    stroke="#5B5B5B"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </form>
             <div id="search-results-client" class="search-results hidden">
               <ul id="results-list-client"></ul>
             </div>
+            <div class="form-actions">
+              <button class="button button-secondary">Clear</button>
+              <button
+                type="submit"
+                id="confirm-client-btn"
+                class="button button-primary button-medium"
+              >
+                Confirm
+              </button>
+            </div>
           </div>
-          <form id="client-details-form" class="client-details-form">
-            <div class="form-group">
-              <label for="clientName">Client Name</label>
-              <input type="text" id="clientName" name="clientName" readonly />
-            </div>
-            <div class="form-group">
-              <label for="clientAddress">Client Address</label>
-              <input
-                type="text"
-                id="clientAddress"
-                name="clientAddress"
-                readonly
-              />
-            </div>
-            <div class="form-group">
-              <label for="clientPhone">Client Phone</label>
-              <input type="text" id="clientPhone" name="clientPhone" readonly />
-            </div>
-            <div class="form-group">
-              <label for="clientDebt">Client Debt</label>
-              <input type="number" id="clientDebt" name="clientDebt" readonly />
-            </div>
-          </form>
         </div>
       </div>
-    </div> -->
+    </div>
 
     <button id="open-modal-btn" class="button">Add New Product</button>
 
@@ -310,166 +314,100 @@
       </div>
     </div>
 
-    <!-- Shopping List -->
-    <section class="table_container">
-      <table id="shopping-list">
-        <thead>
-          <tr>
-            <th>Num</th>
-            <th>Product Name</th>
-            <th>Quantity</th>
-            <th>Units</th>
-            <th>Unit Price</th>
-            <th>Sub Total</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Table Rows -->
-          <tr>
-            <td><span class="number-circle">1</span></td>
-            <td>Product A</td>
-            <td class="quantity">
-              <span class="main-quantity">5 & 6</span>
-              <span class="sub-quantity highlight">08</span>
-            </td>
-            <td>46</td>
-            <td>23.26</td>
-            <td>1069.96</td>
-            <td>
-              <button class="edit button button-secondary button-small">
-                EDIT
-              </button>
-              <button class="del button button-danger button-small">DEL</button>
-            </td>
-          </tr>
-          <tr>
-            <td><span class="number-circle">2</span></td>
-            <td>Product A</td>
-            <td class="quantity">
-              <span class="main-quantity">3 & 8</span>
-              <span class="sub-quantity highlight">10</span>
-            </td>
-            <td>38</td>
-            <td>126.50</td>
-            <td>4807.00</td>
-            <td>
-              <button class="edit button button-secondary button-small">
-                EDIT
-              </button>
-              <button class="del button button-danger button-small">DEL</button>
-            </td>
-          </tr>
-          <tr>
-            <td><span class="number-circle">2</span></td>
-            <td>Product C</td>
-            <td class="quantity">
-              <span class="main-quantity">4</span>
-              <span class="sub-quantity highlight">01</span>
-            </td>
-            <td>4</td>
-            <td>326.50</td>
-            <td>1302.00</td>
-            <td>
-              <button class="edit button button-secondary button-small">
-                EDIT
-              </button>
-              <button class="del button button-danger button-small">DEL</button>
-            </td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr>
-            <td class="total-price" colspan="4" class="total-label">Total</td>
-            <td id="total-price" class="total-price" colspan="2">
-              12,548,896 DA
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-    </section>
-    <button
-      onclick="confirmOrder()"
-      class="button button-primary button-medium"
-    >
-      CONFIRM ORDER
-    </button>
+    <main>
+      <div class="container">
+        <section class="shopping-section">
+          <h2>Shopping List</h2>
+          <!-- Shopping List -->
+          <section class="table_container">
+            <table id="shopping-list">
+              <thead>
+                <tr>
+                  <th>Num</th>
+                  <th>Product Name</th>
+                  <th>Quantity</th>
+                  <th>Units</th>
+                  <th>Unit Price</th>
+                  <th>Sub Total</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Table Rows -->
+                <tr>
+                  <td><span class="number-circle">1</span></td>
+                  <td>Product A</td>
+                  <td class="quantity">
+                    <span class="main-quantity">5 & 6</span>
+                    <span class="sub-quantity highlight">08</span>
+                  </td>
+                  <td>46</td>
+                  <td>23.26</td>
+                  <td>1069.96</td>
+                  <td>
+                    <button class="edit button button-secondary button-small">
+                      EDIT
+                    </button>
+                    <button class="del button button-danger button-small">
+                      DEL
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="number-circle">2</span></td>
+                  <td>Product A</td>
+                  <td class="quantity">
+                    <span class="main-quantity">3 & 8</span>
+                    <span class="sub-quantity highlight">10</span>
+                  </td>
+                  <td>38</td>
+                  <td>126.50</td>
+                  <td>4807.00</td>
+                  <td>
+                    <button class="edit button button-secondary button-small">
+                      EDIT
+                    </button>
+                    <button class="del button button-danger button-small">
+                      DEL
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="number-circle">2</span></td>
+                  <td>Product C</td>
+                  <td class="quantity">
+                    <span class="main-quantity">4</span>
+                    <span class="sub-quantity highlight">01</span>
+                  </td>
+                  <td>4</td>
+                  <td>326.50</td>
+                  <td>1302.00</td>
+                  <td>
+                    <button class="edit button button-secondary button-small">
+                      EDIT
+                    </button>
+                    <button class="del button button-danger button-small">
+                      DEL
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td class="total-price" colspan="4" class="total-label">
+                    Total
+                  </td>
+                  <td id="total-price" class="total-price" colspan="2">
+                    12,548,896 DA
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </section>
+        </section>
 
-    <div class="main-container">
-      <div class="product-section">
-        <!-- Your product details form here -->
-
-        <!-- Your shopping list here -->
-        <div id="shopping-list-container" class="shopping-list-container">
-          <h3>Shopping List</h3>
-          <table id="shopping-list-table" class="shopping-list-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Unit Price</th>
-                <th>Total</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="shopping-list-body">
-              <!-- Shopping list items will be inserted here -->
-            </tbody>
-          </table>
-          <div class="shopping-list-summary">
-            <p id="total-price" class="total-price">Total: $0.00</p>
-            <button id="clear-list" class="button button-danger">
-              Clear List
-            </button>
-          </div>
-        </div>
-
-        <!-- Confirm Transaction -->
-        <button
-          type="button button-primary"
-          id="confirm-transaction"
-          class="button button-primary"
-        >
-          Confirm Transaction
-        </button>
-      </div>
-
-      <div class="client-section">
-        <div class="client-info-section">
-          <h2>Clients Searchbar</h2>
-          <!-- Your client search form here -->
-          <div class="search-container">
-            <form id="search-form-client" class="search-form">
-              <input
-                type="text"
-                class="search-input"
-                id="search-input-client"
-                placeholder="Search for a Client"
-                autocomplete="off"
-              />
-              <button type="submit" id="search-btn-client" class="search-btn">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="22"
-                  height="23"
-                  viewBox="0 0 22 23"
-                  fill="none"
-                >
-                  <path
-                    d="M16.4998 16.9997L13.2515 13.7513M13.2515 13.7513C13.7728 13.2299 14.1864 12.611 14.4686 11.9298C14.7508 11.2486 14.896 10.5184 14.896 9.7811C14.896 9.04376 14.7508 8.31364 14.4686 7.63243C14.1864 6.95121 13.7728 6.33225 13.2515 5.81087C12.7301 5.28949 12.1111 4.87592 11.4299 4.59375C10.7487 4.31158 10.0186 4.16635 9.28125 4.16635C8.54391 4.16635 7.81379 4.31158 7.13258 4.59375C6.45137 4.87592 5.8324 5.28949 5.31102 5.81087C4.25806 6.86384 3.6665 8.29197 3.6665 9.7811C3.6665 11.2702 4.25806 12.6984 5.31102 13.7513C6.36399 14.8043 7.79213 15.3958 9.28125 15.3958C10.7704 15.3958 12.1985 14.8043 13.2515 13.7513Z"
-                    stroke="#5B5B5B"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </button>
-            </form>
-            <div id="search-results-client" class="search-results hidden">
-              <ul id="results-list-client"></ul>
-            </div>
-          </div>
-
+        <section class="client-section">
+          <h2>Clients Details</h2>
           <!-- Your client details form here -->
           <form id="client-details-form" class="client-details-form">
             <!-- Client Name -->
@@ -521,11 +459,82 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="button button-secondary">
-              Submit
-            </button>
+            <button type="reset" class="button button-secondary">Reset</button>
           </form>
+        </section>
+      </div>
+    </main>
+
+    <button
+      onclick="confirmOrder()"
+      class="button button-primary button-medium"
+    >
+      CONFIRM ORDER
+    </button>
+
+    <div class="main-container">
+      <div class="product-section">
+        <!-- Your product details form here -->
+
+        <!-- Your shopping list here -->
+        <div id="shopping-list-container" class="shopping-list-container">
+          <h3>Shopping List</h3>
+          <table id="shopping-list-table" class="shopping-list-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="shopping-list-body">
+              <!-- Shopping list items will be inserted here -->
+              <tr>
+                <td>Product A</td>
+                <td>100</td>
+                <td>120.35</td>
+                <td>12035</td>
+                <td>
+                  <button class="button button-secondary button-small">
+                    Edit
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>Product A</td>
+                <td>100</td>
+                <td>120.35</td>
+                <td>12035</td>
+                <td>
+                  <button class="button button-secondary button-small">
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="shopping-list-summary">
+            <p id="total-price" class="total-price">Total: $0.00</p>
+            <button id="clear-list" class="button button-danger">
+              Clear List
+            </button>
+          </div>
         </div>
+
+        <!-- Confirm Transaction -->
+        <button
+          type="button button-primary"
+          id="confirm-transaction"
+          class="button button-primary"
+        >
+          Confirm Transaction
+        </button>
+      </div>
+
+      <div class="client-section">
+        <div class="client-info-section"></div>
 
         <!-- Payment -->
         <div class="purchase-section">
@@ -591,6 +600,36 @@
 
     <script type="module" src="selling2.js"></script>
     <script src="../../../scripts/common/Searchbar.js"></script>
+
+    <!-- Handling Clients Modal -->
+    <script type="module">
+      import modalManager from "../modalManager.js";
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize modal
+        modalManager.init("client-modal");
+
+        // Open modal button logic
+        // openModalBtn.addEventListener("click", openProductModal);
+
+        // Close modal button logic
+        // closeModalBtn.addEventListener("click", closeProductModal);
+
+        modalManager.open("client-modal");
+      });
+
+      function openClientsModal() {
+        modalManager.open("client-modal");
+      }
+      function closeClientsModal() {
+        modalManager.close("client-modal");
+      }
+      document
+        .getElementById("confirm-client-btn")
+        .addEventListener("click", () => {
+          closeClientsModal();
+        });
+    </script>
 
     <!-- Client form handler -->
     <script>
