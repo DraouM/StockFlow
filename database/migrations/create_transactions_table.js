@@ -258,7 +258,7 @@ class TransactionDB {
   }
 }
 
-// Instantiate the PartyDB class and create the table
+// Instantiate the ProductDatabase class and create the table
 const transactionDB = new TransactionDB();
 transactionDB.createTransactionsTable().finally(() => {
   transactionDB.closeConnection();
