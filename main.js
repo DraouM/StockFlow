@@ -3,17 +3,17 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 
 // Import Transaction handlers
-const {
-  getAllTransactions,
-  getTransactionById,
-  createTransaction,
-  updateTransaction,
-  deleteTransaction,
-  getTransactionsByDateRange,
-  getTotalAmountByType,
-  settleTransaction,
-  getUnsettledTransactions,
-} = require("./controllers/transactionController");
+// const {
+//   getAllTransactions,
+//   getTransactionById,
+//   createTransaction,
+//   updateTransaction,
+//   deleteTransaction,
+//   getTransactionsByDateRange,
+//   getTotalAmountByType,
+//   settleTransaction,
+//   getUnsettledTransactions,
+// } = require("./controllers/transactionController");
 
 // Create a new BrowserWindow when `app` is ready
 function createWindow() {
@@ -56,33 +56,33 @@ app.on("activate", () => {
 // --------- IPC Handlers: Grouped by Functionality ---------
 
 // Transactions IPC Handlers
-ipcMain.handle("transactions-get-all", getAllTransactions);
-ipcMain.handle("transactions-get-by-id", (event, transactionId) => {
-  console.log("Data received in main process:", transactionId);
-  return getTransactionById(transactionId);
-});
-ipcMain.handle("transactions-create", (event, transactionData) => {
-  return createTransaction(transactionData);
-});
-ipcMain.handle("transactions-update", (event, id, transactionData) => {
-  console.log("Data received in main process (UPDATE):", id, transactionData);
-  return updateTransaction(event, id, transactionData);
-});
-ipcMain.handle("transactions-delete", (event, id) => deleteTransaction(id));
-ipcMain.handle(
-  "transactions-get-by-date-range",
-  (event, startDate, endDate, type) =>
-    getTransactionsByDateRange(startDate, endDate, type)
-);
-ipcMain.handle(
-  "transactions-get-total-amount-by-type",
-  (event, type, startDate, endDate) =>
-    getTotalAmountByType(type, startDate, endDate)
-);
-ipcMain.handle("transactions-settle", (event, id) => settleTransaction(id));
-ipcMain.handle("transactions-get-unsettled", (event, partyId) =>
-  getUnsettledTransactions(partyId)
-);
+// ipcMain.handle("transactions-get-all", getAllTransactions);
+// ipcMain.handle("transactions-get-by-id", (event, transactionId) => {
+//   console.log("Data received in main process:", transactionId);
+//   return getTransactionById(transactionId);
+// });
+// ipcMain.handle("transactions-create", (event, transactionData) => {
+//   return createTransaction(transactionData);
+// });
+// ipcMain.handle("transactions-update", (event, id, transactionData) => {
+//   console.log("Data received in main process (UPDATE):", id, transactionData);
+//   return updateTransaction(event, id, transactionData);
+// });
+// ipcMain.handle("transactions-delete", (event, id) => deleteTransaction(id));
+// ipcMain.handle(
+//   "transactions-get-by-date-range",
+//   (event, startDate, endDate, type) =>
+//     getTransactionsByDateRange(startDate, endDate, type)
+// );
+// ipcMain.handle(
+//   "transactions-get-total-amount-by-type",
+//   (event, type, startDate, endDate) =>
+//     getTotalAmountByType(type, startDate, endDate)
+// );
+// ipcMain.handle("transactions-settle", (event, id) => settleTransaction(id));
+// ipcMain.handle("transactions-get-unsettled", (event, partyId) =>
+//   getUnsettledTransactions(partyId)
+// );
 
 /** IPCs handlers setups */
 const { setupPartiesIPC } = require("./IPCs/partiesIPC_setup"); //path-to-ipc-setup
@@ -91,6 +91,9 @@ setupPartiesIPC();
 
 const { setupProductsIPC } = require("./IPCs/productsIPC_setup");
 setupProductsIPC();
+
+const { setupTransactionsIPC } = require("./IPCs/transactionsIPC_setup");
+setupTransactionsIPC();
 
 // Optional: Handle graceful shutdowns
 // process.on('SIGINT', () => {
