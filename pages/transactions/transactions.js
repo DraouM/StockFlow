@@ -176,16 +176,19 @@
 //     console.error("Error updating transaction:", error);
 //   }
 // })();
+// Import the transactions API
 
+function fetchTransactions() {
+  return transactionsAPI.getAllTransactions();
+}
 document.addEventListener("DOMContentLoaded", async () => {
+  const { transactionsAPI } = window;
+
   const spinner = new LoadingSpinner("transactionsTable", {
     message: "Loading products...",
   });
   try {
     spinner.show(); // Show spinner before data fetching
-
-    // Fetch all the transactions using the exposed API
-    const transactions = await window.electronAPI.transactions.getAll();
 
     // Get the table body element
     const tableBody = document.querySelector("#transactionsTable tbody");
@@ -196,28 +199,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Use a document fragment to improve performance
     const fragment = document.createDocumentFragment();
 
-    // Iterate over each product and add a row to the fragment
-    for (const transaction of transactions) {
-      const party = await window.electronAPI.parties.getById(
-        transaction.party_id
-      );
+    // Fetch all the transactions using the exposed API
+    // const transactions = fetchTransactions();
+    // Get all transactions
+    transactionsAPI
+      .getAllTransactions()
+      .then(async (transactions) => {
+        console.log("All Transactions:", transactions);
+        // Update UI or perform further actions
 
-      const row = document.createElement("tr");
-      row.innerHTML = `
-      <td>${transaction.transaction_id}</td>
-      <td>${party.name}</td>
-      <td>${transaction.transaction_date}</td>
-      <td>${transaction.transaction_type}</td>
-      <td>${transaction.total_amount}</td>
-      <td>${transaction.discount}</td>
-      <td>${transaction.notes}</td>
-      <td>${transaction.settled}</td>
-      <td><button class="button button-small button-secondary edit-button" data-id="${transaction.transaction_id}">Edit</button> 
-      `;
+        // Iterate over each product and add a row to the fragment
+        for (const transaction of transactions) {
+          const party = await window.electronAPI.parties.getById(
+            transaction.party_id
+          );
 
-      // Append the fragment to the table body
-      fragment.appendChild(row);
-    }
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${transaction.transaction_id}</td>
+            <td>${party.name}</td>
+            <td>${transaction.transaction_date}</td>
+            <td>${transaction.transaction_type}</td>
+            <td>${transaction.total_amount}</td>
+            <td>${transaction.discount}</td>
+            <td>${transaction.notes}</td>
+            <td>${transaction.settled}</td>
+            <td><button class="button button-small button-secondary edit-button" data-id="${transaction.transaction_id}">Edit</button> 
+            `;
+
+          // Append the fragment to the table body
+          fragment.appendChild(row);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to fetch transactions:", error);
+        // Handle error in UI (show error message, etc.)
+      });
+
     // Append the fragment to the table body
     tableBody.appendChild(fragment);
 
@@ -231,10 +249,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       emptyMessage: "No Item found",
       emptyImageSrc: "../assets/empty-table.png",
     });
-    // Optionally handle the case where no products are available
-    if (transactions.length === 0) {
-      transactionsTable.checkTableEmpty(0);
-    }
+    // // Optionally handle the case where no products are available
+    // if (transactions.length === 0) {
+    //   transactionsTable.checkTableEmpty(0);
+    // }
   } catch (error) {
     console.error("Error fetching transactions:", error);
 
