@@ -4,61 +4,6 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 const { contextBridge, ipcRenderer } = require("electron");
-
-// contextBridge.exposeInMainWorld("electronAPI", {
-//   products: {
-//     getAll: () => ipcRenderer.invoke("products-get-all"),
-//     getById: (id) => ipcRenderer.invoke("products:getById", id),
-//     create: (productData) => ipcRenderer.invoke("products-create", productData),
-//     update: (id, productData) =>
-//       ipcRenderer.invoke("products-update", id, productData),
-//     delete: (id) => ipcRenderer.invoke("products:delete", id),
-//     searchProducts: (searchTerm) =>
-//       ipcRenderer.invoke("products.search", searchTerm), // <--- NEW LINE ADDED HERE
-//   },
-//   transactions: {
-//     getAll: () => ipcRenderer.invoke("transactions-get-all"),
-//     getById: (id) => ipcRenderer.invoke("transactions-get-by-id", id),
-//     create: (transactionData) =>
-//       ipcRenderer.invoke("transactions-create", transactionData),
-
-//     update: (id, transactionData) => {
-//       console.log(
-//         "STEP B => Data received in preload script:",
-//         id,
-//         transactionData
-//       ); // Debug log
-
-//       console.log(
-//         "Data received in preload before invoking IPC (UPDATE):",
-//         id,
-//         transactionData
-//       );
-//       return ipcRenderer.invoke("transactions-update", id, transactionData);
-//     },
-
-//     delete: (id) => ipcRenderer.invoke("transactions-delete", id),
-//     getByDateRange: (startDate, endDate, type) =>
-//       ipcRenderer.invoke(
-//         "transactions-get-by-date-range",
-//         startDate,
-//         endDate,
-//         type
-//       ),
-//     getTotalAmountByType: (type, startDate, endDate) =>
-//       ipcRenderer.invoke(
-//         "transactions-get-total-amount-by-type",
-//         type,
-//         startDate,
-//         endDate
-//       ),
-//     settle: (id) => ipcRenderer.invoke("transactions-settle", id),
-//     getUnsettled: (partyId = null) =>
-//       ipcRenderer.invoke("transactions-get-unsettled", partyId),
-//   },
-// });
-
-// Expose parties API to renderer process
 contextBridge.exposeInMainWorld("partiesAPI", {
   getAllParties: (req) => ipcRenderer.invoke("parties:getAll", req),
   getPartyById: (partyId) => ipcRenderer.invoke("parties:getById", partyId),
@@ -91,49 +36,138 @@ contextBridge.exposeInMainWorld("productsAPI", {
 // contextBridge.exposeInIsolatedWorld("transactionsAPI", {});
 
 const transactionsAPI = {
-  // Get all transactions
-  getAllTransactions: async () => {
-    return await ipcRenderer.invoke("get-all-transactions");
+  createTransaction: async (transaction) => {
+    try {
+      const result = await ipcRenderer.invoke(
+        "create-transaction",
+        transaction
+      );
+      return result;
+    } catch (error) {
+      console.error("Error in createTransaction:", error);
+      return { success: false, error: error.message };
+    }
   },
 
-  // Get a transaction by ID
+  getAllTransactions: async (page = 1, limit = 50) => {
+    try {
+      const result = await ipcRenderer.invoke(
+        "get-all-transactions",
+        page,
+        limit
+      );
+      return result;
+    } catch (error) {
+      console.error("Error in getAllTransactions:", error);
+      return { success: false, error: error.message };
+    }
+  },
+
   getTransactionById: async (transactionId) => {
-    return await ipcRenderer.invoke("get-transaction-by-id", transactionId);
+    try {
+      const result = await ipcRenderer.invoke(
+        "get-transaction-by-id",
+        transactionId
+      );
+      return result;
+    } catch (error) {
+      console.error("Error in getTransactionById:", error);
+      return { success: false, error: error.message };
+    }
   },
 
-  // Create a new transaction
-  createTransaction: async (transactionData) => {
-    return await ipcRenderer.invoke("create-transaction", transactionData);
+  updateTransaction: async (transactionId, updates) => {
+    try {
+      const result = await ipcRenderer.invoke(
+        "update-transaction",
+        transactionId,
+        updates
+      );
+      return result;
+    } catch (error) {
+      console.error("Error in updateTransaction:", error);
+      return { success: false, error: error.message };
+    }
   },
 
-  // Update a transaction
-  updateTransaction: async (transactionData) => {
-    return await ipcRenderer.invoke("update-transaction", transactionData);
-  },
-
-  // Delete a transaction
   deleteTransaction: async (transactionId) => {
-    return await ipcRenderer.invoke("delete-transaction", transactionId);
+    try {
+      const result = await ipcRenderer.invoke(
+        "delete-transaction",
+        transactionId
+      );
+      return result;
+    } catch (error) {
+      console.error("Error in deleteTransaction:", error);
+      return { success: false, error: error.message };
+    }
   },
 
-  // Get all transaction details for a specific transaction
-  getTransactionDetails: async (transactionId) => {
-    return await ipcRenderer.invoke("get-transaction-details", transactionId);
+  createTransactionDetail: async (transactionDetail) => {
+    try {
+      const result = await ipcRenderer.invoke(
+        "create-transaction-detail",
+        transactionDetail
+      );
+      return result;
+    } catch (error) {
+      console.error("Error in createTransactionDetail:", error);
+      return { success: false, error: error.message };
+    }
   },
 
-  // Create a new transaction detail
-  createTransactionDetail: async (detailData) => {
-    return await ipcRenderer.invoke("create-transaction-detail", detailData);
+  getAllTransactionDetails: async (page = 1, limit = 50) => {
+    try {
+      const result = await ipcRenderer.invoke(
+        "get-all-transaction-details",
+        page,
+        limit
+      );
+      return result;
+    } catch (error) {
+      console.error("Error in getAllTransactionDetails:", error);
+      return { success: false, error: error.message };
+    }
   },
 
-  // Update a transaction detail
-  updateTransactionDetail: async (detailData) => {
-    return await ipcRenderer.invoke("update-transaction-detail", detailData);
+  getTransactionDetailsByTransactionId: async (transactionId) => {
+    try {
+      const result = await ipcRenderer.invoke(
+        "get-transaction-details-by-transaction-id",
+        transactionId
+      );
+      return result;
+    } catch (error) {
+      console.error("Error in getTransactionDetailsByTransactionId:", error);
+      return { success: false, error: error.message };
+    }
   },
 
-  // Delete a transaction detail
-  deleteTransactionDetail: async (detailId) => {
-    return await ipcRenderer.invoke("delete-transaction-detail", detailId);
+  updateTransactionDetail: async (transactionDetailId, updates) => {
+    try {
+      const result = await ipcRenderer.invoke(
+        "update-transaction-detail",
+        transactionDetailId,
+        updates
+      );
+      return result;
+    } catch (error) {
+      console.error("Error in updateTransactionDetail:", error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  deleteTransactionDetail: async (transactionDetailId) => {
+    try {
+      const result = await ipcRenderer.invoke(
+        "delete-transaction-detail",
+        transactionDetailId
+      );
+      return result;
+    } catch (error) {
+      console.error("Error in deleteTransactionDetail:", error);
+      return { success: false, error: error.message };
+    }
   },
 };
 

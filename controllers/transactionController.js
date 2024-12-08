@@ -124,151 +124,151 @@
 
 const TransactionsModel = require("../database/models/transactionsModel");
 
-const transactionDB = new TransactionsModel();
+const transactionModel = new TransactionsModel();
 
 class TransactionController {
-  // Get all transactions
-  async getTransactions() {
-    try {
-      const transactions = await transactionDB.getTransactions();
-      return transactions;
-    } catch (error) {
-      console.error("Error getting transactions:", error);
-      return { error: "Failed to get transactions." };
-    }
-  }
-
-  // Get a transaction by ID
-  async getTransactionById(req, res) {
-    const transactionId = req.params.transactionId;
-    try {
-      const transaction = await transactionDB.getTransactionById(transactionId);
-      if (!transaction) {
-        return res.status(404).json({ error: "Transaction not found." });
-      }
-      res.json(transaction);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to get transaction." });
-    }
-  }
-
   // Create a new transaction
-  async createTransaction(req, res) {
-    const { partyId, transactionType, totalAmount, discount, status } =
-      req.body;
+  async createTransaction(transaction) {
     try {
-      const newTransactionId = await transactionDB.createTransaction(
-        partyId,
-        transactionType,
-        totalAmount,
-        discount,
-        status
-      );
-      res.status(201).json({
-        message: "Transaction created successfully.",
-        id: newTransactionId,
-      });
+      const result = await this.transactionModel.createTransaction(transaction);
+      return {
+        success: true,
+        message: "Transaction created successfully",
+        result,
+      };
     } catch (error) {
-      res.status(500).json({ error: "Failed to create transaction." });
+      return { success: false, error: error.message };
     }
   }
 
-  // Update a transaction
-  async updateTransaction(req, res) {
-    const transactionId = req.params.transactionId;
-    const { partyId, transactionType, totalAmount, discount, status } =
-      req.body;
+  // Get all transactions with optional pagination
+  async getAllTransactions(page = 1, limit = 50) {
     try {
-      await transactionDB.updateTransaction(
+      const transactions = await this.transactionModel.getAllTransactions(
+        page,
+        limit
+      );
+      return { success: true, transactions };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Get transaction by ID
+  async getTransactionById(transactionId) {
+    try {
+      const transaction = await this.transactionModel.getById(transactionId);
+      return { success: true, transaction };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Update transaction by ID
+  async updateTransaction(transactionId, updates) {
+    try {
+      const result = await this.transactionModel.updateTransaction(
         transactionId,
-        partyId,
-        transactionType,
-        totalAmount,
-        discount,
-        status
+        updates
       );
-      res.json({ message: "Transaction updated successfully." });
+      return {
+        success: true,
+        message: "Transaction updated successfully",
+        result,
+      };
     } catch (error) {
-      res.status(500).json({ error: "Failed to update transaction." });
+      return { success: false, error: error.message };
     }
   }
 
-  // Delete a transaction
-  async deleteTransaction(req, res) {
-    const transactionId = req.params.transactionId;
+  // Delete transaction by ID
+  async deleteTransaction(transactionId) {
     try {
-      await transactionDB.deleteTransaction(transactionId);
-      res.json({ message: "Transaction deleted successfully." });
+      const result = await this.transactionModel.deleteTransaction(
+        transactionId
+      );
+      return {
+        success: true,
+        message: "Transaction deleted successfully",
+        result,
+      };
     } catch (error) {
-      res.status(500).json({ error: "Failed to delete transaction." });
+      return { success: false, error: error.message };
     }
   }
 
-  // Get all transaction details for a specific transaction
-  async getTransactionDetails(req, res) {
-    const transactionId = req.params.transactionId;
-    try {
-      const details = await transactionDB.getTransactionDetails(transactionId);
-      res.json(details);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to get transaction details." });
-    }
-  }
-
+  /** Transaction Details */
   // Create a new transaction detail
-  async createTransactionDetail(req, res) {
-    const transactionId = req.params.transactionId;
-    const { productId, quantitySelected, pricePerUnit, taxRate } = req.body;
+  async createTransactionDetail(transactionDetail) {
     try {
-      const newDetailId = await transactionDB.createTransactionDetail(
-        transactionId,
-        productId,
-        quantitySelected,
-        pricePerUnit,
-        taxRate
+      const result = await this.transactionDetailsModel.createTransactionDetail(
+        transactionDetail
       );
-      res.status(201).json({
-        message: "Transaction detail created successfully.",
-        id: newDetailId,
-      });
+      return {
+        success: true,
+        message: "Transaction detail created successfully",
+        result,
+      };
     } catch (error) {
-      res.status(500).json({ error: "Failed to create transaction detail." });
+      return { success: false, error: error.message };
     }
   }
 
-  // Update a transaction detail
-  async updateTransactionDetail(req, res) {
-    const detailId = req.params.detailId;
-    const {
-      transactionId,
-      productId,
-      quantitySelected,
-      pricePerUnit,
-      taxRate,
-    } = req.body;
+  // Get all transaction details with optional pagination
+  async getAllTransactionDetails(page = 1, limit = 50) {
     try {
-      await transactionDB.updateTransactionDetail(
-        detailId,
-        transactionId,
-        productId,
-        quantitySelected,
-        pricePerUnit,
-        taxRate
-      );
-      res.json({ message: "Transaction detail updated successfully." });
+      const transactionDetails =
+        await this.transactionDetailsModel.getAllTransactionDetails(
+          page,
+          limit
+        );
+      return { success: true, transactionDetails };
     } catch (error) {
-      res.status(500).json({ error: "Failed to update transaction detail." });
+      return { success: false, error: error.message };
     }
   }
 
-  // Delete a transaction detail
-  async deleteTransactionDetail(req, res) {
-    const detailId = req.params.detailId;
+  // Get transaction details by transaction ID
+  async getTransactionDetailsByTransactionId(transactionId) {
     try {
-      await transactionDB.deleteTransactionDetail(detailId);
-      res.json({ message: "Transaction detail deleted successfully." });
+      const transactionDetails =
+        await this.transactionDetailsModel.getByTransactionId(transactionId);
+      return { success: true, transactionDetails };
     } catch (error) {
-      res.status(500).json({ error: "Failed to delete transaction detail." });
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Update transaction detail by ID
+  async updateTransactionDetail(transactionDetailId, updates) {
+    try {
+      const result = await this.transactionDetailsModel.updateTransactionDetail(
+        transactionDetailId,
+        updates
+      );
+      return {
+        success: true,
+        message: "Transaction detail updated successfully",
+        result,
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Delete transaction detail by ID
+  async deleteTransactionDetail(transactionDetailId) {
+    try {
+      const result = await this.transactionDetailsModel.deleteTransactionDetail(
+        transactionDetailId
+      );
+      return {
+        success: true,
+        message: "Transaction detail deleted successfully",
+        result,
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
   }
 }

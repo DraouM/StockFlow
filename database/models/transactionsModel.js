@@ -272,207 +272,283 @@ class TransactionsModel {
     this.db = openConnection();
   }
 
-  runQuery(query, successMessage, errorMessage) {
-    return new Promise((resolve, reject) => {
-      this.db.run(query, (err) => {
-        if (err) {
-          console.error(`${errorMessage}:`, err.message);
-          reject(err);
-        } else {
-          console.log(successMessage);
-          resolve();
-        }
+  // Generic query executor with better error handling
+  async runQuery(query, params = [], successMessage, errorMessage) {
+    try {
+      return new Promise((resolve, reject) => {
+        this.db.run(query, params, function (err) {
+          if (err) {
+            console.error(`${errorMessage}:`, err.message);
+            reject(err);
+          } else {
+            console.log(successMessage);
+            resolve({ id: this.lastID, changes: this.changes });
+          }
+        });
       });
-    });
+    } catch (error) {
+      console.error(`Database error in runQuery: ${error.message}`);
+      throw error;
+    }
   }
 
-  // Get all transactions
-  async getTransactions() {
-    return new Promise((resolve, reject) => {
-      this.db.all("SELECT * FROM transactions", (err, rows) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rows);
-        }
-      });
-    });
-  }
-
-  // Get a transaction by ID
-  async getTransactionById(transactionId) {
-    return new Promise((resolve, reject) => {
-      this.db.get(
-        "SELECT * FROM transactions WHERE transaction_id = ?",
-        [transactionId],
-        (err, row) => {
+  // Generic fetch query with better error handling
+  async fetchQuery(query, params = [], errorMessage) {
+    try {
+      return new Promise((resolve, reject) => {
+        this.db.all(query, params, (err, rows) => {
           if (err) {
-            reject(err);
-          } else {
-            resolve(row);
-          }
-        }
-      );
-    });
-  }
-
-  // Create a new transaction
-  async createTransaction(
-    partyId,
-    transactionType,
-    totalAmount,
-    discount = 0,
-    status = "pending"
-  ) {
-    return new Promise((resolve, reject) => {
-      this.db.run(
-        "INSERT INTO transactions (party_id, transaction_type, total_amount, discount, status) VALUES (?, ?, ?, ?, ?)",
-        [partyId, transactionType, totalAmount, discount, status],
-        (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(this.db.lastID);
-          }
-        }
-      );
-    });
-  }
-
-  // Update a transaction
-  async updateTransaction(
-    transactionId,
-    partyId,
-    transactionType,
-    totalAmount,
-    discount,
-    status
-  ) {
-    return new Promise((resolve, reject) => {
-      this.db.run(
-        "UPDATE transactions SET party_id = ?, transaction_type = ?, total_amount = ?, discount = ?, status = ? WHERE transaction_id = ?",
-        [
-          partyId,
-          transactionType,
-          totalAmount,
-          discount,
-          status,
-          transactionId,
-        ],
-        (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        }
-      );
-    });
-  }
-
-  // Delete a transaction
-  async deleteTransaction(transactionId) {
-    return new Promise((resolve, reject) => {
-      this.db.run(
-        "DELETE FROM transactions WHERE transaction_id = ?",
-        [transactionId],
-        (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        }
-      );
-    });
-  }
-
-  // Get all transaction details for a specific transaction
-  async getTransactionDetails(transactionId) {
-    return new Promise((resolve, reject) => {
-      this.db.all(
-        "SELECT * FROM transaction_details WHERE transaction_id = ?",
-        [transactionId],
-        (err, rows) => {
-          if (err) {
+            console.error(`${errorMessage}:`, err.message);
             reject(err);
           } else {
             resolve(rows);
           }
-        }
-      );
-    });
+        });
+      });
+    } catch (error) {
+      console.error(`Database error in fetchQuery: ${error.message}`);
+      throw error;
+    }
   }
 
-  // Create a new transaction detail
-  async createTransactionDetail(
-    transactionId,
-    productId,
-    quantitySelected,
-    pricePerUnit,
-    taxRate = 0
-  ) {
-    return new Promise((resolve, reject) => {
-      this.db.run(
-        "INSERT INTO transaction_details (transaction_id, product_id, quantity_selected, price_per_unit, tax_rate) VALUES (?, ?, ?, ?, ?)",
-        [transactionId, productId, quantitySelected, pricePerUnit, taxRate],
-        (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(this.db.lastID);
-          }
-        }
-      );
-    });
+  // Get all transactions with optional pagination
+  async getAllTransactions(page = 1, limit = 50) {
+    const offset = (page - 1) * limit;
+    const query = `
+      SELECT * FROM transactions 
+      ORDER BY created_at DESC 
+      LIMIT ? OFFSET ?
+    `;
+    return this.fetchQuery(
+      query,
+      [limit, offset],
+      "Error fetching transactions"
+    );
   }
 
-  // Update a transaction detail
-  async updateTransactionDetail(
-    detailId,
-    transactionId,
-    productId,
-    quantitySelected,
-    pricePerUnit,
-    taxRate
-  ) {
-    return new Promise((resolve, reject) => {
-      this.db.run(
-        "UPDATE transaction_details SET transaction_id = ?, product_id = ?, quantity_selected = ?, price_per_unit = ?, tax_rate = ? WHERE detail_id = ?",
-        [
-          transactionId,
-          productId,
-          quantitySelected,
-          pricePerUnit,
-          taxRate,
-          detailId,
-        ],
-        (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        }
-      );
-    });
+  // Get a transaction by ID
+  async getTransactionById(transactionId) {
+    const query = `SELECT * FROM transactions WHERE transaction_id = ?`;
+    const transaction = await this.fetchSingle(
+      query,
+      [transactionId],
+      "Error fetching transaction by ID"
+    );
+
+    if (!transaction) {
+      throw new Error(`Transaction with ID ${transactionId} not found`);
+    }
+
+    return transaction;
   }
 
-  // Delete a transaction detail
-  async deleteTransactionDetail(detailId) {
-    return new Promise((resolve, reject) => {
-      this.db.run(
-        "DELETE FROM transaction_details WHERE detail_id = ?",
-        [detailId],
-        (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        }
+  async createTransaction(transactionData) {
+    const { party_id, transaction_type, total_amount, discount } =
+      transactionData;
+    const sql = `
+      INSERT INTO transactions (party_id, transaction_type, total_amount, discount)
+      VALUES (?, ?, ?, ?)
+    `;
+    // Execute the SQL query and return the transaction ID
+    const result = await db.run(sql, [
+      party_id,
+      transaction_type,
+      total_amount,
+      discount,
+    ]);
+    return result.lastID; // Return the ID of the newly created transaction
+  }
+
+  // Update transaction by ID with validation
+  async updateTransaction(transactionId, updates) {
+    const updateFields = [];
+    const params = [];
+
+    if (updates.party_id) {
+      updateFields.push("party_id = ?");
+      params.push(updates.party_id);
+    }
+    if (updates.transaction_type) {
+      updateFields.push("transaction_type = ?");
+      params.push(updates.transaction_type);
+    }
+    if (updates.total_amount !== undefined) {
+      updateFields.push("total_amount = ?");
+      params.push(updates.total_amount);
+    }
+    if (updates.discount !== undefined) {
+      updateFields.push("discount = ?");
+      params.push(updates.discount);
+    }
+    if (updates.status) {
+      updateFields.push("status = ?");
+      params.push(updates.status);
+    }
+
+    if (updateFields.length === 0) {
+      throw new Error("No fields provided for update");
+    }
+
+    updateFields.push("updated_at = CURRENT_TIMESTAMP");
+    params.push(transactionId);
+
+    const query = `
+    UPDATE transactions
+    SET ${updateFields.join(", ")}
+    WHERE transaction_id = ?
+  `;
+
+    const result = await this.runQuery(
+      query,
+      params,
+      "Transaction updated successfully",
+      "Error updating transaction"
+    );
+
+    if (result.changes === 0) {
+      throw new Error(`Transaction with ID ${transactionId} not found`);
+    }
+
+    return result;
+  }
+
+  // Delete transaction by ID with validation
+  async deleteTransaction(transactionId) {
+    const query = `DELETE FROM transactions WHERE transaction_id = ?`;
+    const result = await this.runQuery(
+      query,
+      [transactionId],
+      "Transaction deleted successfully",
+      "Error deleting transaction"
+    );
+
+    if (result.changes === 0) {
+      throw new Error(`Transaction with ID ${transactionId} not found`);
+    }
+
+    return result;
+  }
+
+  /** Transaction Details */
+  // Get all transaction details for a specific transaction
+  async createTransactionDetail(transactionDetail) {
+    const query = `
+      INSERT INTO transaction_details (
+        transaction_id, product_id, quantity, unit_price
+      ) VALUES (?, ?, ?, ?)
+    `;
+    const params = [
+      transactionDetail.transaction_id,
+      transactionDetail.product_id,
+      transactionDetail.quantity,
+      transactionDetail.unit_price,
+    ];
+
+    return this.runQuery(
+      query,
+      params,
+      `New transaction detail created for transaction ID: ${transactionDetail.transaction_id}`,
+      "Error creating new transaction detail"
+    );
+  }
+
+  // Get all transaction details with optional pagination
+  async getAllTransactionDetails(page = 1, limit = 50) {
+    const offset = (page - 1) * limit;
+    const query = `
+      SELECT * FROM transaction_details 
+      ORDER BY created_at DESC 
+      LIMIT ? OFFSET ?
+    `;
+    return this.fetchQuery(
+      query,
+      [limit, offset],
+      "Error fetching transaction details"
+    );
+  }
+
+  // Get transaction details by transaction ID with error handling
+  async getByTransactionId(transactionId) {
+    const query = `SELECT * FROM transaction_details WHERE transaction_id = ?`;
+    const transactionDetails = await this.fetchQuery(
+      query,
+      [transactionId],
+      "Error fetching transaction details by transaction ID"
+    );
+
+    if (!transactionDetails || transactionDetails.length === 0) {
+      throw new Error(
+        `Transaction details for transaction ID ${transactionId} not found`
       );
-    });
+    }
+
+    return transactionDetails;
+  }
+
+  // Update transaction detail by ID with validation
+  async updateTransactionDetail(transactionDetailId, updates) {
+    const updateFields = [];
+    const params = [];
+
+    if (updates.product_id) {
+      updateFields.push("product_id = ?");
+      params.push(updates.product_id);
+    }
+    if (updates.quantity !== undefined) {
+      updateFields.push("quantity = ?");
+      params.push(updates.quantity);
+    }
+    if (updates.unit_price !== undefined) {
+      updateFields.push("unit_price = ?");
+      params.push(updates.unit_price);
+    }
+
+    if (updateFields.length === 0) {
+      throw new Error("No fields provided for update");
+    }
+
+    updateFields.push("updated_at = CURRENT_TIMESTAMP");
+    params.push(transactionDetailId);
+
+    const query = `
+      UPDATE transaction_details
+      SET ${updateFields.join(", ")}
+      WHERE transaction_detail_id = ?
+    `;
+
+    const result = await this.runQuery(
+      query,
+      params,
+      "Transaction detail updated successfully",
+      "Error updating transaction detail"
+    );
+
+    if (result.changes === 0) {
+      throw new Error(
+        `Transaction detail with ID ${transactionDetailId} not found`
+      );
+    }
+
+    return result;
+  }
+
+  // Delete transaction detail by ID with validation
+  async deleteTransactionDetail(transactionDetailId) {
+    const query = `DELETE FROM transaction_details WHERE transaction_detail_id = ?`;
+    const result = await this.runQuery(
+      query,
+      [transactionDetailId],
+      "Transaction detail deleted successfully",
+      "Error deleting transaction detail"
+    );
+
+    if (result.changes === 0) {
+      throw new Error(
+        `Transaction detail with ID ${transactionDetailId} not found`
+      );
+    }
+
+    return result;
   }
 
   // Close the database connection
