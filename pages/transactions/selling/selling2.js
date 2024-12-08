@@ -1,113 +1,51 @@
 import modalManager from "../modalManager.js";
 import formManager from "../formsManager.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-  // const searchInput = document.getElementById("search-input-client");
-  // const resultsList = document.getElementById("results-list-client");
-  // searchInput.addEventListener("input", async () => {
-  //   const searchTerm = searchInput.value;
-  //   if (searchTerm.length > 1) {
-  //     const clients = await fetchClients(searchTerm); // Function to fetch clients
-  //     displayClientResults(clients);
-  //   } else {
-  //     resultsList.innerHTML = ""; // Clear results if input is less than 2 characters
-  //   }
-  // });
-  // resultsList.addEventListener("click", (event) => {
-  //   if (event.target.tagName === "LI") {
-  //     const selectedClient = JSON.parse(event.target.dataset.client);
-  //     displaySelectedClient(selectedClient);
-  //     closeClientModal(); // Close the modal after selection
-  //   }
-  // });
-});
-
-// async function fetchClients(searchTerm) {
-//   try {
-//     const response = await window.partiesAPI.searchParties({
-//       term: searchTerm,
-//       type: null, // You can specify a type if needed, e.g., "customer"
-//       page: 1, // Set the page number as needed
-//       limit: 50, // Set the limit for pagination
-//     });
-
-//     return response.data; // Assuming the response structure has a data field
-//   } catch (error) {
-//     console.error("Error fetching clients:", error);
-//     return []; // Return an empty array in case of error
-//   }
-// }
-// // Function to fetch clients (you can replace this with your API call)
-// // async function fetchClients(searchTerm) {
-// //   // Simulated API call
-// //   const response = await window.partiesAPI.searchParties(searchTerm);
-// //   return response; // Assuming response is an array of client objects
-// // }
-
-// // Function to display client results
-// function displayClientResults(clients) {
-//   const resultsList = document.getElementById("results-list-client");
-//   resultsList.innerHTML = ""; // Clear previous results
-
-//   clients.forEach((client) => {
-//     const li = document.createElement("li");
-//     li.textContent = client.name; // Display client name
-//     li.dataset.client = JSON.stringify(client); // Store client data
-//     resultsList.appendChild(li);
-//   });
-// }
-
-// // Function to display selected client information in the form
-// function displaySelectedClient(client) {
-//   document.getElementById("clientName").value = client.name || "";
-//   document.getElementById("clientAddress").value = client.address || "";
-//   document.getElementById("clientPhone").value = client.phone || "";
-//   document.getElementById("clientDebt").value = client.total_debt || 0.0;
-// }
-
-// // Function to close the client modal
-// function closeClientModal() {
-//   const modal = document.getElementById("client-modal");
-//   modal.style.display = "none"; // Hide the modal
-// }
+const NOTIFICATION_TYPES = {
+  INFO: "info",
+  WARNING: "warning",
+  ERROR: "error",
+};
 
 const ShoppingListManager = {
-  // Store items in an array
   shoppingList: [],
-  // Create a utility function
+
   getId(item) {
     return item.id || item.productId || item.userId;
   },
 
-  // Notification system
-  showNotification(message, type = "info") {
-    // Create notification container if it doesn't exist
+  showNotification(message, type = NOTIFICATION_TYPES.INFO) {
     let notificationContainer = document.getElementById(
       "notification-container"
     );
+
     if (!notificationContainer) {
-      notificationContainer = document.createElement("div");
-      notificationContainer.id = "notification-container";
-      notificationContainer.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1000;
-        max-width: 300px;
-      `;
+      notificationContainer = this.createNotificationContainer();
       document.body.appendChild(notificationContainer);
     }
 
-    // Create notification element
+    const notification = this.createNotificationElement(message, type);
+    notificationContainer.appendChild(notification);
+    this.fadeInNotification(notification);
+  },
+
+  createNotificationContainer() {
+    const container = document.createElement("div");
+    container.id = "notification-container";
+    container.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      max-width: 300px;
+    `;
+    return container;
+  },
+
+  createNotificationElement(message, type) {
     const notification = document.createElement("div");
     notification.style.cssText = `
-      background-color: ${
-        type === "warning"
-          ? "#ffcc00"
-          : type === "error"
-          ? "#ff4444"
-          : "#4CAF50"
-      };
+      background-color: ${this.getNotificationColor(type)};
       color: white;
       padding: 15px;
       margin-bottom: 10px;
@@ -117,236 +55,264 @@ const ShoppingListManager = {
       transition: opacity 0.3s ease-in-out;
     `;
     notification.textContent = message;
+    return notification;
+  },
 
-    // Add to container
-    notificationContainer.appendChild(notification);
+  getNotificationColor(type) {
+    switch (type) {
+      case NOTIFICATION_TYPES.WARNING:
+        return "#ffcc00";
+      case NOTIFICATION_TYPES.ERROR:
+        return "#ff4444";
+      default:
+        return "#4CAF50";
+    }
+  },
 
-    // Trigger reflow to enable transition
-    notification.offsetHeight;
-
-    // Fade in
+  fadeInNotification(notification) {
+    notification.offsetHeight; // Trigger reflow
     notification.style.opacity = "1";
 
-    // Auto-remove after 3 seconds
     setTimeout(() => {
-      notification.style.opacity = "0";
-      setTimeout(() => {
-        notificationContainer.removeChild(notification);
-
-        // Remove container if no notifications
-        if (notificationContainer.children.length === 0) {
-          document.body.removeChild(notificationContainer);
-        }
-      }, 300);
+      this.fadeOutNotification(notification);
     }, 3000);
   },
 
-  // Add a new item
+  fadeOutNotification(notification) {
+    notification.style.opacity = "0";
+    setTimeout(() => {
+      const container = notification.parentNode;
+      container.removeChild(notification);
+
+      if (container.children.length === 0) {
+        document.body.removeChild(container);
+      }
+    }, 300);
+  },
+
   addItem(product) {
     console.log("Item added ", product);
-
-    // Calculate subtotal
-    const subTotal = product.quantity * product.unitPrice;
-
-    // Always create a new item with a unique ID
-    const newItem = {
-      ...product,
-      id: Date.now().toString(), // Generate unique ID
-      subTotal: subTotal,
-    };
-
-    // Add the new item to the list
+    const newItem = this.createNewItem(product);
     this.shoppingList.push(newItem);
-
-    // Render the list
     this.renderList();
-
-    // Show notification
     this.showNotification(
       `Added ${product.quantity} ${product.productName}`,
-      "info"
+      NOTIFICATION_TYPES.INFO
     );
+    this.checkForDuplicateProducts(product);
+  },
 
-    // Optional: Check if this is a duplicate product
+  createNewItem(product) {
+    const subTotal = product.quantity * product.unitPrice;
+    return {
+      ...product,
+      id: Date.now().toString(),
+      subTotal: subTotal,
+    };
+  },
+
+  checkForDuplicateProducts(product) {
     const similarProducts = this.shoppingList.filter(
       (item) => item.productName === product.productName
     );
-
     if (similarProducts.length > 1) {
       this.showNotification(
         `Note: You've added multiple entries for ${product.productName}`,
-        "warning"
+        NOTIFICATION_TYPES.WARNING
       );
     }
   },
 
-  // Update an existing item
-
   updateItem(itemId, updatedItem) {
     console.log("Shopping List ", this.shoppingList);
-
-    this.shoppingList = this.shoppingList.map(
-      (item) => {
-        if (item.id === itemId) {
-          console.log("Match found for ID:", item.id);
-          return { ...item, ...updatedItem }; // Use spread to keep the existing ID;
-        } else {
-          console.log("Match not found for ID:", item.id);
-
-          return item;
-        }
-      }
-      // item.id === updatedItem.id ? updatedItem : item
+    this.shoppingList = this.shoppingList.map((item) =>
+      item.id === itemId ? { ...item, ...updatedItem } : item
     );
     this.renderList();
-    console.log(" Update 2 ", { itemId, updatedItem });
+    console.log("Update 2 ", { itemId, updatedItem });
   },
 
-  // Edit an item
   editItem(itemId) {
     console.log({ itemId });
-    console.log("Shopping List ", this.shoppingList);
+    const itemToEdit = this.shoppingList.find((item) => item.id == itemId);
 
-    const itemIndex = this.shoppingList.findIndex((item) => item.id == itemId);
-    if (itemIndex !== -1) {
-      const itemToEdit = this.shoppingList[itemIndex];
-
-      const form = document.getElementById("selling-form");
-
-      form.setAttribute("data-operation", "update");
-      form.setAttribute("data-item-id", itemId); // Store the specific ID
-
-      // Populate form with the selected item
-      formManager.populate("selling-form", itemToEdit);
-
-      // Show the modal for editing
+    if (itemToEdit) {
+      this.populateEditForm(itemId, itemToEdit);
       openProductModal();
     } else {
       console.error("Item not found for editing");
     }
   },
-  // Render the shopping list in the UI
+
+  populateEditForm(itemId, itemToEdit) {
+    const form = document.getElementById("selling-form");
+    form.setAttribute("data-operation", "update");
+    form.setAttribute("data-item-id", itemId); // Store the specific ID
+    formManager.populate("selling-form", itemToEdit);
+  },
+
   renderList() {
     const tableBody = document.querySelector("#shopping-list tbody");
     tableBody.innerHTML = ""; // Clear the table body
 
-    this.shoppingList.forEach((item) => {
-      const rowCount = tableBody.children.length;
-      // Create a new row
-      const newRow = document.createElement("tr");
-      newRow.dataset.id = item.id; // Store unique identifier
-
-      // Populate row cells
-      newRow.innerHTML = `
-            <td><span class="number-circle">${rowCount + 1}</span></td>
-            <td>${item.productName}</td>
-            <td>
-            <span class="main-quantity">${item.quantity}</span>
-            <span class="sub-quantity highlight">${item.quantityUnit}</span>
-            </td> <!-- Quantity -->
-            <td>${
-              item.subUnits ? item.subUnits : "N/A"
-            }</td> <!-- Sub-unit or units (if there's a separate value) -->
-            <td>${
-              item.unitPrice
-                ? UtilityHelpers.formatNumber(item.unitPrice)
-                : "N/A"
-            }</td> <!-- Unit Price -->
-            <td>${
-              item.subTotal ? UtilityHelpers.formatNumber(item.subTotal) : "N/A"
-            }</td> <!-- Total Price -->
-            <td>
-              <button  onclick="ShoppingListManager.editItem(${
-                item.id
-              })" class="edit button button-secondary button-small">Edit</button>
-              <button onclick="ShoppingListManager.deleteItem(${this.getId(
-                item
-              )})"  class="del button button-danger button-small">Del</button>
-            </td>
-        `;
-      // Add row to the product list
+    this.shoppingList.forEach((item, index) => {
+      const newRow = this.createTableRow(item, index + 1);
       tableBody.appendChild(newRow);
     });
   },
 
+  createTableRow(item, rowCount) {
+    const newRow = document.createElement("tr");
+    newRow.dataset.id = item.id; // Store unique identifier
+
+    newRow.innerHTML = `
+      <td><span class="number-circle">${rowCount}</span></td>
+      <td>${item.productName}</td>
+      <td>
+        <span class="main-quantity">${item.quantity}</span>
+        <span class="sub-quantity highlight">${item.quantityUnit}</span>
+      </td>
+      <td>${item.subUnits || "N/A"}</td>
+      <td>${
+        item.unitPrice ? UtilityHelpers.formatNumber(item.unitPrice) : "N/A"
+      }</td>
+      <td>${
+        item.subTotal ? UtilityHelpers.formatNumber(item.subTotal) : "N/A"
+      }</td>
+      <td>
+        <button onclick="ShoppingListManager.editItem('${
+          item.id
+        }')" class="edit button button-secondary button-small">Edit</button>
+        <button onclick="ShoppingListManager.deleteItem('${this.getId(
+          item
+        )}')" class="del button button-danger button-small">Del</button>
+      </td>
+    `;
+    return newRow;
+  },
+
   deleteItem(id) {
-    // Find the index of the item with the specific ID
     const indexToRemove = this.shoppingList.findIndex((item) => item.id == id);
     console.log("Index To remove ", indexToRemove);
 
     if (indexToRemove !== -1) {
-      // Store the product name for notification
       const removedProduct = this.shoppingList[indexToRemove].productName;
-
-      // Remove only the specific item using its unique ID
       this.shoppingList.splice(indexToRemove, 1);
-
-      // Render the updated list
       this.renderList();
-
-      // Show notification
-      this.showNotification(`Removed ${removedProduct}`, "info");
+      this.showNotification(
+        `Removed ${removedProduct}`,
+        NOTIFICATION_TYPES.INFO
+      );
     }
   },
-  //   // Prompt user for updates
-  //   updateItemPrompt(productId) {
-  //     const item = this.items.find((item) => item.id === productId);
-  //     if (item) {
-  //       const newQuantity = parseInt(
-  //         prompt(`Enter new quantity for ${item.name}:`, item.quantity),
-  //         10
-  //       );
-  //       const newPrice = parseFloat(
-  //         prompt(`Enter new price for ${item.name}:`, item.price)
-  //       );
-  //       this.updateItem(productId, { quantity: newQuantity, price: newPrice });
-  //     }
-  //   },
 
-  //   // Clear the entire list
-  //   clearList() {
-  //     this.items = [];
-  //     this.renderList();
-  //   },
+  clearList() {
+    this.shoppingList = [];
+    this.renderList();
+  },
 };
+
 // Make it globally accessible
 window.ShoppingListManager = ShoppingListManager;
 
-// // Example Usage
-// ShoppingListManager.addItem({
-//   id: 1,
-//   name: "Product A",
-//   quantity: 2,
-//   price: 10,
-// });
-// ShoppingListManager.addItem({
-//   id: 2,
-//   name: "Product B",
-//   quantity: 1,
-//   price: 15,
-// });
-// ShoppingListManager.updateItem(1, { quantity: 3 });
-// ShoppingListManager.deleteItem(2);
-
 document.addEventListener("DOMContentLoaded", function () {
-  /** MODAL */
-  // Select open and close buttons
-  const closeModalBtn = document.querySelector(".close-modal-btn");
-  const openModalBtn = document.getElementById("open-modal-btn");
+  initializeModals();
+  initializeClientSearch();
+  initializeProductSearch();
+  initializeProductForm();
+});
 
-  // Initialize modal
+function initializeModals() {
+  // Client Modal
+  modalManager.init("client-modal");
+  modalManager.open("client-modal");
+
+  document
+    .getElementById("confirm-client-btn")
+    .addEventListener("click", () => {
+      modalManager.close("client-modal");
+    });
+
+  // Product Modal
   modalManager.init("product-modal");
+  document
+    .getElementById("open-modal-btn")
+    .addEventListener("click", openProductModal);
+  document
+    .querySelector(".close-modal-btn")
+    .addEventListener("click", closeProductModal);
+}
 
-  // Open modal button logic
-  openModalBtn.addEventListener("click", openProductModal);
+function initializeClientSearch() {
+  const fetchParties = async (searchTerm) => {
+    console.log({ searchTerm });
+    return await window.partiesAPI.searchParties({
+      searchTerm: searchTerm,
+      type: "customer",
+      page: 1,
+      limit: 50,
+    });
+  };
 
-  // Close modal button logic
-  closeModalBtn.addEventListener("click", closeProductModal);
+  const onPartySelected = (selectedClient) => {
+    console.log("Client selected:", selectedClient);
+    displaySelectedClient(selectedClient);
+  };
 
-  // The overlay click is already handled in modalManager (window.addEventListener inside init).
+  const clientSearchbar = new Searchbar(
+    "search-input-client",
+    "results-list-client",
+    "search-form-client",
+    "search-results-client",
+    fetchParties,
+    onPartySelected
+  );
+}
 
-  /** PRODUCT FORM */
-  // Select form
+function displaySelectedClient(client) {
+  const clientNameInput = document.getElementById("clientName");
+  const clientAddressInput = document.getElementById("clientAddress");
+  const clientPhoneInput = document.getElementById("clientPhone");
+  const clientDebtInput = document.getElementById("clientDebt");
+
+  clientNameInput.dataset.clientId = client.party_id;
+  clientNameInput.value = client.name || "";
+  clientAddressInput.value = client.address || "";
+  clientPhoneInput.value = client.phone || "";
+  clientDebtInput.value = client.total_debt || 0.0;
+}
+
+function initializeProductSearch() {
+  const searchProducts = async (searchTerm) => {
+    return await window.productsAPI.searchProduct(searchTerm);
+  };
+
+  const onProductSelected = (selectedProduct) => {
+    console.log("Product selected:", selectedProduct);
+    const productDataEx = {
+      productId: selectedProduct.id,
+      productName: selectedProduct.name,
+      unitPrice: selectedProduct.selling_price,
+      quantityUnit: selectedProduct.subunit_in_unit,
+    };
+
+    // Update the quantity unit display
+    document.getElementById("quantityUnit").textContent =
+      productDataEx.quantityUnit.toString().padStart(2, "0");
+    formManager.populate("selling-form", productDataEx);
+  };
+
+  const productSearchbar = new Searchbar(
+    "search-product-input",
+    "product-results-list",
+    "search-product-form",
+    "search-product-results",
+    searchProducts,
+    onProductSelected
+  );
+}
+
+function initializeProductForm() {
   const productFormId = "selling-form";
 
   formManager.init(productFormId, {
@@ -357,111 +323,127 @@ document.addEventListener("DOMContentLoaded", function () {
       unitPrice: { required: true, min: 0.01 },
     },
 
-    // onSubmit: (formData) => {
-    //   // Manually append the span value
-    //   const quantityUnit = document.getElementById("quantityUnit").textContent;
-    //   formData.append("quantityUnit", quantityUnit);
-
-    //   // Convert FormData to plain object
-    //   const data = Object.fromEntries(formData);
-    //   console.log("Data ", data);
-    //   // Now you can use the data object
-    //   productFormOnSubmit(data);
-    // },
     onAdd: (data) => {
-      // Include the span value in the data object
       const quantityUnit = document.getElementById("quantityUnit").textContent;
       data.quantityUnit = quantityUnit;
-
       console.log("Adding item: ", data);
       ShoppingListManager.addItem(data);
-
-      // Use the data object to add the new item
-      // productFormOnSubmit(data); // Assuming this handles adding the item
     },
 
     onUpdate: (product) => {
-      // Retrieve the ID from the form
-      const form = document.getElementById("selling-form");
+      const form = document.getElementById(productFormId);
       const itemId = form.getAttribute("data-item-id");
       ShoppingListManager.updateItem(itemId, product);
-      // Reset the form operation
       form.setAttribute("data-operation", "add");
-      // form.removeAttribute("data-item-id");
     },
   });
-
-  const fetchProducts = async (searchTerm) => {
-    return await window.productsAPI.searchProduct(searchTerm);
-  };
-
-  const searchParties = async (searchTerm) => {
-    return await window.partiesAPI.searchParties({
-      term: searchTerm,
-      type: null, // You can specify a type if needed, e.g., "customer"
-      page: 1, // Set the page number as needed
-      limit: 50, // Set the limit for pagination
-    }); // You can adjust the parameters as needed
-  };
-
-  const onProductSelected = (selectedProduct) => {
-    console.log("Product selected:", selectedProduct);
-    // You can add custom behavior for what happens when a product is selected.
-    // For example, you might want to fill another input field or redirect the user.
-    const productDataEx = {
-      productId: selectedProduct.id,
-      productName: selectedProduct.name,
-      //   quantity: selectedProduct.total_stock,
-      //   subUnits: selectedProduct.subunit_in_unit,
-      unitPrice: selectedProduct.selling_price,
-      quantityUnit: selectedProduct.subunit_in_unit,
-      //   subTotal: subUnits * unitPrice,
-    };
-
-    // Add quantityUnit dynamically (because it is NOT an input)
-    // ensure the value of quantityUnit is always displayed as a two-digit format (e.g., 08, 01, or 12)
-    document.getElementById("quantityUnit").textContent =
-      productDataEx.quantityUnit.toString().padStart(2, "0");
-    // Populate the other input with the form
-    formManager.populate(productFormId, productDataEx);
-  };
-
-  const onClientSelected = (selectedClient) => {
-    console.log("Client selected:", selectedClient);
-  };
-
-  // Create an instance of the Searchbar class
-  const productSearchbar = new Searchbar(
-    "search-product-input", // Input field ID
-    "product-results-list", // Results list ID
-    "search-product-form", // Search form ID
-    "search-product-results", // Results div ID
-    fetchProducts, // Fetch function for searching products
-    onProductSelected // Callback when a product is selected
-  );
-
-  // // Create an instance of the Searchbar class
-  // const clientsSearchbar = new Searchbar(
-  //   "search-input-client", // Input field ID
-  //   "search-results-client", // Results div ID
-  //   "client-details-form", // Search form ID
-  //   "results-list-client", // Results list ID
-  //   searchParties, // Fetch function for searching products
-  //   onClientSelected // Callback when a product is selected
-  // );
-});
-
-function productFormOnSubmit(data) {
-  console.log("form submited!! ", data);
-  ShoppingListManager.addItem(data);
-
-  console.log("product added !!");
 }
 
 function openProductModal() {
-  modalManager.open("product-modal"); // Opens the modal
+  modalManager.open("product-modal");
 }
 
 function closeProductModal() {
-  modalManager.close("product-modal"); // Closes the modal
+  modalManager.close("product-modal");
+}
+
+async function createTransaction(transactionData) {
+  try {
+    const response = await window.transactionsAPI.createTransaction(
+      transactionData
+    );
+    return response.data; // Handle the response as needed
+  } catch (error) {
+    console.error("Error creating transaction:", error);
+  }
+}
+
+async function updateInventory(productId, quantitySold) {
+  try {
+    await window.productsAPI.updateProductQuantity(productId, quantitySold);
+  } catch (error) {
+    console.error("Error updating inventory:", error);
+  }
+}
+
+async function handlePayment(transactionId, paymentAmount) {
+  try {
+    const response = await window.transactionsAPI.handlePayment(
+      transactionId,
+      paymentAmount
+    );
+    return response.data; // Handle the response as needed
+  } catch (error) {
+    console.error("Error handling payment:", error);
+  }
+}
+
+async function cancelTransaction(transactionId) {
+  try {
+    await window.transactionsAPI.cancelTransaction(transactionId);
+  } catch (error) {
+    console.error("Error canceling transaction:", error);
+  }
+}
+
+async function fetchTransactionHistory() {
+  try {
+    const response = await window.transactionsAPI.getTransactionHistory();
+    return response.data; // Handle the response as needed
+  } catch (error) {
+    console.error("Error fetching transaction history:", error);
+  }
+}
+
+async function fetchTransactionDetails(transactionId) {
+  try {
+    const response = await window.transactionsAPI.getTransactionDetails(
+      transactionId
+    );
+    return response.data; // Handle the response as needed
+  } catch (error) {
+    console.error("Error fetching transaction details:", error);
+  }
+}
+
+async function fetchProductDetails(productId) {
+  try {
+    const response = await window.productsAPI.getProductDetails(productId);
+    return response.data; // Handle the response as needed
+  } catch (error) {
+    console.error("Error fetching product details:", error);
+  }
+}
+
+async function fetchOrderDetails(orderId) {
+  try {
+    const response = await window.ordersAPI.getOrderDetails(orderId);
+    return response.data; // Handle the response as needed
+  } catch (error) {
+    console.error("Error fetching order details:", error);
+  }
+}
+
+async function onSubmitSellingForm(formData) {
+  const transactionData = {
+    clientId: formData.clientId,
+    items: ShoppingListManager.shoppingList,
+    totalAmount: calculateTotalAmount(ShoppingListManager.shoppingList),
+  };
+
+  const transactionResponse = await createTransaction(transactionData);
+  if (transactionResponse) {
+    ShoppingListManager.shoppingList.forEach((item) => {
+      updateInventory(item.productId, item.quantity);
+    });
+    ShoppingListManager.clearList(); // Clear the list after successful transaction
+    ShoppingListManager.showNotification(
+      "Transaction completed successfully!",
+      NOTIFICATION_TYPES.INFO
+    );
+  }
+}
+
+function calculateTotalAmount(shoppingList) {
+  return shoppingList.reduce((total, item) => total + item.subTotal, 0);
 }
