@@ -220,6 +220,14 @@ document.addEventListener("DOMContentLoaded", function () {
   initializeClientSearch();
   initializeProductSearch();
   initializeProductForm();
+
+  // Example of how to call handleTransaction when the form is submitted
+  document
+    .getElementById("confirmTransactionBtn")
+    .addEventListener("click", async (event) => {
+      // event.preventDefault(); // Prevent default form submission
+      await handleTransaction();
+    });
 });
 
 function initializeModals() {
@@ -275,7 +283,7 @@ function displaySelectedClient(client) {
   const clientPhoneInput = document.getElementById("clientPhone");
   const clientDebtInput = document.getElementById("clientDebt");
 
-  clientNameInput.dataset.clientId = client.party_id;
+  clientNameInput.dataset.clientId = client.id;
   clientNameInput.value = client.name || "";
   clientAddressInput.value = client.address || "";
   clientPhoneInput.value = client.phone || "";
@@ -446,4 +454,74 @@ async function onSubmitSellingForm(formData) {
 
 function calculateTotalAmount(shoppingList) {
   return shoppingList.reduce((total, item) => total + item.subTotal, 0);
+}
+
+async function handleTransaction() {
+  try {
+    // Step 1: Validate Input
+    const clientId = document.getElementById("clientName").dataset.clientId;
+    if (!clientId) {
+      throw new Error("Please select a client.");
+    }
+
+    if (ShoppingListManager.shoppingList.length === 0) {
+      throw new Error("Your shopping list is empty.");
+    }
+
+    // Prepare transaction data
+    const transactionData = {
+      party_id: clientId, // Use the client ID as party_id
+      transaction_type: "sell", // Assuming this is a selling transaction
+      discount: 0, // Set discount if applicable
+    };
+    console.log({ transactionData });
+
+    // Step 1: Create Transaction
+    const transactionResponse = await window.transactionsAPI.createTransaction(
+      transactionData
+    );
+
+    console.log({ transactionResponse });
+
+    if (!transactionResponse.success) {
+      throw new Error(transactionResponse.error);
+    }
+
+    const transactionId = transactionResponse.result;
+    console.log({ transactionId });
+
+    // Step 2: Add Transaction Details
+    for (const item of ShoppingListManager.shoppingList) {
+      const itemDetail = {
+        product_id: item.productId, // Assuming productId is available in the item
+        quantity_selected: item.quantity,
+        unit_price: item.unitPrice,
+      };
+
+      const detailResponse =
+        await window.transactionsAPI.createTransactionDetail({
+          transactionId,
+          ...itemDetail,
+        });
+
+      if (!detailResponse.success) {
+        throw new Error(detailResponse.error);
+      }
+    }
+
+    // Step 3: Clear Shopping List
+    ShoppingListManager.clearList();
+
+    // Step 4: Show Notification
+    ShoppingListManager.showNotification(
+      "Transaction completed successfully!",
+      NOTIFICATION_TYPES.INFO
+    );
+  } catch (error) {
+    console.error("Transaction error:", error);
+    ShoppingListManager.showNotification(
+      error.message || "Transaction failed. Please try again.",
+      NOTIFICATION_TYPES.ERROR
+    );
+  }
 }
