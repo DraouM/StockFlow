@@ -124,13 +124,19 @@
 
 const TransactionsModel = require("../database/models/transactionsModel");
 
-const transactionModel = new TransactionsModel();
+// const transactionModel = new TransactionsModel();
 
 class TransactionController {
+  constructor() {
+    this.transactionModel = new TransactionsModel(); // Ensure this line is present
+    console.log("Transaction Model initialized:", this.transactionModel);
+  }
   // Create a new transaction
   async createTransaction(transaction) {
     try {
+      console.log("From transactionController ", transaction);
       const result = await this.transactionModel.createTransaction(transaction);
+
       return {
         success: true,
         message: "Transaction created successfully",
@@ -201,7 +207,7 @@ class TransactionController {
   // Create a new transaction detail
   async createTransactionDetail(transactionDetail) {
     try {
-      const result = await this.transactionDetailsModel.createTransactionDetail(
+      const result = await this.transactionModel.createTransactionDetail(
         transactionDetail
       );
       return {
@@ -218,10 +224,7 @@ class TransactionController {
   async getAllTransactionDetails(page = 1, limit = 50) {
     try {
       const transactionDetails =
-        await this.transactionDetailsModel.getAllTransactionDetails(
-          page,
-          limit
-        );
+        await this.transactionModel.getAllTransactionDetails(page, limit);
       return { success: true, transactionDetails };
     } catch (error) {
       return { success: false, error: error.message };
@@ -231,8 +234,9 @@ class TransactionController {
   // Get transaction details by transaction ID
   async getTransactionDetailsByTransactionId(transactionId) {
     try {
-      const transactionDetails =
-        await this.transactionDetailsModel.getByTransactionId(transactionId);
+      const transactionDetails = await this.transactionModel.getByTransactionId(
+        transactionId
+      );
       return { success: true, transactionDetails };
     } catch (error) {
       return { success: false, error: error.message };
@@ -242,7 +246,7 @@ class TransactionController {
   // Update transaction detail by ID
   async updateTransactionDetail(transactionDetailId, updates) {
     try {
-      const result = await this.transactionDetailsModel.updateTransactionDetail(
+      const result = await this.transactionModel.updateTransactionDetail(
         transactionDetailId,
         updates
       );
@@ -259,7 +263,7 @@ class TransactionController {
   // Delete transaction detail by ID
   async deleteTransactionDetail(transactionDetailId) {
     try {
-      const result = await this.transactionDetailsModel.deleteTransactionDetail(
+      const result = await this.transactionModel.deleteTransactionDetail(
         transactionDetailId
       );
       return {

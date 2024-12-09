@@ -270,6 +270,7 @@ class TransactionsModel {
   // }
   constructor() {
     this.db = openConnection();
+    console.log("Database connection initialized:", this.db);
   }
 
   // Generic query executor with better error handling
@@ -343,20 +344,26 @@ class TransactionsModel {
   }
 
   async createTransaction(transactionData) {
-    const { party_id, transaction_type, total_amount, discount } =
-      transactionData;
+    console.log("From transactionsModel.js ", transactionData);
+
+    const { party_id, transaction_type, discount } = transactionData;
     const sql = `
-      INSERT INTO transactions (party_id, transaction_type, total_amount, discount)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO transactions (party_id, transaction_type, discount)
+      VALUES (?, ?, ?)
     `;
     // Execute the SQL query and return the transaction ID
-    const result = await db.run(sql, [
-      party_id,
-      transaction_type,
-      total_amount,
-      discount,
-    ]);
-    return result.lastID; // Return the ID of the newly created transaction
+    try {
+      const result = await this.runQuery(sql, [
+        party_id,
+        transaction_type,
+        discount,
+      ]);
+      console.log({ result });
+      return result.id; // Return the ID of the newly created transaction
+    } catch (error) {
+      console.error("Error executing SQL query:", error);
+      throw new Error(`Failed to create transaction: ${error.message}`);
+    }
   }
 
   // Update transaction by ID with validation
@@ -434,13 +441,13 @@ class TransactionsModel {
   async createTransactionDetail(transactionDetail) {
     const query = `
       INSERT INTO transaction_details (
-        transaction_id, product_id, quantity, unit_price
+        transaction_id, product_id, quantity_selected, price_per_unit
       ) VALUES (?, ?, ?, ?)
     `;
     const params = [
-      transactionDetail.transaction_id,
+      transactionDetail.transactionId,
       transactionDetail.product_id,
-      transactionDetail.quantity,
+      transactionDetail.quantity_selected,
       transactionDetail.unit_price,
     ];
 
@@ -553,6 +560,8 @@ class TransactionsModel {
 
   // Close the database connection
   close() {
+    console.log("DB closing !");
+
     closeConnection(this.db);
   }
 }
