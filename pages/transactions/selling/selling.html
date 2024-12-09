@@ -466,7 +466,7 @@
     </main>
 
     <button
-      onclick="confirmOrder()"
+      id="confirmTransactionBtn"
       class="button button-primary button-medium"
     >
       CONFIRM ORDER
@@ -600,86 +600,6 @@
 
     <script type="module" src="selling2.js"></script>
     <script src="../../../scripts/common/Searchbar.js"></script>
-
-    <!-- Handling Clients Modal -->
-    <script type="module">
-      import modalManager from "../modalManager.js";
-
-      document.addEventListener("DOMContentLoaded", function () {
-        // Initialize modal
-        modalManager.init("client-modal");
-
-        // Open modal button logic
-        // openModalBtn.addEventListener("click", openProductModal);
-
-        // Close modal button logic
-        // closeModalBtn.addEventListener("click", closeProductModal);
-
-        modalManager.open("client-modal");
-      });
-
-      function openClientsModal() {
-        modalManager.open("client-modal");
-      }
-      function closeClientsModal() {
-        modalManager.close("client-modal");
-      }
-      document
-        .getElementById("confirm-client-btn")
-        .addEventListener("click", () => {
-          closeClientsModal();
-        });
-    </script>
-
-    <!-- Client form handler -->
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const fetchParties = async (searchTerm) => {
-          console.log({ searchTerm });
-
-          return await window.partiesAPI.searchParties({
-            searchTerm: searchTerm,
-            type: "customer", // You can specify a type if needed, e.g., "customer"
-            page: 1, // Set the page number as needed
-            limit: 50, // Set the limit for pagination
-          });
-        };
-
-        const onPartySelected = (selectedClient) => {
-          console.log("Client selected:", selectedClient);
-          // You can add custom behavior for what happens when a product is selected.
-          // For example, you might want to fill another input field or redirect the user.
-          displaySelectedClient(selectedClient);
-        };
-
-        // Form handler
-        function displaySelectedClient(client) {
-          // Get form input elements
-          const clientNameInput = document.getElementById("clientName");
-          const clientAddressInput = document.getElementById("clientAddress");
-          const clientPhoneInput = document.getElementById("clientPhone");
-          const clientDebtInput = document.getElementById("clientDebt");
-
-          // Store the client ID in the data attribute
-          clientNameInput.dataset.clientId = client.party_id;
-          // Populate form inputs with selected product data
-          clientNameInput.value = client.name || "";
-          clientAddressInput.value = client.address || "";
-          clientPhoneInput.value = client.phone || "";
-          clientDebtInput.value = client.total_debt || 0.0;
-        }
-
-        // Create an instance of the Searchbar class
-        const clientSearchbar = new Searchbar(
-          "search-input-client", // Input field ID
-          "results-list-client", // Results list ID
-          "search-form-client", // Search form ID
-          "search-results-client", // Results div ID
-          fetchParties, // Fetch function for searching products
-          onPartySelected // Callback when a product is selected
-        );
-      });
-    </script>
 
     <!-- Purchase form handler -->
     <script>
