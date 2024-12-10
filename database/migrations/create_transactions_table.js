@@ -20,7 +20,8 @@ class TransactionDB {
   }
 
   async createTransactionsTable() {
-    const transactionTableQuery = `
+    const dropTransactionTableQuery = `DROP TABLE IF EXISTS transactions;`;
+    const createTransactionTableQuery = `
       CREATE TABLE IF NOT EXISTS transactions(
         transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
         party_id INTEGER NOT NULL, -- To associate the transaction with a client or supplier
@@ -34,7 +35,8 @@ class TransactionDB {
     );
     `;
 
-    const transactionDetailsTableQuery = `
+    const dropTransactionDetailsTableQuery = `DROP TABLE IF EXISTS transaction_details;`;
+    const createTransactionDetailsTableQuery = `
       CREATE TABLE IF NOT EXISTS transaction_details (
         transaction_detail_id INTEGER PRIMARY KEY AUTOINCREMENT,
         transaction_id INTEGER NOT NULL,
@@ -73,9 +75,15 @@ class TransactionDB {
     /** See documentation in triggers.md for a detailed
      *  explanation of the trigger logic */
 
+    // Drop triggers if they exist
+    const dropTriggersQuery = `
+      DROP TRIGGER IF EXISTS tr_update_transaction_on_insert;
+      DROP TRIGGER IF EXISTS tr_update_transaction_on_update;
+      DROP TRIGGER IF EXISTS tr_update_transaction_on_delete;
+    `;
+
     // #01
     const tr_update_transaction_on_insert = `
-      Drop TRIGGER if EXISTS tr_update_transaction_on_insert;
       CREATE TRIGGER IF NOT EXISTS tr_update_transaction_on_insert
       AFTER INSERT ON transaction_details
       FOR EACH ROW BEGIN
@@ -123,7 +131,6 @@ class TransactionDB {
     // #02
     const tr_update_transaction_on_update = `
       -- Trigger for UPDATE on transaction_details
-      DROP TRIGGER IF EXISTS tr_update_transaction_on_update;
       CREATE TRIGGER IF NOT EXISTS tr_update_transaction_on_update
       AFTER UPDATE ON transaction_details
       FOR EACH ROW BEGIN
@@ -172,7 +179,6 @@ class TransactionDB {
     // #03
     const tr_update_transaction_on_delete = `
     -- Trigger for DELETE on transaction_details
-      DROP TRIGGER IF EXISTS tr_update_transaction_on_delete;
       CREATE TRIGGER IF NOT EXISTS tr_update_transaction_on_delete
       AFTER DELETE ON transaction_details
       FOR EACH ROW BEGIN
@@ -216,13 +222,26 @@ class TransactionDB {
     `;
 
     try {
+      await this.db.exec("BEGIN TRANSACTION;"); // Start a transaction
+
       await this.runQuery(
-        transactionTableQuery,
+        dropTransactionTableQuery,
+        "Dropped transactions table if it existed.",
+        "Error dropping Transactions table"
+      );
+      await this.runQuery(
+        createTransactionTableQuery,
         "Transactions table created successfully.",
         "Error creating Transactions table"
       );
+
       await this.runQuery(
-        transactionDetailsTableQuery,
+        dropTransactionDetailsTableQuery,
+        "Dropped transaction_details table if it existed.",
+        "Error dropping Transactions Details table"
+      );
+      await this.runQuery(
+        createTransactionDetailsTableQuery,
         "Transactions Details table created successfully.",
         "Error creating Transactions Details table"
       );
@@ -231,6 +250,12 @@ class TransactionDB {
         indexQuery,
         "Indexes for Transactions and Transaction Details tables created successfully.",
         "Error creating indexes for Transactions and Transaction Details tables"
+      );
+
+      await this.runQuery(
+        dropTriggersQuery,
+        "Triggers created successfully",
+        "Error deleting triggers for transaction_details table"
       );
 
       await this.runQuery(
@@ -248,7 +273,10 @@ class TransactionDB {
         "Trigger for DELETE on transaction_details created successfully.",
         "Error creating trigger for deleting on transaction_details"
       );
+
+      await this.db.exec("COMMIT;"); // Commit the transaction
     } catch (error) {
+      await this.db.exec("ROLLBACK;"); // Rollback the transaction on error
       console.error("Failed to set up the transactions database:", error);
     }
   }
