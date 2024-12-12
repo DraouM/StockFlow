@@ -66,8 +66,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         <td>${transaction.transaction_type}</td>
         <td>${transaction.total_amount}</td>
         <td>${transaction.discount}</td>
-        <td>${transaction.notes}</td>
-        <td>${transaction.settled}</td>
         <td><button class="button button-small button-secondary edit-button" data-id="${transaction.transaction_id}">Edit</button></td>
       `;
 
