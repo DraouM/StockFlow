@@ -196,16 +196,16 @@ function initializeClientSearch() {
 }
 
 function displaySelectedClient(client) {
-  const clientNameInput = document.getElementById("clientName");
-  const clientAddressInput = document.getElementById("clientAddress");
-  const clientPhoneInput = document.getElementById("clientPhone");
-  const clientDebtInput = document.getElementById("clientDebt");
+  const clientNameElement = document.getElementById("clientName");
+  const clientAddressElement = document.getElementById("clientAddress");
+  const clientPhoneElement = document.getElementById("clientPhone");
+  const clientDebtElement = document.getElementById("clientDebt");
 
-  clientNameInput.dataset.clientId = client.id;
-  clientNameInput.value = client.name || "";
-  clientAddressInput.value = client.address || "";
-  clientPhoneInput.value = client.phone || "";
-  clientDebtInput.value = client.total_debt || 0.0;
+  clientNameElement.dataset.clientId = client.id;
+  clientNameElement.textContent = client.name || "Unknown Client";
+  clientAddressElement.textContent = `Address: ${client.address || "N/A"}`;
+  clientPhoneElement.textContent = `Phone: ${client.phone || "N/A"}`;
+  clientDebtElement.textContent = `Debt: $${client.total_debt || 0.0}`;
 }
 
 function initializeProductSearch() {

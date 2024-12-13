@@ -7,6 +7,53 @@
     <link rel="stylesheet" href="../../../assets/styles/main.css" />
     <link rel="stylesheet" href="selling.css" />
 
+    <!-- popover style -->
+    <style>
+      /* POPOVER*/
+      .popover {
+        display: none; /* Hidden by default */
+        position: absolute;
+        background-color: #f9f9f9; /* Light gray background */
+        border: 1px solid #007bff; /* Blue border */
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        padding: 15px; /* Increased padding */
+        z-index: 1000;
+        width: 220px; /* Set a width for the popover */
+        transition: opacity 0.3s ease, transform 0.2s ease; /* Added transform transition */
+      }
+
+      .popover p {
+        margin: 5px 0;
+        font-family: "Arial", sans-serif; /* Modern font */
+        color: #333; /* Dark text color */
+      }
+
+      .popover .label {
+        font-weight: bold; /* Bold labels */
+        color: #007bff; /* Blue color for labels */
+      }
+
+      .popover .icon {
+        margin-right: 5px; /* Space between icon and text */
+      }
+
+      .popover:hover {
+        transform: scale(1.05); /* Slight scale effect on hover */
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+      }
+
+      .clickable:hover {
+        text-decoration: underline;
+        color: #0056b3; /* Darker blue on hover */
+      }
+
+      .clickable:hover + .popover,
+      .popover:focus {
+        display: block;
+        /* Show popover on hover or focus */
+      }
+    </style>
     <style>
       /* Table Styles */
       .table_container {
@@ -408,59 +455,26 @@
 
         <section class="client-section">
           <h2>Clients Details</h2>
-          <!-- Your client details form here -->
-          <form id="client-details-form" class="client-details-form">
-            <!-- Client Name -->
-            <div class="form-group">
-              <label for="clientName">Client Name</label>
-              <input
-                type="text"
-                id="clientName"
-                name="clientName"
-                required
-                readonly
-              />
+          <div id="client-details">
+            <span
+              id="clientName"
+              class="clickable"
+              popovertarget="clientPopover"
+              >John Doe</span
+            >
+            <button
+              id="editClientBtn"
+              class="button button-secondary button-small"
+              style="margin-left: 10px"
+            >
+              Change
+            </button>
+            <div id="clientPopover" class="popover">
+              <p id="clientAddress">Address: 123 Main St</p>
+              <p id="clientPhone">Phone: (123) 456-7890</p>
+              <p id="clientDebt">Debt: $100.00</p>
             </div>
-
-            <!-- Product Quantity -->
-            <div class="form-group">
-              <label for="clientAddress">Client Adrress</label>
-              <input
-                type="text"
-                id="clientAddress"
-                name="clientAddress"
-                required
-                readonly
-              />
-            </div>
-
-            <!-- Client Phone -->
-            <div class="form-group">
-              <label for="clientPhone">Client Phone</label>
-              <input
-                type="text"
-                id="clientPhone"
-                name="clientPhone"
-                required
-                readonly
-              />
-            </div>
-
-            <!--Client Total Debt -->
-            <div class="form-group">
-              <label for="clientDebt">Client Debt</label>
-              <input
-                type="number"
-                id="clientDebt"
-                name="clientDebt"
-                required
-                readonly
-              />
-            </div>
-
-            <!-- Submit Button -->
-            <button type="reset" class="button button-secondary">Reset</button>
-          </form>
+          </div>
         </section>
       </div>
     </main>
@@ -473,8 +487,8 @@
     </button>
 
     <div class="main-container">
-      <div class="client-section">
-        <div class="client-info-section"></div>
+      <div class="client">
+        <div class="client-info"></div>
 
         <!-- Payment -->
         <div class="purchase-section">
@@ -541,6 +555,16 @@
     <script type="module" src="selling2.js"></script>
     <script src="../../../scripts/common/Searchbar.js"></script>
 
+    <!-- POPOVER script -->
+    <script>
+      document
+        .getElementById("clientName")
+        .addEventListener("click", function () {
+          const popover = document.getElementById("clientPopover");
+          popover.style.display =
+            popover.style.display === "block" ? "none" : "block";
+        });
+    </script>
     <!-- Purchase form handler -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
