@@ -552,7 +552,10 @@
       </div>
     </div>
 
+    <div id="transactionDetails"></div>
+
     <script type="module" src="selling2.js"></script>
+    <script type="module" src="selling3.js"></script>
     <script src="../../../scripts/common/Searchbar.js"></script>
 
     <!-- POPOVER script -->
@@ -834,6 +837,45 @@
           const number = this.parseNumber(str);
           return number >= 0;
         },
+
+        // Convert sub-units back to quantity string
+        convertSubUnitsToQuantity(subUnits, quantityUnit) {
+          if (!subUnits) return 0;
+          if (quantityUnit == 1) return subUnits;
+
+          const units = Math.floor(subUnits / quantityUnit);
+          const remainingSubUnits = subUnits % quantityUnit;
+
+          // If we only have sub-units (less than one full unit)
+          if (units === 0) {
+            return `0 & ${remainingSubUnits}`;
+          }
+
+          // If we have exact units (no remaining sub-units)
+          if (remainingSubUnits === 0) {
+            return `${units}`;
+          }
+
+          // If we have both units and sub-units
+          return `${units} & ${remainingSubUnits}`;
+        },
+
+        // Calculate total sub-units from quantity string
+        calculateTotalSubUnits(quantityStr) {
+          const cleaned = quantityStr.trim().replace(/\s+/g, " ");
+
+          if (cleaned.includes("&")) {
+            const [units, subUnits] = cleaned.split("&").map((part) => {
+              const num = parseInt(part.trim(), 10);
+              return isNaN(num) ? 0 : num;
+            });
+
+            return units * this.getQuantityUnit() + subUnits;
+          }
+
+          const units = parseInt(cleaned, 10);
+          return isNaN(units) ? 0 : units * this.getQuantityUnit();
+        },
       };
 
       const QuantityPriceManager = {
@@ -925,7 +967,10 @@
           this.elements.subUnitInput.addEventListener("input", (e) => {
             const subUnits = parseInt(e.target.value);
             if (!isNaN(subUnits)) {
-              const quantityStr = this.convertSubUnitsToQuantity(subUnits);
+              const quantityStr = UtilityHelpers.convertSubUnitsToQuantity(
+                subUnits,
+                this.getQuantityUnit()
+              );
               this.elements.quantityInput.value = quantityStr;
               this.elements.subUnitsSpan.textContent = subUnits;
               this.updateTotalPrice();
@@ -949,14 +994,17 @@
           this.toggleInputError(this.elements.quantityInput, !isValid);
 
           if (isValid) {
-            const totalSubUnits = this.calculateTotalSubUnits(value);
+            const totalSubUnits = UtilityHelpers.calculateTotalSubUnits(value);
             // Update both sub-unit displays
             this.updateSubUnits(totalSubUnits);
             this.updateTotalPrice();
 
             // If the input doesn't match the calculated format, update it
-            const calculatedQuantity =
-              this.convertSubUnitsToQuantity(totalSubUnits);
+            // Use the new utility function with quantity unit
+            const calculatedQuantity = UtilityHelpers.convertSubUnitsToQuantity(
+              totalSubUnits,
+              this.getQuantityUnit()
+            );
             if (value.trim() !== calculatedQuantity) {
               this.elements.quantityInput.value = calculatedQuantity;
             }
@@ -975,54 +1023,6 @@
           } else {
             this.elements.subTotalInput.value = "";
           }
-        },
-
-        // Calculate total sub-units from quantity string
-        calculateTotalSubUnits(quantityStr) {
-          const cleaned = quantityStr.trim().replace(/\s+/g, " ");
-
-          if (cleaned.includes("&")) {
-            const [units, subUnits] = cleaned.split("&").map((part) => {
-              const num = parseInt(part.trim(), 10);
-              return isNaN(num) ? 0 : num;
-            });
-
-            // Validate sub-units don't exceed unit size
-            const validSubUnits =
-              subUnits >= this.getQuantityUnit()
-                ? this.getQuantityUnit() - 1
-                : subUnits;
-
-            return units * this.getQuantityUnit() + validSubUnits;
-          }
-
-          const units = parseInt(cleaned, 10);
-          return isNaN(units) ? 0 : units * this.getQuantityUnit();
-        },
-
-        // Convert sub-units back to quantity string
-        convertSubUnitsToQuantity(subUnits) {
-          console.log("Subunits ", subUnits, this.getQuantityUnit());
-
-          if (!subUnits) return "0";
-
-          const units = Math.floor(subUnits / this.getQuantityUnit());
-          const remainingSubUnits = subUnits % this.getQuantityUnit();
-
-          console.log("Check this ", units, remainingSubUnits);
-
-          // If we only have sub-units (less than one full unit)
-          if (units === 0) {
-            return `0 & ${remainingSubUnits}`;
-          }
-
-          // If we have exact units (no remaining sub-units)
-          if (remainingSubUnits === 0) {
-            return `${units}`;
-          }
-
-          // If we have both units and sub-units
-          return `${units} & ${remainingSubUnits}`;
         },
 
         // Update sub-units in both locations
