@@ -1,6 +1,7 @@
 import modalManager from "../modalManager.js";
 import formManager from "../formsManager.js";
 import NotificationManager from "../notificationManager.js";
+import { UtilityHelpers } from "./utilityHelpers.js";
 
 const ShoppingListManager = {
   shoppingList: [],
@@ -22,7 +23,7 @@ const ShoppingListManager = {
   },
 
   createNewItem(product) {
-    const subTotal = product.quantity * product.unitPrice;
+    const subTotal = product.subUnits * product.unitPrice;
     return {
       ...product,
       id: Date.now().toString(),
