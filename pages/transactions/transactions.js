@@ -69,6 +69,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         <td><button class="button button-small button-secondary edit-button" data-id="${transaction.transaction_id}">Edit</button></td>
       `;
 
+      // Add click event listener to the row
+      row.addEventListener("click", () => {
+        console.log(`Transaction ID clicked: ${transaction.transaction_id}`);
+        // Navigate to selling.html, passing the transaction ID as a query parameter
+        window.location.href = `selling/selling.html?transaction_id=${transaction.transaction_id}`;
+      });
+
       // Append the row to the fragment
       fragment.appendChild(row);
     }
