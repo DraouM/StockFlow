@@ -861,7 +861,7 @@
         },
 
         // Calculate total sub-units from quantity string
-        calculateTotalSubUnits(quantityStr) {
+        calculateTotalSubUnits(quantityStr, quantityUnit) {
           const cleaned = quantityStr.trim().replace(/\s+/g, " ");
 
           if (cleaned.includes("&")) {
@@ -870,11 +870,11 @@
               return isNaN(num) ? 0 : num;
             });
 
-            return units * this.getQuantityUnit() + subUnits;
+            return units * quantityUnit + subUnits;
           }
 
           const units = parseInt(cleaned, 10);
-          return isNaN(units) ? 0 : units * this.getQuantityUnit();
+          return isNaN(units) ? 0 : units * quantityUnit;
         },
       };
 
@@ -994,7 +994,10 @@
           this.toggleInputError(this.elements.quantityInput, !isValid);
 
           if (isValid) {
-            const totalSubUnits = UtilityHelpers.calculateTotalSubUnits(value);
+            const totalSubUnits = UtilityHelpers.calculateTotalSubUnits(
+              value,
+              this.getQuantityUnit()
+            );
             // Update both sub-unit displays
             this.updateSubUnits(totalSubUnits);
             this.updateTotalPrice();
