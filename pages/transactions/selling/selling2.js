@@ -68,6 +68,8 @@ const ShoppingListManager = {
     const form = document.getElementById("selling-form");
     form.setAttribute("data-operation", "update");
     form.setAttribute("data-item-id", itemId); // Store the specific ID
+    console.log({ itemId, itemToEdit });
+
     formManager.populate("selling-form", itemToEdit);
   },
 

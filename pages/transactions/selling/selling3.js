@@ -1,12 +1,8 @@
-const urlParams = new URLSearchParams(window.location.search);
-
-const transactionId = urlParams.get("transaction_id");
-console.log(`Transaction ID from URL: ${transactionId}`);
-
-// Function to fetch and display transaction details
 async function fetchTransactionDetails() {
   const urlParams = new URLSearchParams(window.location.search);
   const transactionId = urlParams.get("transaction_id");
+
+  console.log(`Transaction ID from URL: ${transactionId}`);
 
   if (!transactionId) {
     console.error("Transaction ID not found in URL");
@@ -53,6 +49,47 @@ async function fetchTransactionDetails() {
   }
 }
 
+let previousShoppingList = []; // Variable to store the previous state of the shopping list
+
+function trackChanges(currentShoppingList) {
+  const changes = {
+    updated: [],
+    removed: [],
+    added: [],
+  };
+
+  // Check for updated and removed items
+  originalShoppingList.forEach((originalItem) => {
+    const currentItem = currentShoppingList.find(
+      (item) => item.id === originalItem.id
+    );
+    if (currentItem) {
+      // Check for updates
+      if (
+        currentItem.quantity !== originalItem.quantity ||
+        currentItem.unitPrice !== originalItem.unitPrice
+      ) {
+        changes.updated.push({ id: originalItem.id, updatedItem: currentItem });
+      }
+    } else {
+      // Item was removed
+      changes.removed.push(originalItem);
+    }
+  });
+
+  // Check for added items
+  currentShoppingList.forEach((currentItem) => {
+    const originalItem = originalShoppingList.find(
+      (item) => item.id === currentItem.id
+    );
+    if (!originalItem) {
+      changes.added.push(currentItem);
+    }
+  });
+
+  return changes;
+}
+
 // Function to display transaction details on the page
 function displayTransactionDetails(details) {
   const detailsContainer = document.getElementById("transactionDetails");
@@ -67,8 +104,17 @@ function displayTransactionDetails(details) {
     `;
 }
 
-// Fetch transaction details when the page loads
-document.addEventListener("DOMContentLoaded", fetchTransactionDetails);
+document.addEventListener("DOMContentLoaded", async () => {
+  await fetchTransactionDetails();
+
+  // Add event listener for the confirm button
+  const confirmButton = document.getElementById("confirmTransactionBtn");
+  confirmButton.addEventListener("click", () => {
+    const currentShoppingList = ShoppingListManager.shoppingList; // Accessing the shopping list directly
+    const changes = trackChanges(currentShoppingList);
+    displayChanges(changes);
+  });
+});
 
 function convertSubUnitsToQuantity(subUnits, qauntityUnit) {
   console.log({ subUnits, qauntityUnit });
@@ -94,4 +140,42 @@ function convertSubUnitsToQuantity(subUnits, qauntityUnit) {
 
   // If we have both units and sub-units
   return `${units} & ${remainingSubUnits}`;
+}
+
+async function loadTransactionForEditing(transactionId) {
+  const transactionDetails = await fetchTransactionDetails(transactionId);
+  if (transactionDetails) {
+    // Populate the form fields with existing transaction data
+    document.getElementById("clientName").textContent =
+      transactionDetails.clientName;
+    document.getElementById("totalAmount").value =
+      transactionDetails.totalAmount;
+    document.getElementById("discount").value = transactionDetails.discount;
+    document.getElementById("finalAmount").value =
+      transactionDetails.finalAmount;
+
+    // Populate the shopping list
+    transactionDetails.items.forEach((item) => {
+      ShoppingListManager.addItem(item); // Assuming addItem can handle existing items
+    });
+
+    // Set the form to edit mode
+    const form = document.getElementById("selling-form");
+    form.setAttribute("data-operation", "edit");
+    form.setAttribute("data-transaction-id", transactionId);
+  }
+}
+
+let originalShoppingList = []; // Store the original shopping list
+
+// Call this function whenever the shopping list is modified
+function onShoppingListChange(currentShoppingList) {
+  const changes = trackChanges(currentShoppingList);
+  console.log("Changes detected:", changes);
+}
+
+// Example usage when rendering the shopping list
+function renderList() {
+  // Existing rendering logic...
+  originalShoppingList = [...currentShoppingList]; // Update original list after rendering
 }
