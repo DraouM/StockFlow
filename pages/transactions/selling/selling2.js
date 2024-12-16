@@ -71,6 +71,9 @@ const ShoppingListManager = {
     console.log({ itemId, itemToEdit });
 
     formManager.populate("selling-form", itemToEdit);
+    document.getElementById("quantityUnit").textContent =
+      itemToEdit.quantityUnit;
+    document.getElementById("subTotal").value = itemToEdit.subTotal.toFixed(2); // Ensure subTotal input is populated with two decimal places
   },
 
   renderList() {
@@ -274,6 +277,14 @@ function openProductModal() {
 
 function closeProductModal() {
   modalManager.close("product-modal");
+  formManager.reset("selling-form"); // Reset the form when closing the modal
+  // Ensure the form is reset when clicking outside the modal
+  window.addEventListener("click", (event) => {
+    const modal = document.getElementById("product-modal");
+    if (event.target === modal) {
+      formManager.reset("selling-form");
+    }
+  });
 }
 
 async function createTransaction(transactionData) {
