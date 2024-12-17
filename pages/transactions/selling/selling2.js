@@ -2,143 +2,9 @@ import modalManager from "../modalManager.js";
 import formManager from "../formsManager.js";
 import NotificationManager from "../notificationManager.js";
 import { UtilityHelpers } from "./utilityHelpers.js";
+import ShoppingListManager from "../ShoppingListManager.js"; // Import the class
 
-const ShoppingListManager = {
-  shoppingList: [],
-
-  getId(item) {
-    return item.id || item.productId || item.userId;
-  },
-
-  addItem(product) {
-    console.log("Item added ", product);
-    const newItem = this.createNewItem(product);
-    this.shoppingList.push(newItem);
-    this.renderList();
-    NotificationManager.showNotification(
-      `Added ${product.quantity} ${product.productName}`,
-      NotificationManager.NOTIFICATION_TYPES.INFO
-    );
-    this.checkForDuplicateProducts(product);
-  },
-
-  createNewItem(product) {
-    const subTotal = product.subUnits * product.unitPrice;
-    return {
-      ...product,
-      id: Date.now().toString(),
-      subTotal: subTotal,
-    };
-  },
-
-  checkForDuplicateProducts(product) {
-    const similarProducts = this.shoppingList.filter(
-      (item) => item.productName === product.productName
-    );
-    if (similarProducts.length > 1) {
-      NotificationManager.showNotification(
-        `Note: You've added multiple entries for ${product.productName}`,
-        NotificationManager.NOTIFICATION_TYPES.WARNING
-      );
-    }
-  },
-
-  updateItem(itemId, updatedItem) {
-    console.log("Shopping List ", this.shoppingList);
-    this.shoppingList = this.shoppingList.map((item) =>
-      item.id === itemId ? { ...item, ...updatedItem } : item
-    );
-    this.renderList();
-    console.log("Update 2 ", { itemId, updatedItem });
-  },
-
-  editItem(itemId) {
-    console.log({ itemId });
-    const itemToEdit = this.shoppingList.find((item) => item.id == itemId);
-
-    if (itemToEdit) {
-      this.populateEditForm(itemId, itemToEdit);
-      openProductModal();
-    } else {
-      console.error("Item not found for editing");
-    }
-  },
-
-  populateEditForm(itemId, itemToEdit) {
-    const form = document.getElementById("selling-form");
-    form.setAttribute("data-operation", "update");
-    form.setAttribute("data-item-id", itemId); // Store the specific ID
-    console.log({ itemId, itemToEdit });
-
-    formManager.populate("selling-form", itemToEdit);
-    document.getElementById("quantityUnit").textContent =
-      itemToEdit.quantityUnit;
-    document.getElementById("subTotal").value = itemToEdit.subTotal.toFixed(2); // Ensure subTotal input is populated with two decimal places
-  },
-
-  renderList() {
-    const tableBody = document.querySelector("#shopping-list tbody");
-    tableBody.innerHTML = ""; // Clear the table body
-
-    this.shoppingList.forEach((item, index) => {
-      const newRow = this.createTableRow(item, index + 1);
-      tableBody.appendChild(newRow);
-    });
-  },
-
-  createTableRow(item, rowCount) {
-    const newRow = document.createElement("tr");
-    newRow.dataset.id = item.id; // Store unique identifier
-
-    newRow.innerHTML = `
-      <td><span class="number-circle">${rowCount}</span></td>
-      <td>${item.productName}</td>
-      <td>
-        <span class="main-quantity">${item.quantity}</span>
-        <span class="sub-quantity highlight">${item.quantityUnit}</span>
-      </td>
-      <td>${item.subUnits || "N/A"}</td>
-      <td>${
-        item.unitPrice ? UtilityHelpers.formatNumber(item.unitPrice) : "N/A"
-      }</td>
-      <td>${
-        item.subTotal ? UtilityHelpers.formatNumber(item.subTotal) : "N/A"
-      }</td>
-      <td>
-        <button onclick="ShoppingListManager.editItem('${
-          item.id
-        }')" class="edit button button-secondary button-small">Edit</button>
-        <button onclick="ShoppingListManager.deleteItem('${this.getId(
-          item
-        )}')" class="del button button-danger button-small">Del</button>
-      </td>
-    `;
-    return newRow;
-  },
-
-  deleteItem(id) {
-    const indexToRemove = this.shoppingList.findIndex((item) => item.id == id);
-    console.log("Index To remove ", indexToRemove);
-
-    if (indexToRemove !== -1) {
-      const removedProduct = this.shoppingList[indexToRemove].productName;
-      this.shoppingList.splice(indexToRemove, 1);
-      this.renderList();
-      NotificationManager.showNotification(
-        `Removed ${removedProduct}`,
-        NotificationManager.NOTIFICATION_TYPES.INFO
-      );
-    }
-  },
-
-  clearList() {
-    this.shoppingList = [];
-    this.renderList();
-  },
-};
-
-// Make it globally accessible
-window.ShoppingListManager = ShoppingListManager;
+const shoppingListManager = new ShoppingListManager(formManager, modalManager); // Create an instance
 
 document.addEventListener("DOMContentLoaded", function () {
   initializeModals();
@@ -146,7 +12,20 @@ document.addEventListener("DOMContentLoaded", function () {
   initializeProductSearch();
   initializeProductForm();
 
-  // Example of how to call handleTransaction when the form is submitted
+  // Event delegation for edit and delete buttons
+  document
+    .querySelector("#shopping-list tbody")
+    .addEventListener("click", (event) => {
+      const tempId = event.target.dataset.id;
+      console.log({ tempId });
+
+      if (event.target.classList.contains("edit-button")) {
+        shoppingListManager.handleEditButtonClick(tempId); // Call the edit handler
+      } else if (event.target.classList.contains("delete-button")) {
+        shoppingListManager.deleteProduct(tempId); // Call the delete handler
+      }
+    });
+
   document
     .getElementById("confirmTransactionBtn")
     .addEventListener("click", async (event) => {
@@ -177,7 +56,6 @@ function initializeModals() {
 
 function initializeClientSearch() {
   const fetchParties = async (searchTerm) => {
-    console.log({ searchTerm });
     return await window.partiesAPI.searchParties({
       searchTerm: searchTerm,
       type: "customer",
@@ -187,7 +65,6 @@ function initializeClientSearch() {
   };
 
   const onPartySelected = (selectedClient) => {
-    console.log("Client selected:", selectedClient);
     displaySelectedClient(selectedClient);
   };
 
@@ -220,7 +97,6 @@ function initializeProductSearch() {
   };
 
   const onProductSelected = (selectedProduct) => {
-    console.log("Product selected:", selectedProduct);
     const productDataEx = {
       productId: selectedProduct.id,
       productName: selectedProduct.name,
@@ -228,7 +104,6 @@ function initializeProductSearch() {
       quantityUnit: selectedProduct.subunit_in_unit,
     };
 
-    // Update the quantity unit display
     document.getElementById("quantityUnit").textContent =
       productDataEx.quantityUnit.toString().padStart(2, "0");
     formManager.populate("selling-form", productDataEx);
@@ -255,17 +130,27 @@ function initializeProductForm() {
       unitPrice: { required: true, min: 0.01 },
     },
 
-    onAdd: (data) => {
+    onAdd: (formData) => {
+      console.log({ formData });
+
       const quantityUnit = document.getElementById("quantityUnit").textContent;
-      data.quantityUnit = quantityUnit;
-      console.log("Adding item: ", data);
-      ShoppingListManager.addItem(data);
+      const product = {
+        productId: formData.productId,
+        productName: formData.productName,
+        quantity: formData.quantity,
+        subUnits: formData.subUnits,
+        unitPrice: formData.unitPrice,
+        quantityUnit,
+      };
+      shoppingListManager.addProduct(product); // Use the class instance
     },
 
     onUpdate: (product) => {
+      console.log({ product });
+
       const form = document.getElementById(productFormId);
       const itemId = form.getAttribute("data-item-id");
-      ShoppingListManager.updateItem(itemId, product);
+      shoppingListManager.updateProduct(itemId, product); // Use the class instance
       form.setAttribute("data-operation", "add");
     },
   });
@@ -278,13 +163,6 @@ function openProductModal() {
 function closeProductModal() {
   modalManager.close("product-modal");
   formManager.reset("selling-form"); // Reset the form when closing the modal
-  // Ensure the form is reset when clicking outside the modal
-  window.addEventListener("click", (event) => {
-    const modal = document.getElementById("product-modal");
-    if (event.target === modal) {
-      formManager.reset("selling-form");
-    }
-  });
 }
 
 async function createTransaction(transactionData) {
@@ -367,16 +245,16 @@ async function fetchOrderDetails(orderId) {
 async function onSubmitSellingForm(formData) {
   const transactionData = {
     clientId: formData.clientId,
-    items: ShoppingListManager.shoppingList,
-    totalAmount: calculateTotalAmount(ShoppingListManager.shoppingList),
+    items: shoppingListManager.shoppingList, // Use the class instance
+    totalAmount: calculateTotalAmount(shoppingListManager.shoppingList), // Use the class instance
   };
 
   const transactionResponse = await createTransaction(transactionData);
   if (transactionResponse) {
-    ShoppingListManager.shoppingList.forEach((item) => {
+    shoppingListManager.shoppingList.forEach((item) => {
       updateInventory(item.productId, item.quantity);
     });
-    ShoppingListManager.clearList(); // Clear the list after successful transaction
+    shoppingListManager.clearList(); // Use the class instance
     NotificationManager.showNotification(
       "Transaction completed successfully!",
       NotificationManager.NOTIFICATION_TYPES.INFO
@@ -390,40 +268,34 @@ function calculateTotalAmount(shoppingList) {
 
 async function handleTransaction() {
   try {
-    // Step 1: Validate Input
     const clientId = document.getElementById("clientName").dataset.clientId;
     if (!clientId) {
       throw new Error("Please select a client.");
     }
 
-    if (ShoppingListManager.shoppingList.length === 0) {
+    if (shoppingListManager.shoppingList.length === 0) {
+      // Use the class instance
       throw new Error("Your shopping list is empty.");
     }
 
-    // Prepare transaction data
     const transactionData = {
       party_id: clientId, // Use the client ID as party_id
       transaction_type: "sell", // Assuming this is a selling transaction
       discount: 0, // Set discount if applicable
     };
-    console.log({ transactionData });
 
-    // Step 1: Create Transaction
     const transactionResponse = await window.transactionsAPI.createTransaction(
       transactionData
     );
-
-    console.log({ transactionResponse });
 
     if (!transactionResponse.success) {
       throw new Error(transactionResponse.error);
     }
 
     const transactionId = transactionResponse.result;
-    console.log({ transactionId });
 
-    // Step 2: Add Transaction Details
-    for (const item of ShoppingListManager.shoppingList) {
+    for (const item of shoppingListManager.shoppingList) {
+      // Use the class instance
       const itemDetail = {
         product_id: item.productId, // Assuming productId is available in the item
         quantity_selected: item.quantity,
@@ -441,11 +313,8 @@ async function handleTransaction() {
       }
     }
 
-    // Step 3: Clear Shopping List
-    ShoppingListManager.clearList();
+    shoppingListManager.clearList(); // Use the class instance
 
-    // Step 4: Show Notification
-    // Step 5: Show Success Notification
     NotificationManager.showNotification(
       "Transaction completed successfully!",
       NotificationManager.NOTIFICATION_TYPES.INFO
