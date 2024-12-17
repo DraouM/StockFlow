@@ -146,8 +146,6 @@ function initializeProductForm() {
     },
 
     onUpdate: (product) => {
-      console.log({ product });
-
       const form = document.getElementById(productFormId);
       const itemId = form.getAttribute("data-item-id");
       shoppingListManager.updateProduct(itemId, product); // Use the class instance
@@ -173,14 +171,6 @@ async function createTransaction(transactionData) {
     return response.data; // Handle the response as needed
   } catch (error) {
     console.error("Error creating transaction:", error);
-  }
-}
-
-async function updateInventory(productId, quantitySold) {
-  try {
-    await window.productsAPI.updateProductQuantity(productId, quantitySold);
-  } catch (error) {
-    console.error("Error updating inventory:", error);
   }
 }
 
