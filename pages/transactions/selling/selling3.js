@@ -1,181 +1,257 @@
 async function fetchTransactionDetails() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const transactionId = urlParams.get("transaction_id");
-
-  console.log(`Transaction ID from URL: ${transactionId}`);
-
-  if (!transactionId) {
-    console.error("Transaction ID not found in URL");
-    return;
-  }
-
   try {
-    const transactionDetailsResponse =
-      await window.transactionsAPI.getTransactionDetailsByTransactionId(
-        transactionId
-      );
-    console.log({ transactionDetailsResponse });
+    const transactionId = getTransactionIdFromUrl();
 
-    if (!transactionDetailsResponse.success) {
-      throw new Error("Failed to fetch transaction details");
+    if (!transactionId) {
+      throw new Error("Invalid Transaction ID");
     }
 
-    const transactionDetails = transactionDetailsResponse.transactionDetails; // Access the transaction details data
-    // Add transaction details to the shopping list
-    for (const item of transactionDetails) {
-      const productResponse = await window.productsAPI.fetchSingleProduct(
-        item.product_id
-      );
-      console.log({ productResponse });
-
-      const productName = productResponse.data.name; // Assuming the response contains product_name
-      const quantityUnit = productResponse.data.subunit_in_unit; // Assuming the response contains unit
-
-      ShoppingListManager.addItem({
-        productName: productName,
-        subUnits: item.quantity_selected,
-        unitPrice: item.price_per_unit,
-        quantityUnit: quantityUnit,
-        quantity: convertSubUnitsToQuantity(
-          item.quantity_selected,
-          quantityUnit
-        ),
-      });
-    }
-
-    ShoppingListManager.renderList(); // Render the updated shopping list
+    const transactionDetails = await fetchTransactionData(transactionId);
+    await populateShoppingList(transactionDetails);
   } catch (error) {
-    console.error("Error fetching transaction details:", error);
+    handleTransactionFetchError(error);
   }
 }
 
-let previousShoppingList = []; // Variable to store the previous state of the shopping list
-
-function trackChanges(currentShoppingList) {
-  const changes = {
-    updated: [],
-    removed: [],
-    added: [],
-  };
-
-  // Check for updated and removed items
-  originalShoppingList.forEach((originalItem) => {
-    const currentItem = currentShoppingList.find(
-      (item) => item.id === originalItem.id
-    );
-    if (currentItem) {
-      // Check for updates
-      if (
-        currentItem.quantity !== originalItem.quantity ||
-        currentItem.unitPrice !== originalItem.unitPrice
-      ) {
-        changes.updated.push({ id: originalItem.id, updatedItem: currentItem });
-      }
-    } else {
-      // Item was removed
-      changes.removed.push(originalItem);
-    }
-  });
-
-  // Check for added items
-  currentShoppingList.forEach((currentItem) => {
-    const originalItem = originalShoppingList.find(
-      (item) => item.id === currentItem.id
-    );
-    if (!originalItem) {
-      changes.added.push(currentItem);
-    }
-  });
-
-  return changes;
+function getTransactionIdFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get("transaction_id");
 }
 
-// Function to display transaction details on the page
-function displayTransactionDetails(details) {
-  const detailsContainer = document.getElementById("transactionDetails");
-  detailsContainer.innerHTML = `
-        <p>Transaction ID: ${details.transaction_id}</p>
-        <p>Party Name: ${details.party_name}</p>
-        <p>Transaction Date: ${details.transaction_date}</p>
-        <p>Transaction Type: ${details.transaction_type}</p>
-        <p>Total Amount: ${details.total_amount}</p>
-        <p>Discount: ${details.discount}</p>
-        <!-- Add more details as needed -->
-    `;
+async function fetchTransactionData(transactionId) {
+  const response =
+    await window.transactionsAPI.getTransactionDetailsByTransactionId(
+      transactionId
+    );
+
+  if (!response.success) {
+    throw new Error("Failed to fetch transaction details");
+  }
+
+  return response.transactionDetails;
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await fetchTransactionDetails();
+async function populateShoppingList(transactionDetails) {
+  for (const item of transactionDetails) {
+    const productResponse = await window.productsAPI.fetchSingleProduct(
+      item.product_id
+    );
 
-  // Add event listener for the confirm button
-  const confirmButton = document.getElementById("confirmTransactionBtn");
-  confirmButton.addEventListener("click", () => {
-    const currentShoppingList = ShoppingListManager.shoppingList; // Accessing the shopping list directly
-    const changes = trackChanges(currentShoppingList);
-    displayChanges(changes);
-  });
-});
+    const productDetails = {
+      productName: productResponse.data.name,
+      subUnits: item.quantity_selected,
+      unitPrice: item.price_per_unit,
+      quantityUnit: productResponse.data.subunit_in_unit,
+      quantity: convertSubUnitsToQuantity(
+        item.quantity_selected,
+        productResponse.data.subunit_in_unit
+      ),
+    };
 
-function convertSubUnitsToQuantity(subUnits, qauntityUnit) {
-  console.log({ subUnits, qauntityUnit });
+    ShoppingListManager.addItem(productDetails);
+  }
 
-  console.log("Subunits ", subUnits, qauntityUnit);
+  ShoppingListManager.renderList();
+}
+
+function handleTransactionFetchError(error) {
+  console.error("Error fetching transaction details:", error);
+  NotificationManager.showError("Unable to load transaction details");
+}
+
+/** */
+// Ensure these are defined or imported
+import EditableShoppingListManager from "../EditableShoppingListManager.js";
+
+// Utility function for unit conversion
+function convertSubUnitsToQuantity(subUnits, quantityUnit) {
+  console.log({ subUnits, quantityUnit });
 
   if (!subUnits) return "0";
 
-  const units = Math.floor(subUnits / qauntityUnit);
-  const remainingSubUnits = subUnits % qauntityUnit;
+  const units = Math.floor(subUnits / quantityUnit);
+  const remainingSubUnits = subUnits % quantityUnit;
 
-  console.log("Check this ", units, remainingSubUnits);
-
-  // If we only have sub-units (less than one full unit)
   if (units === 0) {
     return `0 & ${remainingSubUnits}`;
   }
 
-  // If we have exact units (no remaining sub-units)
   if (remainingSubUnits === 0) {
     return `${units}`;
   }
 
-  // If we have both units and sub-units
   return `${units} & ${remainingSubUnits}`;
 }
 
-async function loadTransactionForEditing(transactionId) {
-  const transactionDetails = await fetchTransactionDetails(transactionId);
-  if (transactionDetails) {
-    // Populate the form fields with existing transaction data
-    document.getElementById("clientName").textContent =
-      transactionDetails.clientName;
-    document.getElementById("totalAmount").value =
-      transactionDetails.totalAmount;
-    document.getElementById("discount").value = transactionDetails.discount;
-    document.getElementById("finalAmount").value =
-      transactionDetails.finalAmount;
+// Notification Manager
+const NotificationManager = {
+  showError: (message) => {
+    console.error(message);
+    const errorContainer = document.getElementById("error-container");
+    if (errorContainer) {
+      errorContainer.textContent = message;
+      errorContainer.style.display = "block";
+    }
+  },
+  showSuccess: (message) => {
+    console.log(message);
+    const successContainer = document.getElementById("success-container");
+    if (successContainer) {
+      successContainer.textContent = message;
+      successContainer.style.display = "block";
+    }
+  },
+};
+async function fetchTransactionDetailsForEditing() {
+  try {
+    const transactionId = getTransactionIdFromUrl();
 
-    // Populate the shopping list
-    transactionDetails.items.forEach((item) => {
-      ShoppingListManager.addItem(item); // Assuming addItem can handle existing items
-    });
+    if (!transactionId) {
+      throw new Error("Invalid Transaction ID");
+    }
 
-    // Set the form to edit mode
-    const form = document.getElementById("selling-form");
-    form.setAttribute("data-operation", "edit");
-    form.setAttribute("data-transaction-id", transactionId);
+    // Create an instance of EditableShoppingListManager
+    const editableListManager = new EditableShoppingListManager();
+
+    // Fetch transaction details
+    const transactionDetails = await fetchTransactionData(transactionId);
+
+    // Populate initial list (original state)
+    await populateEditableShoppingList(editableListManager, transactionDetails);
+
+    // Set up event listeners for tracking changes
+    setupChangeTrackingListeners(editableListManager);
+
+    // Return the manager for further use
+    return editableListManager;
+  } catch (error) {
+    handleTransactionFetchError(error);
   }
 }
 
-let originalShoppingList = []; // Store the original shopping list
+async function populateEditableShoppingList(
+  editableListManager,
+  transactionDetails
+) {
+  for (const item of transactionDetails) {
+    const productResponse = await window.productsAPI.fetchSingleProduct(
+      item.product_id
+    );
 
-// Call this function whenever the shopping list is modified
-function onShoppingListChange(currentShoppingList) {
-  const changes = trackChanges(currentShoppingList);
-  console.log("Changes detected:", changes);
+    const productDetails = {
+      tempId: `transaction-item-${item.id}`, // Unique identifier
+      productId: item.product_id,
+      productName: productResponse.data.name,
+      subUnits: item.quantity_selected,
+      unitPrice: item.price_per_unit,
+      quantityUnit: productResponse.data.subunit_in_unit,
+      quantity: convertSubUnitsToQuantity(
+        item.quantity_selected,
+        productResponse.data.subunit_in_unit
+      ),
+      originalTransactionItem: item, // Keep original transaction item for reference
+    };
+
+    // Use the editable manager to add items
+    editableListManager.addProduct(productDetails);
+  }
+
+  // Render the initial list
+  editableListManager.renderList();
 }
 
-// Example usage when rendering the shopping list
-function renderList() {
-  // Existing rendering logic...
-  originalShoppingList = [...currentShoppingList]; // Update original list after rendering
+function setupChangeTrackingListeners(editableListManager) {
+  // Example: Track changes when confirm button is clicked
+  const confirmButton = document.getElementById("confirmTransactionBtn");
+  confirmButton.addEventListener("click", () => {
+    // Get change history
+    const changeLog = editableListManager.getChangeHistory();
+
+    // Display or process changes
+    displayTransactionChanges(changeLog);
+  });
+
+  // Optional: Add real-time change tracking
+  editableListManager.on("productAdded", (product) => {
+    console.log("Product Added:", product);
+    // Additional logic for product addition
+  });
+
+  editableListManager.on("productUpdated", (update) => {
+    console.log("Product Updated:", update);
+    // Additional logic for product update
+  });
+
+  editableListManager.on("productDeleted", (product) => {
+    console.log("Product Deleted:", product);
+    // Additional logic for product deletion
+  });
 }
+
+function displayTransactionChanges(changeLog) {
+  const changesContainer = document.getElementById("transactionChanges");
+
+  // Ensure the container exists
+  if (!changesContainer) {
+    console.warn("Changes container not found");
+    return;
+  }
+
+  // Clear previous changes
+  changesContainer.innerHTML = "";
+
+  // Render changes
+  changeLog.forEach((change) => {
+    const changeElement = document.createElement("div");
+    changeElement.classList.add("change-item");
+    changeElement.innerHTML = `
+      <span>Type: ${change.type}</span>
+      <span>Timestamp: ${change.timestamp}</span>
+      <pre>${JSON.stringify(change.details, null, 2)}</pre>
+    `;
+    changesContainer.appendChild(changeElement);
+  });
+}
+// Add this function or remove the call if not needed
+function setupAdditionalEditing(editableListManager) {
+  // Optional: Add any additional setup for editing
+  console.log("Setting up additional editing", editableListManager);
+
+  // Example: Add more specific configurations
+  // You can customize this based on your specific requirements
+  const editControls = {
+    // Example configurations
+    allowQuantityEdit: true,
+    allowPriceEdit: true,
+    trackChanges: true,
+  };
+
+  // Optional: Set up any specific event listeners or configurations
+  editableListManager.on("productUpdated", (update) => {
+    console.log("Additional editing - Product updated", update);
+    // Add any specific logic for additional editing
+  });
+
+  return editControls;
+}
+
+// Modify your DOMContentLoaded event listener
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const editableListManager = await fetchTransactionDetailsForEditing();
+
+    // Optional: Additional setup
+    if (editableListManager) {
+      // Use the function if it exists, otherwise provide a default implementation
+      const additionalSetup =
+        typeof setupAdditionalEditing === "function"
+          ? setupAdditionalEditing(editableListManager)
+          : null;
+
+      console.log("Additional editing setup:", additionalSetup);
+    }
+  } catch (error) {
+    console.error("Error in DOMContentLoaded:", error);
+    NotificationManager.showError("Failed to initialize transaction editing");
+  }
+});
