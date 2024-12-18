@@ -60,20 +60,6 @@ class ShoppingListManager {
     this.renderList();
   }
 
-  // Method to delete an item from the shopping list
-  deleteProduct(id) {
-    const indexToRemove = this.shoppingList.findIndex((item) => item.id === id);
-    if (indexToRemove !== -1) {
-      const removedProduct = this.shoppingList[indexToRemove].productName;
-      this.shoppingList.splice(indexToRemove, 1);
-      this.renderList();
-      NotificationManager.showNotification(
-        `Removed ${removedProduct}`,
-        NotificationManager.NOTIFICATION_TYPES.INFO
-      );
-    }
-  }
-
   // Method to render the shopping list in the UI
   renderList() {
     this.tableBody.innerHTML = ""; // Clear the table body
@@ -104,8 +90,12 @@ class ShoppingListManager {
         item.subTotal ? UtilityHelpers.formatNumber(item.subTotal) : "N/A"
       }</td>
        <td>
-        <button class="edit-button" data-id="${item.tempId}">Edit</button>
-        <button class="delete-button" data-id="${item.tempId}">Delete</button>
+        <button class="button button-small button-secondary edit-button" data-id="${
+          item.tempId
+        }">Edit</button>
+        <button class="button button-small button-danger delete-button" data-id="${
+          item.tempId
+        }">Delete</button>
       </td>
     `;
     return newRow;
