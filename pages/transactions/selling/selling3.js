@@ -1,3 +1,8 @@
+function getTransactionIdFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get("transaction_id");
+}
+
 const confirmButton = document.getElementById("confirmTransactionBtn");
 const transactionId = getTransactionIdFromUrl();
 
