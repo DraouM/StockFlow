@@ -2,36 +2,147 @@ import modalManager from "../modalManager.js";
 import formManager from "../formsManager.js";
 import NotificationManager from "../notificationManager.js";
 import { UtilityHelpers } from "./utilityHelpers.js";
-import ShoppingListManager from "../ShoppingListManager.js"; // Import the class
+import ShoppingList from "../ShoppingList.js"; // Import the class
 
-const shoppingListManager = new ShoppingListManager(formManager, modalManager); // Create an instance
+const shoppingList = new ShoppingList(formManager, modalManager); // Create an instance
+document.addEventListener("DOMContentLoaded", () => initializePage());
 
-document.addEventListener("DOMContentLoaded", function () {
+function initializePage() {
+  const transactionId = getTransactionIdFromUrl();
+  // Initialize features
   initializeModals();
   initializeClientSearch();
   initializeProductSearch();
   initializeProductForm();
+  // initializeEventListeners();
+  // Handle page context (new or update)
+  handlePageContext(transactionId);
 
-  // Event delegation for edit and delete buttons
-  document
-    .querySelector("#shopping-list tbody")
-    .addEventListener("click", (event) => {
-      const tempId = event.target.dataset.id;
-      console.log({ tempId });
+  // Initialize event listeners
+  initializeEventListeners(transactionId);
+}
 
-      if (event.target.classList.contains("edit-button")) {
-        shoppingListManager.handleEditButtonClick(tempId); // Call the edit handler
-      } else if (event.target.classList.contains("delete-button")) {
-        shoppingListManager.deleteProduct(tempId); // Call the delete handler
-      }
+function handlePageContext(transactionId) {
+  const confirmTransactionButton = document.getElementById(
+    "confirmTransactionBtn"
+  );
+
+  if (transactionId) {
+    // Update mode
+    populateTransactionDetails(transactionId);
+    if (confirmTransactionButton) {
+      confirmTransactionButton.textContent = "Update Order"; // Adjust button text
+    }
+  } else {
+    // Create mode
+    if (confirmTransactionButton) {
+      confirmTransactionButton.textContent = "Confirm Order"; // Default button text
+    }
+  }
+}
+
+function initializeEventListeners(transactionId) {
+  // Handle shopping list table actions
+  const shoppingListTable = document.querySelector("#shopping-list tbody");
+  if (shoppingListTable) {
+    shoppingListTable.addEventListener("click", handleShoppingListActions);
+  }
+
+  // Handle confirm transaction button
+  const confirmTransactionButton = document.getElementById(
+    "confirmTransactionBtn"
+  );
+  if (confirmTransactionButton) {
+    confirmTransactionButton.addEventListener("click", async () => {
+      await handleTransaction(transactionId);
     });
+  }
+}
 
-  document
-    .getElementById("confirmTransactionBtn")
-    .addEventListener("click", async (event) => {
-      await handleTransaction();
-    });
-});
+function handleShoppingListActions(event) {
+  const target = event.target;
+  const tempId = target.dataset.id;
+
+  if (!tempId) return;
+
+  if (target.classList.contains("edit-button")) {
+    shoppingList.handleEditButtonClick(tempId); // Edit handler
+  } else if (target.classList.contains("delete-button")) {
+    shoppingList.deleteProduct(tempId); // Delete handler
+  }
+}
+
+function getTransactionIdFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get("transaction_id");
+}
+
+async function populateTransactionDetails(transactionId) {
+  try {
+    const transactionData = await fetchTransactionData(transactionId);
+    console.log({ transactionId, transactionData });
+
+    if (transactionData) {
+      populateShoppingList(transactionData); // Populate the form with fetched data
+    }
+  } catch (error) {
+    console.error("Error fetching transaction data:", error);
+  }
+}
+async function fetchTransactionData(transactionId) {
+  const response =
+    await window.transactionsAPI.getTransactionDetailsByTransactionId(
+      transactionId
+    );
+
+  if (!response.success) {
+    throw new Error("Failed to fetch transaction details");
+  }
+
+  return response.transactionDetails;
+}
+
+async function populateShoppingList(transactionDetails) {
+  for (const item of transactionDetails) {
+    const productResponse = await window.productsAPI.fetchSingleProduct(
+      item.product_id
+    );
+
+    const productDetails = {
+      productName: productResponse.data.name,
+      subUnits: item.quantity_selected,
+      unitPrice: item.price_per_unit,
+      quantityUnit: productResponse.data.subunit_in_unit,
+      quantity: convertSubUnitsToQuantity(
+        item.quantity_selected,
+        productResponse.data.subunit_in_unit
+      ),
+    };
+
+    shoppingList.addProduct(productDetails);
+  }
+
+  shoppingList.renderList();
+}
+// REMOUVE later!! ****
+function convertSubUnitsToQuantity(subUnits, quantityUnit) {
+  console.log({ subUnits, quantityUnit });
+
+  if (!subUnits) return "0";
+
+  const units = Math.floor(subUnits / quantityUnit);
+  const remainingSubUnits = subUnits % quantityUnit;
+
+  if (units === 0) {
+    return `0 & ${remainingSubUnits}`;
+  }
+
+  if (remainingSubUnits === 0) {
+    return `${units}`;
+  }
+
+  return `${units} & ${remainingSubUnits}`;
+}
 
 function initializeModals() {
   // Client Modal
@@ -142,13 +253,13 @@ function initializeProductForm() {
         unitPrice: formData.unitPrice,
         quantityUnit,
       };
-      shoppingListManager.addProduct(product); // Use the class instance
+      shoppingList.addProduct(product); // Use the class instance
     },
 
     onUpdate: (product) => {
       const form = document.getElementById(productFormId);
       const itemId = form.getAttribute("data-item-id");
-      shoppingListManager.updateProduct(itemId, product); // Use the class instance
+      shoppingList.updateProduct(itemId, product); // Use the class instance
       form.setAttribute("data-operation", "add");
     },
   });
@@ -163,107 +274,14 @@ function closeProductModal() {
   formManager.reset("selling-form"); // Reset the form when closing the modal
 }
 
-async function createTransaction(transactionData) {
-  try {
-    const response = await window.transactionsAPI.createTransaction(
-      transactionData
-    );
-    return response.data; // Handle the response as needed
-  } catch (error) {
-    console.error("Error creating transaction:", error);
-  }
-}
-
-async function handlePayment(transactionId, paymentAmount) {
-  try {
-    const response = await window.transactionsAPI.handlePayment(
-      transactionId,
-      paymentAmount
-    );
-    return response.data; // Handle the response as needed
-  } catch (error) {
-    console.error("Error handling payment:", error);
-  }
-}
-
-async function cancelTransaction(transactionId) {
-  try {
-    await window.transactionsAPI.cancelTransaction(transactionId);
-  } catch (error) {
-    console.error("Error canceling transaction:", error);
-  }
-}
-
-async function fetchTransactionHistory() {
-  try {
-    const response = await window.transactionsAPI.getTransactionHistory();
-    return response.data; // Handle the response as needed
-  } catch (error) {
-    console.error("Error fetching transaction history:", error);
-  }
-}
-
-async function fetchTransactionDetails(transactionId) {
-  try {
-    const response = await window.transactionsAPI.getTransactionDetails(
-      transactionId
-    );
-    return response.data; // Handle the response as needed
-  } catch (error) {
-    console.error("Error fetching transaction details:", error);
-  }
-}
-
-async function fetchProductDetails(productId) {
-  try {
-    const response = await window.productsAPI.getProductDetails(productId);
-    return response.data; // Handle the response as needed
-  } catch (error) {
-    console.error("Error fetching product details:", error);
-  }
-}
-
-async function fetchOrderDetails(orderId) {
-  try {
-    const response = await window.ordersAPI.getOrderDetails(orderId);
-    return response.data; // Handle the response as needed
-  } catch (error) {
-    console.error("Error fetching order details:", error);
-  }
-}
-
-async function onSubmitSellingForm(formData) {
-  const transactionData = {
-    clientId: formData.clientId,
-    items: shoppingListManager.shoppingList, // Use the class instance
-    totalAmount: calculateTotalAmount(shoppingListManager.shoppingList), // Use the class instance
-  };
-
-  const transactionResponse = await createTransaction(transactionData);
-  if (transactionResponse) {
-    shoppingListManager.shoppingList.forEach((item) => {
-      updateInventory(item.productId, item.quantity);
-    });
-    shoppingListManager.clearList(); // Use the class instance
-    NotificationManager.showNotification(
-      "Transaction completed successfully!",
-      NotificationManager.NOTIFICATION_TYPES.INFO
-    );
-  }
-}
-
-function calculateTotalAmount(shoppingList) {
-  return shoppingList.reduce((total, item) => total + item.subTotal, 0);
-}
-
-async function handleTransaction() {
+async function createNewTransaction() {
   try {
     const clientId = document.getElementById("clientName").dataset.clientId;
     if (!clientId) {
       throw new Error("Please select a client.");
     }
 
-    if (shoppingListManager.shoppingList.length === 0) {
+    if (shoppingList.shoppingList.length === 0) {
       // Use the class instance
       throw new Error("Your shopping list is empty.");
     }
@@ -284,7 +302,7 @@ async function handleTransaction() {
 
     const transactionId = transactionResponse.result;
 
-    for (const item of shoppingListManager.shoppingList) {
+    for (const item of shoppingList.shoppingList) {
       // Use the class instance
       const itemDetail = {
         product_id: item.productId, // Assuming productId is available in the item
@@ -303,7 +321,7 @@ async function handleTransaction() {
       }
     }
 
-    shoppingListManager.clearList(); // Use the class instance
+    shoppingList.clearList(); // Use the class instance
 
     NotificationManager.showNotification(
       "Transaction completed successfully!",
@@ -316,4 +334,57 @@ async function handleTransaction() {
       NotificationManager.NOTIFICATION_TYPES.ERROR
     );
   }
+}
+
+async function fetchTransactionDetails(transactionId) {
+  try {
+    const response = await window.transactionsAPI.getTransactionDetails(
+      transactionId
+    );
+    return response.data; // Handle the response as needed
+  } catch (error) {
+    console.error("Error fetching transaction details:", error);
+  }
+}
+
+async function handleTransaction(transactionId = null) {
+  if (transactionId) {
+    // updateTransaction();
+    console.log(transactionId, "Transaction Updated !!");
+  } else {
+    createNewTransaction();
+  }
+}
+
+/** EDITING a transaction */
+function openTransactionModal(transactionId = null) {
+  modalManager.open("transaction-modal");
+
+  if (transactionId) {
+    // Load existing transaction details
+    loadTransaction(transactionId);
+    document.getElementById("transactionId").value = transactionId; // Set the transaction ID
+    document
+      .getElementById("transaction-form")
+      .setAttribute("data-operation", "update");
+  } else {
+    // Prepare for a new transaction
+    document.getElementById("transaction-form").reset(); // Reset the form
+    document.getElementById("transactionId").value = ""; // Clear the transaction ID
+    document
+      .getElementById("transaction-form")
+      .setAttribute("data-operation", "create");
+  }
+}
+
+async function loadTransaction(transactionId) {
+  const transactionDetails = await fetchTransactionDetails(transactionId);
+
+  // Populate the form fields with the transaction data
+  document.getElementById("clientName").value = transactionDetails.clientName;
+  document.getElementById("productName").value = transactionDetails.productName;
+  document.getElementById("quantity").value = transactionDetails.quantity;
+
+  // Load the shopping list into the ShoppingList
+  shoppingList.populate(transactionDetails.items);
 }
