@@ -35,7 +35,7 @@ class ShoppingListManager {
     // Override addProduct
     this.shoppingList.addProduct = (product) => {
       const existingProduct = this.originalList.find(
-        (item) => item.productId === product.productId
+        (item) => item.tempId === product.tempId
       );
 
       const result = originalAddProduct(product);
@@ -104,10 +104,13 @@ class ShoppingListManager {
   }
 
   populate(items) {
-    // Create deep copies with generated tempIds
-    this.originalList = items.map((item) => ({
+    if (!Array.isArray(items)) {
+      throw new Error("Expected an array of items");
+    }
+
+    this.originalList = items.map((item, index) => ({
       ...item,
-      tempId: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      tempId: crypto.randomUUID(), // Generate a unique tempId using timestamp and index
     }));
 
     this.logChange({
@@ -115,6 +118,8 @@ class ShoppingListManager {
       timestamp: new Date(),
       items: [...this.originalList],
     });
+
+    console.log("Original List ", this.originalList);
 
     this.shoppingList.populate(this.originalList);
     this.triggerEvent("listPopulated", { items: this.originalList });
@@ -207,6 +212,10 @@ class ShoppingListManager {
       itemsModified: differences.modified.length,
       lastChangeTimestamp: this.changeLog[this.changeLog.length - 1]?.timestamp,
     };
+  }
+
+  getShoppingList() {
+    return this.shoppingList.shoppingList;
   }
 }
 

@@ -1,4 +1,3 @@
-// ShoppingList.js
 import NotificationManager from "./notificationManager.js";
 import { UtilityHelpers } from "./selling/utilityHelpers.js";
 
@@ -26,7 +25,7 @@ class ShoppingList {
   createNewItem(product) {
     const subTotal = product.subUnits * product.unitPrice;
     return {
-      tempId: Date.now().toString(), // Unique ID for the item
+      tempId: crypto.randomUUID(), // Generate a unique ID using crypto
       productId: product.productId,
       productName: product.productName,
       quantity: product.quantity,
