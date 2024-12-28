@@ -51,8 +51,6 @@ class ShoppingList {
 
   // Method to update an existing item in the shopping list
   updateProduct(itemId, updatedItem) {
-    console.log({ itemId, updatedItem });
-
     this.shoppingList = this.shoppingList.map((item) =>
       item.tempId === itemId ? { ...item, ...updatedItem } : item
     );
@@ -143,6 +141,10 @@ class ShoppingList {
   populate(items) {
     this.shoppingList = items.map((item) => this.createNewItem(item));
     this.renderList();
+  }
+
+  getProducts() {
+    return this.shoppingList;
   }
 }
 
