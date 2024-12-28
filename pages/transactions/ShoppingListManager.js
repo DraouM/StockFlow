@@ -33,24 +33,44 @@ class ShoppingListManager {
   addProduct(product) {
     console.log("Adding Product ", product);
     this.shoppingList.addProduct(product);
-    this.changeLog.push({ type: "add", product });
-    // this.listeners.productAdded.forEach((listener) => listener(product));
+    const newProduct =
+      this.shoppingList.shoppingList[this.shoppingList.shoppingList.length - 1];
+    this.changeLog.push({ type: "add", newProduct });
+    this.listeners.productAdded.push(newProduct);
+    console.log("ADDED products ", this.listeners.productAdded); // Output: true
   }
 
-  // deleteProduct(productTempId) {
-  //   console.log("Deleting Product ", productTempId);
-  //   const product = this.originalList.find(
-  //     (product) => product.tempId === productTempId
-  //   );
-  //   console.log({ product });
+  deleteProduct(productTempId) {
+    console.log("Deleting Product ", productTempId);
 
-  //   if (product) {
-  //     this.shoppingList.deleteProduct(productTempId);
+    // Check if the product exists in the original List
+    const product = this.originalList.find(
+      (product) => product.tempId === productTempId
+    );
+    console.log({ product });
 
-  //     this.changeLog.push({ type: "delete", product });
-  //     // this.listeners.productDeleted.forEach((listener) => listener(product));
-  //   }
-  // }
+    // Case, it exists in the original list
+    if (product) {
+      this.shoppingList.deleteProduct(productTempId);
+      this.changeLog.push({ type: "delete", product });
+      this.listeners.productDeleted.push(product);
+    }
+    // Case not
+    else {
+      this.shoppingList.deleteProduct(productTempId);
+      this.changeLog.push({ type: "delete", product: null });
+      // find the prduct index in the added list
+      const foundItem = this.listeners.productAdded.find(
+        (product) => product.tempId === productTempId
+      );
+      if (foundItem !== -1) {
+        this.listeners.productAdded.splice(foundItem, 1);
+      }
+
+      console.log("ADDED products ", this.listeners.productAdded); // Output: true
+    }
+    console.log("DELETED products ", this.listeners.productDeleted); // Output: true
+  }
 
   log() {
     console.log("Original List ", this.originalList);
