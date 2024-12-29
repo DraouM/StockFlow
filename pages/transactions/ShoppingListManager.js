@@ -72,6 +72,65 @@ class ShoppingListManager {
     console.log("DELETED products ", this.listeners.productDeleted); // Output: true
   }
 
+  updateProduct(productTempId, updatedProduct) {
+    // Validate that updatedProduct has the necessary properties
+    if (!updatedProduct) {
+      throw new Error("Updated product must have a valid tempId");
+    }
+
+    // Check if the product exists in the original list
+    const productIndex = this.originalList.findIndex(
+      (product) => product.tempId === productTempId
+    );
+
+    if (productIndex !== -1) {
+      // Ensure tempId is preserved
+      updatedProduct.tempId = productTempId;
+
+      // Update the product in the original list
+      // this.originalList[productIndex] = updatedProduct;
+
+      this.changeLog.push({ type: "update", product: updatedProduct });
+
+      // check if the product is already updated
+      const foundItemIndex = this.listeners.productUpdated.findIndex(
+        (product) => product.tempId === productTempId
+      );
+      if (foundItemIndex !== -1) {
+        console.log("The Item is updated!!");
+        this.listeners.productUpdated[foundItemIndex] = updatedProduct;
+      } else {
+        console.log("The Item is updated AGAIN!!");
+        this.listeners.productUpdated.push(updatedProduct);
+      }
+
+      console.log(
+        "Product updated in original list: ",
+        this.listeners.productUpdated
+      );
+    }
+    //  else {
+    //   // If the product does not exist in the original list, check in the added products
+    //   const addedProductIndex = this.shoppingList.shoppingList.findIndex(
+    //     (product) => product.tempId === productTempId
+    //   );
+    //   if (addedProductIndex !== -1) {
+    //     // Update the product in the added list
+    //     this.shoppingList.shoppingList[addedProductIndex] = updatedProduct;
+    //     this.changeLog.push({ type: "update", product: updatedProduct });
+    //     this.listeners.productUpdated.forEach((listener) =>
+    //       listener(updatedProduct)
+    //     );
+    //     console.log("Product updated in added list: ", updatedProduct);
+    //   } else {
+    //     // If the product does not exist at all
+    //     throw new Error("Product not found for update");
+    //   }
+    // }
+
+    this.shoppingList.updateProduct(productTempId, updatedProduct);
+  }
+
   log() {
     console.log("Original List ", this.originalList);
     console.log("Change Log ", this.changeLog);
