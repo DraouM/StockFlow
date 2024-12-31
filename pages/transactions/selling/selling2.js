@@ -311,11 +311,11 @@ async function createNewTransaction() {
 
     const transactionId = transactionResponse.result;
 
-    for (const item of shoppingListManager.shoppingList) {
+    for (const item of shoppingListManager.shoppingList.shoppingList) {
       // Use the class instance
       const itemDetail = {
         product_id: item.productId, // Assuming productId is available in the item
-        quantity_selected: item.quantity,
+        quantity_selected: item.subUnits,
         unit_price: item.unitPrice,
       };
 
@@ -369,6 +369,77 @@ async function handleTransaction(transactionId = null) {
 /** EDITING a transaction */
 async function updateTransaction(transactionId) {
   shoppingListManager.log();
+
+  // Assuming `transactionId` is the ID of the transaction being updated
+  // and `shoppingListManager` is the instance of ShoppingListManager
+
+  await applyChangesToDatabase(transactionId, shoppingListManager);
+}
+
+async function applyChangesToDatabase(transactionId, shoppingListManager) {
+  try {
+    // Handle Added Products
+    for (const addedProduct of shoppingListManager.listeners.productAdded) {
+      const itemDetail = {
+        product_id: addedProduct.productId,
+        quantity_selected: addedProduct.subUnits,
+        unit_price: addedProduct.unitPrice,
+      };
+
+      const response = await window.transactionsAPI.createTransactionDetail({
+        transactionId,
+        ...itemDetail,
+      });
+
+      if (!response.success) {
+        throw new Error(`Failed to add product: ${response.error}`);
+      }
+    }
+
+    // // Handle Updated Products
+    // for (const updatedProduct of shoppingListManager.listeners.productUpdated) {
+    //   const itemDetail = {
+    //     product_id: updatedProduct.productId,
+    //     quantity_selected: updatedProduct.quantity,
+    //     unit_price: updatedProduct.unitPrice,
+    //   };
+
+    //   const response = await window.transactionsAPI.updateTransactionDetail(
+    //     updatedProduct.tempId, // Assuming tempId is used as the transaction detail ID
+    //     itemDetail
+    //   );
+
+    //   if (!response.success) {
+    //     throw new Error(`Failed to update product: ${response.error}`);
+    //   }
+    // }
+
+    // Handle Deleted Products
+    for (const deletedProduct of shoppingListManager.listeners.productDeleted) {
+      if (deletedProduct) {
+        const response = await window.transactionsAPI.deleteTransactionDetail(
+          deletedProduct.tempId // Assuming tempId is used as the transaction detail ID
+        );
+
+        if (!response.success) {
+          throw new Error(`Failed to delete product: ${response.error}`);
+        }
+      }
+    }
+
+    // Clear the change log and listeners after applying changes
+    shoppingListManager.changeLog = [];
+    shoppingListManager.listeners = {
+      productAdded: [],
+      productUpdated: [],
+      productDeleted: [],
+    };
+
+    console.log("Changes applied successfully to the database.");
+  } catch (error) {
+    console.error("Error applying changes to the database:", error);
+    throw error;
+  }
 }
 
 // async function loadTransaction(transactionId) {
