@@ -3,8 +3,11 @@ import formManager from "../formsManager.js";
 import NotificationManager from "../notificationManager.js";
 import { UtilityHelpers } from "./utilityHelpers.js";
 import ShoppingList from "../ShoppingList.js"; // Import the class
+import ShoppingListManager from "../ShoppingListManager.js"; // Import the class
 
 const shoppingList = new ShoppingList(formManager, modalManager); // Create an instance
+const shoppingListManager = new ShoppingListManager(shoppingList); // Create an instance
+
 document.addEventListener("DOMContentLoaded", () => initializePage());
 
 function initializePage() {
@@ -32,6 +35,7 @@ function handlePageContext(transactionId) {
     populateTransactionDetails(transactionId);
     if (confirmTransactionButton) {
       confirmTransactionButton.textContent = "Update Order"; // Adjust button text
+      confirmTransactionButton.style.background = "green"; // Adjust button text
     }
   } else {
     // Create mode
@@ -66,9 +70,9 @@ function handleShoppingListActions(event) {
   if (!tempId) return;
 
   if (target.classList.contains("edit-button")) {
-    shoppingList.handleEditButtonClick(tempId); // Edit handler
+    shoppingListManager.shoppingList.handleEditButtonClick(tempId); // Edit handler
   } else if (target.classList.contains("delete-button")) {
-    shoppingList.deleteProduct(tempId); // Delete handler
+    shoppingListManager.deleteProduct(tempId); // Delete handler
   }
 }
 
@@ -83,7 +87,8 @@ async function populateTransactionDetails(transactionId) {
     console.log({ transactionId, transactionData });
 
     if (transactionData) {
-      populateShoppingList(transactionData); // Populate the form with fetched data
+      // Populate the form with fetched data
+      initializeShoppingList(transactionData);
     }
   } catch (error) {
     console.error("Error fetching transaction data:", error);
@@ -102,28 +107,32 @@ async function fetchTransactionData(transactionId) {
   return response.transactionDetails;
 }
 
-async function populateShoppingList(transactionDetails) {
-  for (const item of transactionDetails) {
-    const productResponse = await window.productsAPI.fetchSingleProduct(
-      item.product_id
-    );
+async function initializeShoppingList(transactionDetails) {
+  // First, prepare all items with complete data
+  const populatedItems = await Promise.all(
+    transactionDetails.map(async (item) => {
+      const productResponse = await window.productsAPI.fetchSingleProduct(
+        item.product_id
+      );
 
-    const productDetails = {
-      productName: productResponse.data.name,
-      subUnits: item.quantity_selected,
-      unitPrice: item.price_per_unit,
-      quantityUnit: productResponse.data.subunit_in_unit,
-      quantity: convertSubUnitsToQuantity(
-        item.quantity_selected,
-        productResponse.data.subunit_in_unit
-      ),
-    };
+      return {
+        productId: productResponse.data.id,
+        productName: productResponse.data.name,
+        subUnits: item.quantity_selected,
+        unitPrice: item.price_per_unit,
+        quantityUnit: productResponse.data.subunit_in_unit,
+        quantity: convertSubUnitsToQuantity(
+          item.quantity_selected,
+          productResponse.data.subunit_in_unit
+        ),
+      };
+    })
+  );
 
-    shoppingList.addProduct(productDetails);
-  }
-
-  shoppingList.renderList();
+  // Now populate the shopping list manager with all items at once
+  shoppingListManager.populate(populatedItems);
 }
+
 // REMOUVE later!! ****
 function convertSubUnitsToQuantity(subUnits, quantityUnit) {
   console.log({ subUnits, quantityUnit });
@@ -215,8 +224,6 @@ function initializeProductSearch() {
       quantityUnit: selectedProduct.subunit_in_unit,
     };
 
-    document.getElementById("quantityUnit").textContent =
-      productDataEx.quantityUnit.toString().padStart(2, "0");
     formManager.populate("selling-form", productDataEx);
   };
 
@@ -253,13 +260,15 @@ function initializeProductForm() {
         unitPrice: formData.unitPrice,
         quantityUnit,
       };
-      shoppingList.addProduct(product); // Use the class instance
+      shoppingListManager.addProduct(product); // Use the class instance
     },
 
     onUpdate: (product) => {
+      console.log({ product });
+
       const form = document.getElementById(productFormId);
       const itemId = form.getAttribute("data-item-id");
-      shoppingList.updateProduct(itemId, product); // Use the class instance
+      shoppingListManager.updateProduct(itemId, product); // Use the class instance
       form.setAttribute("data-operation", "add");
     },
   });
@@ -281,7 +290,7 @@ async function createNewTransaction() {
       throw new Error("Please select a client.");
     }
 
-    if (shoppingList.shoppingList.length === 0) {
+    if (shoppingListManager.shoppingList.length === 0) {
       // Use the class instance
       throw new Error("Your shopping list is empty.");
     }
@@ -302,7 +311,7 @@ async function createNewTransaction() {
 
     const transactionId = transactionResponse.result;
 
-    for (const item of shoppingList.shoppingList) {
+    for (const item of shoppingListManager.shoppingList) {
       // Use the class instance
       const itemDetail = {
         product_id: item.productId, // Assuming productId is available in the item
@@ -321,7 +330,7 @@ async function createNewTransaction() {
       }
     }
 
-    shoppingList.clearList(); // Use the class instance
+    shoppingListManager.clearList(); // Use the class instance
 
     NotificationManager.showNotification(
       "Transaction completed successfully!",
@@ -351,40 +360,25 @@ async function handleTransaction(transactionId = null) {
   if (transactionId) {
     // updateTransaction();
     console.log(transactionId, "Transaction Updated !!");
+    await updateTransaction(transactionId);
   } else {
     createNewTransaction();
   }
 }
 
 /** EDITING a transaction */
-function openTransactionModal(transactionId = null) {
-  modalManager.open("transaction-modal");
-
-  if (transactionId) {
-    // Load existing transaction details
-    loadTransaction(transactionId);
-    document.getElementById("transactionId").value = transactionId; // Set the transaction ID
-    document
-      .getElementById("transaction-form")
-      .setAttribute("data-operation", "update");
-  } else {
-    // Prepare for a new transaction
-    document.getElementById("transaction-form").reset(); // Reset the form
-    document.getElementById("transactionId").value = ""; // Clear the transaction ID
-    document
-      .getElementById("transaction-form")
-      .setAttribute("data-operation", "create");
-  }
+async function updateTransaction(transactionId) {
+  shoppingListManager.log();
 }
 
-async function loadTransaction(transactionId) {
-  const transactionDetails = await fetchTransactionDetails(transactionId);
+// async function loadTransaction(transactionId) {
+//   const transactionDetails = await fetchTransactionDetails(transactionId);
 
-  // Populate the form fields with the transaction data
-  document.getElementById("clientName").value = transactionDetails.clientName;
-  document.getElementById("productName").value = transactionDetails.productName;
-  document.getElementById("quantity").value = transactionDetails.quantity;
+//   // Populate the form fields with the transaction data
+//   document.getElementById("clientName").value = transactionDetails.clientName;
+//   document.getElementById("productName").value = transactionDetails.productName;
+//   document.getElementById("quantity").value = transactionDetails.quantity;
 
-  // Load the shopping list into the ShoppingList
-  shoppingList.populate(transactionDetails.items);
-}
+//   // Load the shopping list into the ShoppingList
+//   shoppingListManager.populate(transactionDetails.items);
+// }
