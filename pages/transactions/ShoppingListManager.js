@@ -14,7 +14,6 @@ class ShoppingListManager {
       productAdded: [],
       productUpdated: [],
       productDeleted: [],
-      listPopulated: [],
     };
   }
 
@@ -25,9 +24,6 @@ class ShoppingListManager {
     console.log("Shopping List Populated ", givenList);
     this.shoppingList.populate(givenList);
     this.originalList = [...this.shoppingList.shoppingList];
-    this.listeners.listPopulated.forEach((listener) =>
-      listener(this.originalList)
-    );
   }
 
   addProduct(product) {
@@ -87,9 +83,6 @@ class ShoppingListManager {
       // Ensure tempId is preserved
       updatedProduct.tempId = productTempId;
 
-      // Update the product in the original list
-      // this.originalList[productIndex] = updatedProduct;
-
       this.changeLog.push({ type: "update", product: updatedProduct });
 
       // check if the product is already updated
@@ -108,25 +101,24 @@ class ShoppingListManager {
         "Product updated in original list: ",
         this.listeners.productUpdated
       );
+    } else {
+      // If the product does not exist in the original list, check in the added products
+      const addedProductIndex = this.listeners.productAdded.findIndex(
+        (product) => product.tempId === productTempId
+      );
+      if (addedProductIndex !== -1) {
+        // Update the product in the added list
+        this.listeners.productAdded[addedProductIndex] = updatedProduct;
+        this.changeLog.push({ type: "update", product: updatedProduct });
+        // this.listeners.productUpdated.forEach((listener) =>
+        //   listener(updatedProduct)
+        // );
+        console.log("Product updated in added list: ", updatedProduct);
+      } else {
+        // If the product does not exist at all
+        throw new Error("Product not found for update");
+      }
     }
-    //  else {
-    //   // If the product does not exist in the original list, check in the added products
-    //   const addedProductIndex = this.shoppingList.shoppingList.findIndex(
-    //     (product) => product.tempId === productTempId
-    //   );
-    //   if (addedProductIndex !== -1) {
-    //     // Update the product in the added list
-    //     this.shoppingList.shoppingList[addedProductIndex] = updatedProduct;
-    //     this.changeLog.push({ type: "update", product: updatedProduct });
-    //     this.listeners.productUpdated.forEach((listener) =>
-    //       listener(updatedProduct)
-    //     );
-    //     console.log("Product updated in added list: ", updatedProduct);
-    //   } else {
-    //     // If the product does not exist at all
-    //     throw new Error("Product not found for update");
-    //   }
-    // }
 
     this.shoppingList.updateProduct(productTempId, updatedProduct);
   }
@@ -134,6 +126,7 @@ class ShoppingListManager {
   log() {
     console.log("Original List ", this.originalList);
     console.log("Change Log ", this.changeLog);
+    console.log("Changes ", this.listeners);
   }
 }
 
