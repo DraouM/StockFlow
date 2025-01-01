@@ -415,6 +415,7 @@ async function applyChangesToDatabase(transactionId, shoppingListManager) {
     // }
 
     // Handle Deleted Products
+    /** BUG */
     for (const deletedProduct of shoppingListManager.listeners.productDeleted) {
       if (deletedProduct) {
         const response = await window.transactionsAPI.deleteTransactionDetail(
@@ -428,12 +429,7 @@ async function applyChangesToDatabase(transactionId, shoppingListManager) {
     }
 
     // Clear the change log and listeners after applying changes
-    shoppingListManager.changeLog = [];
-    shoppingListManager.listeners = {
-      productAdded: [],
-      productUpdated: [],
-      productDeleted: [],
-    };
+    shoppingListManager.clearList();
 
     console.log("Changes applied successfully to the database.");
   } catch (error) {

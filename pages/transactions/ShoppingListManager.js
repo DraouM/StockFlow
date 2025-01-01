@@ -123,6 +123,14 @@ class ShoppingListManager {
     this.shoppingList.updateProduct(productTempId, updatedProduct);
   }
 
+  clearList() {
+    this.originalList = [];
+    this.changeLog = [];
+    this.listeners.productUpdated = [];
+    this.listeners.productAdded = [];
+    this.listeners.productDeleted = [];
+  }
+
   log() {
     console.log("Original List ", this.originalList);
     console.log("Change Log ", this.changeLog);
