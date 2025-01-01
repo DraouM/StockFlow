@@ -16,6 +16,8 @@ const formManager = {
 
     const form = document.getElementById(formId);
 
+    document.getElementById("quantityUnit").textContent =
+      data.quantityUnit.toString().padStart(2, "0");
     Object.keys(data).forEach((key) => {
       const input = form.querySelector(`[name="${key}"]`);
       if (input) {
