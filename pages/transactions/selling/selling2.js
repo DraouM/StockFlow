@@ -116,6 +116,7 @@ async function initializeShoppingList(transactionDetails) {
       );
 
       return {
+        tempId: item.transaction_detail_id.toString(),
         productId: productResponse.data.id,
         productName: productResponse.data.name,
         subUnits: item.quantity_selected,
@@ -128,6 +129,7 @@ async function initializeShoppingList(transactionDetails) {
       };
     })
   );
+  console.log(populatedItems);
 
   // Now populate the shopping list manager with all items at once
   shoppingListManager.populate(populatedItems);
