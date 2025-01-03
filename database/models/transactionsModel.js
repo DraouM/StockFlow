@@ -497,24 +497,25 @@ class TransactionsModel {
     const updateFields = [];
     const params = [];
 
-    if (updates.product_id) {
-      updateFields.push("product_id = ?");
-      params.push(updates.product_id);
+    // if (updates.product_id) {
+    //   updateFields.push("product_id = ?");
+    //   params.push(updates.product_id);
+    // }
+
+    if (updates.quantity_selected !== undefined) {
+      updateFields.push("quantity_selected = ?");
+      params.push(updates.quantity_selected);
     }
-    if (updates.quantity !== undefined) {
-      updateFields.push("quantity = ?");
-      params.push(updates.quantity);
-    }
-    if (updates.unit_price !== undefined) {
-      updateFields.push("unit_price = ?");
-      params.push(updates.unit_price);
+    if (updates.price_per_unit !== undefined) {
+      updateFields.push("price_per_unit = ?");
+      params.push(updates.price_per_unit);
     }
 
     if (updateFields.length === 0) {
       throw new Error("No fields provided for update");
     }
 
-    updateFields.push("updated_at = CURRENT_TIMESTAMP");
+    // updateFields.push("updated_at = CURRENT_TIMESTAMP");
     params.push(transactionDetailId);
 
     const query = `
@@ -522,6 +523,9 @@ class TransactionsModel {
       SET ${updateFields.join(", ")}
       WHERE transaction_detail_id = ?
     `;
+
+    console.log("Executing Query:", query);
+    console.log("With Parameters:", params);
 
     const result = await this.runQuery(
       query,
