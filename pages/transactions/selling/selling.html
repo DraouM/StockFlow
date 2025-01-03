@@ -23,6 +23,16 @@
         transition: opacity 0.3s ease, transform 0.2s ease; /* Added transform transition */
       }
 
+      .popover__title {
+        background-color: #007bff;
+        border-radius: 20px;
+        font-size: 16px;
+        text-decoration: none;
+        color: white;
+        text-align: center;
+        padding: 0.5rem;
+      }
+
       .popover p {
         margin: 5px 0;
         font-family: "Arial", sans-serif; /* Modern font */
@@ -45,7 +55,7 @@
 
       .clickable:hover {
         text-decoration: underline;
-        color: #0056b3; /* Darker blue on hover */
+        color: #e6e9ec; /* Darker blue on hover */
       }
 
       .clickable:hover + .popover,
@@ -458,23 +468,28 @@
         <section class="client-section">
           <h2>Clients Details</h2>
           <div id="client-details">
-            <span
+            <h2
               id="clientName"
-              class="clickable"
               popovertarget="clientPopover"
-              >John Doe</span
+              class="clickable popover__title"
             >
-            <button
-              id="editClientBtn"
-              class="button button-secondary button-small"
-              style="margin-left: 10px"
-            >
-              Change
-            </button>
+              John Doe
+            </h2>
+            <i class="fas fa-user"></i>
+            <!-- Add an icon next to the clientName span -->
+
             <div id="clientPopover" class="popover">
               <p id="clientAddress">Address: 123 Main St</p>
               <p id="clientPhone">Phone: (123) 456-7890</p>
               <p id="clientDebt">Debt: $100.00</p>
+              <br />
+              <button
+                id="editClientBtn"
+                class="button button-secondary button-small"
+                style="margin-left: 10px"
+              >
+                Change
+              </button>
             </div>
           </div>
         </section>
