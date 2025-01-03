@@ -382,6 +382,8 @@ async function applyChangesToDatabase(transactionId, shoppingListManager) {
   try {
     // Handle Added Products
     for (const addedProduct of shoppingListManager.listeners.productAdded) {
+      console.log("Start adding new products to the database ...");
+
       const itemDetail = {
         product_id: addedProduct.productId,
         quantity_selected: addedProduct.subUnits,
@@ -398,27 +400,31 @@ async function applyChangesToDatabase(transactionId, shoppingListManager) {
       }
     }
 
-    // // Handle Updated Products
-    // for (const updatedProduct of shoppingListManager.listeners.productUpdated) {
-    //   const itemDetail = {
-    //     product_id: updatedProduct.productId,
-    //     quantity_selected: updatedProduct.quantity,
-    //     unit_price: updatedProduct.unitPrice,
-    //   };
+    // Handle Updated Products
+    for (const updatedProduct of shoppingListManager.listeners.productUpdated) {
+      console.log("Start Updating products ....", updatedProduct);
 
-    //   const response = await window.transactionsAPI.updateTransactionDetail(
-    //     updatedProduct.tempId, // Assuming tempId is used as the transaction detail ID
-    //     itemDetail
-    //   );
+      const itemDetail = {
+        product_id: updatedProduct.productId,
+        quantity_selected: updatedProduct.subUnits,
+        price_per_unit: updatedProduct.unitPrice,
+      };
 
-    //   if (!response.success) {
-    //     throw new Error(`Failed to update product: ${response.error}`);
-    //   }
-    // }
+      const response = await window.transactionsAPI.updateTransactionDetail(
+        parseInt(updatedProduct.tempId), // Assuming tempId is used as the transaction detail ID
+        itemDetail
+      );
+
+      if (!response.success) {
+        throw new Error(`Failed to update product: ${response.error}`);
+      }
+    }
 
     // Handle Deleted Products
     /** BUG */
     for (const deletedProduct of shoppingListManager.listeners.productDeleted) {
+      console.log("Deleting products ... ");
+
       if (deletedProduct) {
         const response = await window.transactionsAPI.deleteTransactionDetail(
           deletedProduct.tempId // Assuming tempId is used as the transaction detail ID
