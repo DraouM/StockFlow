@@ -18,7 +18,7 @@
     width: 80%;
     max-width: 800px;
     /* Limit the height of the modal */
-    max-height: 90%;
+    /* max-height: 90%; */
     /* Allow vertical scrolling if content is too tall */
     overflow-y: auto;
     background-color: white;
