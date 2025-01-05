@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="../../../assets/styles/main.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="selling.css" />
 
     <!-- popover style -->
@@ -283,6 +291,86 @@
         transform: translateY(0);
       }
     </style>
+    <style>
+      /* Top Row */
+      .footer-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        margin-top: -0.5rem;
+      }
+
+      /* Items Count */
+      .items-count {
+        font-size: 1rem;
+        color: #333;
+        font-weight: 500;
+      }
+
+      .items-count span {
+        font-weight: bold;
+        color: #007bff; /* Highlight the number */
+      }
+
+      /* Footer Actions (Print and Download Buttons) */
+      .footer-actions {
+        display: flex;
+        gap: 10px; /* Space between buttons */
+      }
+
+      /* Bottom Row */
+      .footer-bottom {
+        text-align: center;
+      }
+
+      /* Confirm Order Button */
+      #confirmTransactionBtn {
+        width: 100%; /* Full width */
+        max-width: 300px; /* Limit width for better aesthetics */
+        margin: 0 auto; /* Center the button */
+      }
+
+      /* Secondary button styles (for Download and Print) */
+      .button.button-secondary {
+        background-color: #fff; /* White background */
+        border: 1px solid #e0e0e0; /* Light border */
+        color: #333; /* Dark text */
+      }
+
+      .button.button-secondary:hover {
+        background-color: #f5f5f5; /* Light gray on hover */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+      }
+
+      /* Primary button styles (for Confirm Order) */
+      .button.button-primary {
+        background-color: #007bff; /* Blue background */
+        color: #fff; /* White text */
+      }
+
+      .button.button-primary:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+      }
+
+      /* Icon-only buttons (Download and Print) */
+      .button.button-icon-only {
+        padding: 0.75rem; /* Equal padding for a square shape */
+        width: 40px; /* Fixed width for consistency */
+        height: 40px; /* Fixed height for consistency */
+      }
+
+      .button.button-icon-only i {
+        margin-right: 0; /* Remove margin for icon-only buttons */
+      }
+      /* Hover effect for icons */
+      .button.button-secondary:hover i {
+        color: #007bff; /* Change icon color to blue on hover */
+        transform: scale(1.1); /* Slightly enlarge the icon */
+        transition: all 0.2s ease;
+      }
+    </style>
   </head>
   <body>
     <header>
@@ -531,14 +619,43 @@
                 </tfoot>
               </table>
             </section>
+
+            <div class="footer-top">
+              <!-- Items Count -->
+              <div class="items-count">
+                <span id="itemsCount">5</span> items
+              </div>
+
+              <!-- Print and Download Buttons -->
+              <div class="footer-actions">
+                <button
+                  id="downloadBtn"
+                  class="button button-secondary button-icon-only"
+                  title="Download"
+                >
+                  <i class="fa-solid fa-download"></i>
+                </button>
+                <button
+                  id="printBtn"
+                  class="button button-secondary button-icon-only"
+                  title="Print"
+                >
+                  <i class="fa-solid fa-print"></i>
+                </button>
+              </div>
+            </div>
           </section>
 
-          <button
-            id="confirmTransactionBtn"
-            class="button button-primary button-medium"
-          >
-            CONFIRM ORDER
-          </button>
+          <div class="shopping-list-footer">
+            <!-- Top Row -->
+
+            <!-- Bottom Row -->
+            <div class="footer-bottom">
+              <button id="confirmTransactionBtn" class="button button-primary">
+                CONFIRM ORDER
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="right">
@@ -549,9 +666,9 @@
                 popovertarget="clientPopover"
                 class="clickable popover__title"
               >
+                <i class="fas fa-user"></i>
                 John Doe
               </h2>
-              <i class="fas fa-user"></i>
               <!-- Add an icon next to the clientName span -->
 
               <div id="clientPopover" class="popover card-style">
@@ -639,6 +756,18 @@
     <!-- <script type="module" src="selling3.js"></script> -->
     <script src="../../../scripts/common/Searchbar.js"></script>
 
+    <!--  Dynamic Items Count -->
+    <script>
+      // Function to update items count
+      function updateItemsCount() {
+        const shoppingList = document.getElementById("shopping-list");
+        const itemsCount = shoppingList.querySelectorAll("tbody tr").length;
+        document.getElementById("itemsCount").textContent = itemsCount;
+      }
+
+      // Call the function when the page loads or when items are added/removed
+      document.addEventListener("DOMContentLoaded", updateItemsCount);
+    </script>
     <!-- POPOVER script -->
     <script>
       document
