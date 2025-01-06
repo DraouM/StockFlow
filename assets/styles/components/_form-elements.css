@@ -92,6 +92,11 @@ input[type="radio"]:checked+label {
     border-color: #007bff;
 }
 
+input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
 /* Checkbox Styles
 input[type="checkbox"] {
     display: none;
