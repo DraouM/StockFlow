@@ -16,11 +16,15 @@ header {
 
 .container {
     display: flex;
+    justify-content: space-between;
+}
+
+.left {
+    flex: 4;
 }
 
 .container .shopping-section {
     width: 100%;
-    flex: 4;
 }
 
 .container .client-section {

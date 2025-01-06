@@ -232,12 +232,6 @@
         box-shadow: var(--card-shadow);
       }
 
-      .purchase-section {
-        max-width: 500px;
-        margin: 0 auto;
-        padding: 2rem;
-      }
-
       .section-title {
         font-size: 1.5rem;
         font-weight: 600;
@@ -369,6 +363,19 @@
         color: #007bff; /* Change icon color to blue on hover */
         transform: scale(1.1); /* Slightly enlarge the icon */
         transition: all 0.2s ease;
+      }
+    </style>
+
+    <!-- Discount -->
+    <style>
+      /* Form Styles */
+      .discount-container {
+        display: flex;
+        align-items: center;
+      }
+
+      .discount-input {
+        flex: 1; /* Allow the input to take up available space */
       }
     </style>
   </head>
@@ -633,14 +640,14 @@
                   class="button button-secondary button-icon-only"
                   title="Download"
                 >
-                  <i class="fa-solid fa-download"></i>
+                  <i class="bx bx-download"></i>
                 </button>
                 <button
                   id="printBtn"
                   class="button button-secondary button-icon-only"
                   title="Print"
                 >
-                  <i class="fa-solid fa-print"></i>
+                  <i class="bx bx-printer"></i>
                 </button>
               </div>
             </div>
@@ -692,23 +699,26 @@
             <h3 class="section-title">Purchase Details</h3>
             <form id="purchase-form" class="purchase-form">
               <!-- Total Amount -->
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <label class="form-label">Total Amount</label>
                 <span id="totalAmount" class="form-value">0.00</span>
-              </div>
+              </div> -->
 
               <!-- Discount -->
               <div class="form-group">
                 <label for="discount" class="form-label">Discount</label>
-                <input
-                  type="number"
-                  id="discount"
-                  name="discount"
-                  min="0"
-                  step="0.01"
-                  placeholder="Enter discount"
-                  class="form-input"
-                />
+                <div class="discount-container">
+                  <input
+                    type="text"
+                    id="discount-input"
+                    class="discount-input"
+                    placeholder="Sum"
+                    value="0"
+                  />
+                  <button id="apply-button" class="button button-primary">
+                    Apply
+                  </button>
+                </div>
               </div>
 
               <!-- Final Amount -->
@@ -718,7 +728,7 @@
               </div>
 
               <!-- Payment Amount -->
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <label for="paymentAmount" class="form-label"
                   >Payment Amount</label
                 >
@@ -732,13 +742,13 @@
                   placeholder="Enter payment amount"
                   class="form-input"
                 />
-              </div>
+              </div> -->
 
               <!-- Remaining Debt -->
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <label class="form-label">New Total Debt</label>
                 <span id="remainingDebt" class="form-value">0.00</span>
-              </div>
+              </div> -->
 
               <!-- Submit Button -->
               <button type="submit" class="submit-button" disabled>
