@@ -8,206 +8,234 @@
     <link rel="stylesheet" href="buying.css" />
   </head>
   <body>
-    <h1>Buying Page</h1>
+    <!-- Modals -->
 
-    <button data-modal="newProductModal" class="button button-secondary">
-      Create New Product
-    </button>
-
-    <div class="product-form">
-      <h2>Product Information</h2>
-      <form id="product-details-form">
-        <div class="form-section">
+    <div id="newProductModal" class="modal">
+      <form id="newProductForm" class="modal-content">
+        <span class="close-modal-btn">&times;</span>
+        <h2 class="modal-title">New Product</h2>
+        <div class="modal-body">
           <div class="form-group">
-            <label for="productName">Product Name</label>
-            <input type="text" id="productName" name="productName" required />
-          </div>
-          <div class="form-group">
-            <label for="quantityInUnit">Quantity (In Unit)</label>
+            <label for="productDesignation">Product Name</label>
             <input
-              type="number"
-              id="quantityInUnit"
-              name="quantityInUnit"
+              type="text"
+              id="productDesignation"
+              name="productDesignation"
+              value="kokaw"
               required
             />
+            <small class="form-text">Enter the name of the product.</small>
           </div>
-          <div class="form-group">
-            <label for="stockQauntity">Quantity (In Subunit)</label>
-            <input
-              type="number"
-              id="stockQauntity"
-              name="stockQauntity"
-              required
-            />
-          </div>
-        </div>
 
-        <div class="form-section buying-section">
-          <h3>Buying Information</h3>
           <div class="form-group">
-            <label for="buyingPrice">Buying Price</label>
+            <label for="productTaxes">Taxes (%)</label>
             <input
               type="number"
-              id="buyingPrice"
-              name="buyingPrice"
+              id="productTaxes"
+              name="productTaxes"
               step="0.01"
-              required
+              min="0"
+              value="1.2"
             />
+            <small class="form-text">
+              Enter the applicable tax percentage.
+            </small>
           </div>
-          <div class="form-group">
-            <label for="buyingTax">Buying Tax (%)</label>
-            <input
-              type="number"
-              id="buyingTax"
-              name="buyingTax"
-              step="0.01"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label for="totalBuyingPrice">Total Buying Price</label>
-            <input
-              type="number"
-              id="totalBuyingPrice"
-              name="totalBuyingPrice"
-              readonly
-            />
-          </div>
-        </div>
 
-        <div class="form-section selling-section">
-          <h3>Selling Information</h3>
           <div class="form-group">
-            <label for="sellingPrice">Selling Price</label>
+            <label for="subunitsInUnit">Subunits in 1 Unit</label>
             <input
-              type="number"
-              id="sellingPrice"
-              name="sellingPrice"
-              step="0.01"
+              type="text"
+              id="subunitsInUnit"
+              name="subunitsInUnit"
+              placeholder="e.g., 1 box contains 8 bottles"
+              value="6"
               required
             />
+            <small class="form-text">
+              Specify the number of subunits (e.g., bottles) in one unit (e.g.,
+              box).
+            </small>
           </div>
-          <div class="form-group">
-            <label for="sellingTax">Selling Tax (%)</label>
-            <input
-              type="number"
-              id="sellingTax"
-              name="sellingTax"
-              step="0.01"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label for="totalSellingPrice">Total Selling Price</label>
-            <input
-              type="number"
-              id="totalSellingPrice"
-              name="totalSellingPrice"
-              readonly
-            />
-          </div>
-        </div>
 
-        <div class="button-group">
           <button
-            type="button"
+            type="submit"
+            onclick="createNewProduct()"
             class="button button-secondary"
-            onclick="addToPurchaseList()"
           >
-            Add to Purchase List
+            Add Product
           </button>
         </div>
       </form>
     </div>
 
+    <div id="product-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal-btn">&times;</span>
+        <h2 class="modal-title">Buy a Product</h2>
+        <div class="modal-body">
+          <div class="search-container">
+            <form id="search-form" class="search-form">
+              <input
+                type="text"
+                class="search-input"
+                id="search-input"
+                placeholder="Search for a Product"
+                autocomplete="off"
+              />
+              <button type="submit" id="search-btn" class="search-btn">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22"
+                  height="23"
+                  viewBox="0 0 22 23"
+                  fill="none"
+                >
+                  <path
+                    d="M16.4998 16.9997L13.2515 13.7513M13.2515 13.7513C13.7728 13.2299 14.1864 12.611 14.4686 11.9298C14.7508 11.2486 14.896 10.5184 14.896 9.7811C14.896 9.04376 14.7508 8.31364 14.4686 7.63243C14.1864 6.95121 13.7728 6.33225 13.2515 5.81087C12.7301 5.28949 12.1111 4.87592 11.4299 4.59375C10.7487 4.31158 10.0186 4.16635 9.28125 4.16635C8.54391 4.16635 7.81379 4.31158 7.13258 4.59375C6.45137 4.87592 5.8324 5.28949 5.31102 5.81087C4.25806 6.86384 3.6665 8.29197 3.6665 9.7811C3.6665 11.2702 4.25806 12.6984 5.31102 13.7513C6.36399 14.8043 7.79213 15.3958 9.28125 15.3958C10.7704 15.3958 12.1985 14.8043 13.2515 13.7513Z"
+                    stroke="#5B5B5B"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </form>
+            <div id="search-results" class="search-results hidden">
+              <ul id="results-list"></ul>
+            </div>
+          </div>
+
+          <div class="product-form">
+            <form id="product-details-form">
+              <div class="form-section">
+                <h3>Product Information</h3>
+
+                <div class="form-group">
+                  <label for="productName">Product Name</label>
+                  <input
+                    type="text"
+                    id="productName"
+                    name="productName"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="quantityInUnit">Quantity (In Unit)</label>
+                  <input
+                    type="number"
+                    id="quantityInUnit"
+                    name="quantityInUnit"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="stockQauntity">Quantity (In Subunit)</label>
+                  <input
+                    type="number"
+                    id="stockQauntity"
+                    name="stockQauntity"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-section buying-section">
+                <h3>Buying Information</h3>
+                <div class="form-group">
+                  <label for="buyingPrice">Buying Price</label>
+                  <input
+                    type="number"
+                    id="buyingPrice"
+                    name="buyingPrice"
+                    step="0.01"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="buyingTax">Buying Tax (%)</label>
+                  <input
+                    type="number"
+                    id="buyingTax"
+                    name="buyingTax"
+                    step="0.01"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="totalBuyingPrice">Total Buying Price</label>
+                  <input
+                    type="number"
+                    id="totalBuyingPrice"
+                    name="totalBuyingPrice"
+                    readonly
+                  />
+                </div>
+              </div>
+
+              <div class="form-section selling-section">
+                <h3>Selling Information</h3>
+                <div class="form-group">
+                  <label for="sellingPrice">Selling Price</label>
+                  <input
+                    type="number"
+                    id="sellingPrice"
+                    name="sellingPrice"
+                    step="0.01"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="sellingTax">Selling Tax (%)</label>
+                  <input
+                    type="number"
+                    id="sellingTax"
+                    name="sellingTax"
+                    step="0.01"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="totalSellingPrice">Total Selling Price</label>
+                  <input
+                    type="number"
+                    id="totalSellingPrice"
+                    name="totalSellingPrice"
+                    readonly
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <footer>
+          <div class="button-group">
+            <button
+              type="button"
+              class="button button-secondary"
+              onclick="addToPurchaseList()"
+            >
+              Add to Purchase List
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- End Of Modals -->
+
+    <h1>Buying Page</h1>
+
+    <button data-modal="newProductModal" class="button button-secondary">
+      Create New Product
+    </button>
+    <button data-modal="product-modal" class="button button-secondary">
+      buy
+    </button>
+
     <main class="main-container">
       <section class="product-section">
         <!-- Your product search form here -->
-        <div class="search-container">
-          <form id="search-form" class="search-form">
-            <input
-              type="text"
-              class="search-input"
-              id="search-input"
-              placeholder="Search for a Product"
-              autocomplete="off"
-            />
-            <button type="submit" id="search-btn" class="search-btn">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="22"
-                height="23"
-                viewBox="0 0 22 23"
-                fill="none"
-              >
-                <path
-                  d="M16.4998 16.9997L13.2515 13.7513M13.2515 13.7513C13.7728 13.2299 14.1864 12.611 14.4686 11.9298C14.7508 11.2486 14.896 10.5184 14.896 9.7811C14.896 9.04376 14.7508 8.31364 14.4686 7.63243C14.1864 6.95121 13.7728 6.33225 13.2515 5.81087C12.7301 5.28949 12.1111 4.87592 11.4299 4.59375C10.7487 4.31158 10.0186 4.16635 9.28125 4.16635C8.54391 4.16635 7.81379 4.31158 7.13258 4.59375C6.45137 4.87592 5.8324 5.28949 5.31102 5.81087C4.25806 6.86384 3.6665 8.29197 3.6665 9.7811C3.6665 11.2702 4.25806 12.6984 5.31102 13.7513C6.36399 14.8043 7.79213 15.3958 9.28125 15.3958C10.7704 15.3958 12.1985 14.8043 13.2515 13.7513Z"
-                  stroke="#5B5B5B"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </button>
-          </form>
-          <div id="search-results" class="search-results hidden">
-            <ul id="results-list"></ul>
-          </div>
-        </div>
-
-        <!-- Your product details form here -->
-        <form id="product-details-form" class="product-details-form">
-          <!-- Product Name -->
-          <div class="form-group">
-            <label for="productName">Product Name</label>
-            <input
-              type="text"
-              id="productName"
-              name="productName"
-              required
-              readonly
-            />
-            <small class="form-text">Enter the name of the product.</small>
-          </div>
-
-          <!-- Product Quantity -->
-          <div class="form-group">
-            <label for="quantity">Quantity</label>
-            <input type="number" id="quantity" name="quantity" required />
-            <small class="form-text">Enter the quantity of the product.</small>
-          </div>
-
-          <!-- Unit Price -->
-          <div class="form-group">
-            <label for="unitPrice">Unit Price</label>
-            <input type="number" id="unitPrice" name="unitPrice" required />
-            <small class="form-text">The price per unit of the product.</small>
-          </div>
-
-          <!-- Total Price (Quantity * Unit Price) -->
-          <div class="form-group">
-            <label for="totalPrice">Total Price</label>
-            <input
-              type="number"
-              id="totalPrice"
-              name="totalPrice"
-              required
-              readonly
-            />
-            <small class="form-text"
-              >Total cost based on quantity and unit price.</small
-            >
-          </div>
-
-          <!-- ADD to list Button -->
-          <button
-            type="button"
-            onclick="addToShoppingList()"
-            class="button button-secondary"
-          >
-            Add to List
-          </button>
-        </form>
 
         <!-- Your shopping list here -->
         <div id="shopping-list-container" class="shopping-list-container">
@@ -403,73 +431,6 @@
       </section>
     </main>
 
-    <!-- CHECK LATER !! -->
-    <div id="newProductModal" class="modal">
-      <form id="newProductForm" class="modal-content">
-        <span class="close">&times;</span>
-        <div class="form-group">
-          <label for="productDesignation">Product Name</label>
-          <input
-            type="text"
-            id="productDesignation"
-            name="productDesignation"
-            value="kokaw"
-            required
-          />
-          <small class="form-text">Enter the name of the product.</small>
-        </div>
-
-        <div class="form-group">
-          <label for="productTaxes">Taxes (%)</label>
-          <input
-            type="number"
-            id="productTaxes"
-            name="productTaxes"
-            step="0.01"
-            min="0"
-            value="1.2"
-          />
-          <small class="form-text">
-            Enter the applicable tax percentage.
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label for="subunitsInUnit">Subunits in 1 Unit</label>
-          <input
-            type="text"
-            id="subunitsInUnit"
-            name="subunitsInUnit"
-            placeholder="e.g., 1 box contains 8 bottles"
-            value="6"
-            required
-          />
-          <small class="form-text">
-            Specify the number of subunits (e.g., bottles) in one unit (e.g.,
-            box).
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label for="productDescription">Description (Optional)</label>
-          <textarea
-            id="productDescription"
-            name="productDescription"
-            placeholder="Product first creation"
-            rows="3"
-          ></textarea>
-        </div>
-
-        <button
-          type="submit"
-          onclick="createNewProduct()"
-          class="button button-secondary"
-        >
-          Add Product
-        </button>
-      </form>
-    </div>
-
     <script src="../../../scripts/common/Searchbar.js"></script>
     <script src="../../../assets/js/modal.js"></script>
     <script src="buying.js"></script>
@@ -497,7 +458,6 @@
             productName: productDesignation,
             taxes: productTaxes,
             subunitsInUnit: subunitsInUnit,
-            // description: productDescription, -- ADD LATER WHEN CREATING THE PROFUCT HISTORY
           };
 
           console.log("ProductData ", productData);
