@@ -208,10 +208,68 @@ header {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
+    flex-wrap: wrap;
+    /*to make the buttons group under the 2 sections*/
+
+}
+
+/* Quantity Group */
+.quantity-group .quantity-row {
+    display: flex;
+    align-items: flex-end;
+    /* Align items vertically */
+    justify-content: space-between;
+    gap: 8px;
+    /* Add consistent spacing */
+}
+
+.quantity-row span {
+    display: flex;
+    /* Ensures proper alignment */
+    align-items: center;
+    /* Center the text vertically */
+    justify-content: center;
+    /* Center text horizontally */
+    font-weight: bold;
+    /* Optional: Make the "12" more prominent */
+    color: #555;
+    /* Optional: Add a consistent color for clarity */
+    padding: .25rem 0;
+    /*OPtional: center the span vertically  with the labels*/
+}
+
+.quantity-col {
+    flex: 1;
+}
+
+.quantity-col label {
+    margin-bottom: 0.25rem;
+}
+
+.quantity-col input {
+    text-align: center;
+}
+
+.form-section.right .bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.button-group-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .form-section {
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
     padding: 15px;
     border: 1px solid #ddd;
     border-radius: 5px;

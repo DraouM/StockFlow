@@ -9,10 +9,13 @@ import ShoppingListManager from "../ShoppingListManager.js"; // Import the class
 const shoppingList = new ShoppingList(formManager, modalManager); // Create an instance
 const shoppingListManager = new ShoppingListManager(shoppingList); // Create an instance
 
+// Extend the shopping list to handle buying-specific fields
+
 document.addEventListener("DOMContentLoaded", () => initializePage());
 
 function initializePage() {
   initializeProductSearch();
+  initializeProductForm();
 }
 
 function initializeProductSearch() {
@@ -26,11 +29,14 @@ function initializeProductSearch() {
     const productDataEx = {
       productId: selectedProduct.id,
       productName: selectedProduct.name,
-      unitPrice: selectedProduct.selling_price,
-      quantityUnit: selectedProduct.subunit_in_unit,
+      quantityInUnit: selectedProduct.total_stock,
+      stockQuantity: selectedProduct.subunit_in_unit,
+      buyingPrice: selectedProduct.buying_price,
+      taxes: selectedProduct.tax_rate,
+      sellingPrice: selectedProduct.selling_price,
     };
 
-    formManager.populate("buying-form", productDataEx);
+    formManager.populate("product-details-form", productDataEx);
   };
 
   const productSearchbar = new Searchbar(
@@ -44,13 +50,13 @@ function initializeProductSearch() {
 }
 
 function initializeProductForm() {
-  const productFormId = "purchase-form";
+  const productFormId = "product-details-form";
 
   formManager.init(productFormId, {
     rules: {
       productName: { required: true, minLength: 2 },
       // quantity: { required: true, min: 1 },
-      subUnits: { required: true, min: 1 },
+      // subUnits: { required: true, min: 1 },
       // unitPrice: { required: true, min: 0.01 },
     },
 
@@ -58,15 +64,21 @@ function initializeProductForm() {
       console.log({ formData });
 
       // const quantityUnit = document.getElementById("quantityUnit").textContent;
-      // const product = {
-      //   productId: formData.productId,
-      //   productName: formData.productName,
-      //   quantity: formData.quantity,
-      //   subUnits: formData.subUnits,
-      //   unitPrice: formData.unitPrice,
-      //   quantityUnit,
-      // };
-      // shoppingListManager.addProduct(product); // Use the class instance
+      const product = {
+        productId: formData.productId,
+        productName: formData.productName,
+        quantity: formData.quantity,
+        subUnits: formData.subUnits,
+        unitPrice: formData.unitPrice,
+        quantityUnit,
+      };
+
+      try {
+        shoppingListManager.addProduct(product);
+      } catch (error) {
+        console.error("Error adding product:", error);
+        NotificationManager.showError("Failed to add product");
+      }
     },
 
     onUpdate: (product) => {

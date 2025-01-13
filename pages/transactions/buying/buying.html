@@ -75,11 +75,11 @@
         <h2 class="modal-title">Buy a Product</h2>
         <div class="modal-body">
           <div class="search-container">
-            <form id="search-form" class="search-form">
+            <form id="search-product-form" class="search-form">
               <input
                 type="text"
                 class="search-input"
-                id="search-input"
+                id="search-product-input"
                 placeholder="Search for a Product"
                 autocomplete="off"
               />
@@ -101,15 +101,19 @@
                 </svg>
               </button>
             </form>
-            <div id="search-results" class="search-results hidden">
-              <ul id="results-list"></ul>
+            <div id="search-product-results" class="search-results hidden">
+              <ul id="product-results-list"></ul>
             </div>
           </div>
 
           <div class="product-form">
             <form id="product-details-form">
-              <div class="form-section">
+              <div class="form-section left">
                 <h3>Product Information</h3>
+                <div class="form-group">
+                  <label for="productId">Product Id</label>
+                  <input type="text" id="productId" name="productId" required />
+                </div>
 
                 <div class="form-group">
                   <label for="productName">Product Name</label>
@@ -120,105 +124,114 @@
                     required
                   />
                 </div>
+
                 <div class="form-group">
-                  <label for="quantityInUnit">Quantity (In Unit)</label>
-                  <input
-                    type="number"
-                    id="quantityInUnit"
-                    name="quantityInUnit"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="stockQauntity">Quantity (In Subunit)</label>
+                  <label for="stockQuantity">Quantity (In Subunit)</label>
                   <input
                     type="number"
                     id="stockQauntity"
-                    name="stockQauntity"
+                    name="stockQuantity"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="taxes"> Tax (%)</label>
+                  <input
+                    type="number"
+                    id="taxes"
+                    name="taxes"
+                    step="0.01"
                     required
                   />
                 </div>
               </div>
 
-              <div class="form-section buying-section">
-                <h3>Buying Information</h3>
-                <div class="form-group">
-                  <label for="buyingPrice">Buying Price</label>
-                  <input
-                    type="number"
-                    id="buyingPrice"
-                    name="buyingPrice"
-                    step="0.01"
-                    required
-                  />
+              <div class="form-section right">
+                <h3>Product Information</h3>
+
+                <div class="top">
+                  <div class="form-group quantity-group">
+                    <!-- <label>Quantity</label> -->
+                    <div class="quantity-row">
+                      <div class="quantity-col">
+                        <label for="quantity">Quantity</label>
+                        <input type="text" id="quantity" name="quantity" />
+                      </div>
+                      <span>* <span id="quantityUnit">01</span> =</span>
+                      <div class="quantity-col">
+                        <label for="subUnits">Sub Units</label>
+                        <input type="text" id="subUnits" name="subUnits" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <label for="buyingTax">Buying Tax (%)</label>
-                  <input
-                    type="number"
-                    id="buyingTax"
-                    name="buyingTax"
-                    step="0.01"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="totalBuyingPrice">Total Buying Price</label>
-                  <input
-                    type="number"
-                    id="totalBuyingPrice"
-                    name="totalBuyingPrice"
-                    readonly
-                  />
+                <div class="bottom">
+                  <div class="form-section buying-section">
+                    <h3>Buying Information</h3>
+                    <div class="form-group">
+                      <label for="buyingPrice">Buying Price</label>
+                      <input
+                        type="number"
+                        id="buyingPrice"
+                        name="buyingPrice"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="totalBuyingPrice">Total Buying Price</label>
+                      <input
+                        type="number"
+                        id="totalBuyingPrice"
+                        name="totalBuyingPrice"
+                        readonly
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-section selling-section">
+                    <h3>Selling Information</h3>
+
+                    <div class="form-group">
+                      <label for="sellingPrice">Selling Price</label>
+                      <input
+                        type="number"
+                        id="sellingPrice"
+                        name="sellingPrice"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="totalSellingPrice">Total Selling Price</label>
+                      <input
+                        type="number"
+                        id="totalSellingPrice"
+                        name="totalSellingPrice"
+                        readonly
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              <div class="form-section selling-section">
-                <h3>Selling Information</h3>
-                <div class="form-group">
-                  <label for="sellingPrice">Selling Price</label>
-                  <input
-                    type="number"
-                    id="sellingPrice"
-                    name="sellingPrice"
-                    step="0.01"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="sellingTax">Selling Tax (%)</label>
-                  <input
-                    type="number"
-                    id="sellingTax"
-                    name="sellingTax"
-                    step="0.01"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="totalSellingPrice">Total Selling Price</label>
-                  <input
-                    type="number"
-                    id="totalSellingPrice"
-                    name="totalSellingPrice"
-                    readonly
-                  />
+              <div class="button-group-wrapper">
+                <div class="button-group">
+                  <button
+                    type="submit"
+                    class="button button-secondary"
+                    id="add-to-list-btn"
+                  >
+                    Add to Purchase List
+                  </button>
                 </div>
               </div>
             </form>
           </div>
         </div>
-        <footer>
-          <div class="button-group">
-            <button
-              type="button"
-              class="button button-secondary"
-              onclick="addToPurchaseList()"
-            >
-              Add to Purchase List
-            </button>
-          </div>
-        </footer>
+        <footer></footer>
       </div>
     </div>
 
@@ -235,8 +248,6 @@
 
     <main class="main-container">
       <section class="product-section">
-        <!-- Your product search form here -->
-
         <!-- Your shopping list here -->
         <div id="shopping-list-container" class="shopping-list-container">
           <h3>Shopping List</h3>
@@ -433,7 +444,7 @@
 
     <script src="../../../scripts/common/Searchbar.js"></script>
     <script src="../../../assets/js/modal.js"></script>
-    <script src="buying.js"></script>
+    <script type="module" src="buying.js"></script>
 
     <!-- Handle the creation of new product -->
     <script>
@@ -450,8 +461,6 @@
           const subunitsInUnit = parseInt(
             document.getElementById("subunitsInUnit").value
           );
-          const productDescription =
-            document.getElementById("productDescription").value || "";
 
           // Create the product data object
           const productData = {
@@ -463,9 +472,7 @@
           console.log("ProductData ", productData);
 
           try {
-            const result = await window.electronAPI.products.create(
-              productData
-            );
+            const result = await window.productsAPI.createProduct(productData);
 
             if (result.success) {
               console.log("Product created successfully with ID:", result.id);
@@ -528,7 +535,7 @@
     </script>
 
     <!-- The new product form implemnetaion -->
-    <script>
+    <!-- <script>
       // Function to calculate total prices
       function calculateTotals() {
         const quantity =
@@ -571,6 +578,6 @@
         // Implement your logic here
         alert("Product added to purchase list");
       }
-    </script>
+    </script> -->
   </body>
 </html>
