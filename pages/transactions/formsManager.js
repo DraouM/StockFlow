@@ -8,16 +8,26 @@ const formManager = {
       form.addEventListener("submit", (event) =>
         this.handleSubmit(event, formId)
       );
+    } else {
+      console.log("Form Not Submited!!");
     }
   },
 
   populate(formId, data) {
     console.log("Data to populate ", data);
 
-    const form = document.getElementById(formId);
+    console.log(`Populating form with id: ${formId}`);
 
-    document.getElementById("quantityUnit").textContent =
-      data.quantityUnit.toString().padStart(2, "0");
+    const form = document.getElementById(formId);
+    console.log(`Form element: ${form}`);
+
+    if (!form) {
+      console.error(`Form element not found with id: ${formId}`);
+      return;
+    }
+    document.getElementById("quantityUnit").textContent = data.quantityUnit
+      .toString()
+      .padStart(2, "0");
     Object.keys(data).forEach((key) => {
       const input = form.querySelector(`[name="${key}"]`);
       if (input) {
@@ -64,6 +74,8 @@ const formManager = {
 
   handleSubmit(event, formId) {
     event.preventDefault();
+
+    console.log("There is a problem");
 
     // Validate the form before proceeding
     if (this.validate(formId)) {
