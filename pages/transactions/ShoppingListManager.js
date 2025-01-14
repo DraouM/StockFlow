@@ -1,9 +1,15 @@
 import ShoppingList from "./ShoppingList.js";
+import BuyingShoppingList from "./buyingShoppingList.js";
 
 class ShoppingListManager {
   constructor(shoppingList) {
-    if (!(shoppingList instanceof ShoppingList)) {
-      throw new Error("ShoppingListManager requires a ShoppingList instance");
+    if (
+      !(shoppingList instanceof ShoppingList) &&
+      !(shoppingList instanceof BuyingShoppingList)
+    ) {
+      throw new Error(
+        "ShoppingListManager requires a ShoppingList or BuyingShoppingList instance"
+      );
     }
 
     this.shoppingList = shoppingList;
@@ -82,19 +88,21 @@ class ShoppingListManager {
     if (productIndex !== -1) {
       // Ensure tempId is preserved
       updatedProduct.tempId = productTempId;
-
       this.changeLog.push({ type: "update", product: updatedProduct });
 
-      // check if the product is already updated
+      // Check if the product is already in updated list
       const foundItemIndex = this.listeners.productUpdated.findIndex(
         (product) => product.tempId === productTempId
       );
-      if (foundItemIndex !== -1) {
-        console.log("The Item is updated!!");
-        this.listeners.productUpdated[foundItemIndex] = updatedProduct;
-      } else {
-        console.log("The Item is updated AGAIN!!");
+
+      if (foundItemIndex === -1) {
+        // New update - add to list
+        console.log("Adding new update");
         this.listeners.productUpdated.push(updatedProduct);
+      } else {
+        // Existing update - replace in list
+        console.log("Updating existing update");
+        this.listeners.productUpdated[foundItemIndex] = updatedProduct;
       }
 
       console.log(
@@ -121,6 +129,7 @@ class ShoppingListManager {
     }
 
     this.shoppingList.updateProduct(productTempId, updatedProduct);
+    console.log("UPDATED products ", this.listeners.productUpdated); // Output: true
   }
 
   clearList() {

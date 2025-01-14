@@ -3,10 +3,10 @@ import modalManager from "../modalManager.js";
 import formManager from "../formsManager.js";
 import NotificationManager from "../notificationManager.js";
 // import { UtilityHelpers } from "./utilityHelpers.js";
-import ShoppingList from "../ShoppingList.js"; // Import the class
+import BuyingShoppingList from "../buyingShoppingList.js"; // Import the class
 import ShoppingListManager from "../ShoppingListManager.js"; // Import the class
 
-const shoppingList = new ShoppingList(formManager, modalManager); // Create an instance
+const shoppingList = new BuyingShoppingList(formManager, modalManager); // Create an instance
 const shoppingListManager = new ShoppingListManager(shoppingList); // Create an instance
 
 // Extend the shopping list to handle buying-specific fields
@@ -69,16 +69,17 @@ function initializeProductForm() {
         productName: formData.productName,
         quantity: formData.quantity,
         subUnits: formData.subUnits,
-        unitPrice: formData.unitPrice,
-        quantityUnit,
+        sellingPrice: formData.sellingPrice,
+        buyingPrice: formData.buyingPrice,
+        taxes: formData.taxes,
       };
 
-      try {
-        shoppingListManager.addProduct(product);
-      } catch (error) {
-        console.error("Error adding product:", error);
-        NotificationManager.showError("Failed to add product");
-      }
+      shoppingListManager.addProduct(product);
+      // try {
+      // } catch (error) {
+      //   console.error("Error adding product:", error);
+      //   NotificationManager.showError("Failed to add product");
+      // }
     },
 
     onUpdate: (product) => {
