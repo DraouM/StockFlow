@@ -6,6 +6,51 @@
     <title>Document</title>
     <link rel="stylesheet" href="../../../assets/styles/main.css" />
     <link rel="stylesheet" href="buying.css" />
+
+    <!-- Style the quantity and the circler nums -->
+    <style>
+      /* first row */
+      .number-circle {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #adbdc7;
+        text-align: center;
+        line-height: 30px;
+        font-size: 16px;
+      }
+
+      /* Quantity Column Styling */
+      .quantity {
+        display: flex;
+        align-items: center;
+        /* Center-align both parts vertically */
+        justify-content: flex-end;
+        /* Space between main and sub-quantity */
+        gap: 8px;
+      }
+
+      /* Main Quantity */
+      .main-quantity {
+        font-size: 16px;
+        font-weight: normal;
+        color: #333;
+      }
+
+      /* Sub Quantity */
+      .sub-quantity {
+        font-size: 12px;
+        font-weight: bold;
+        color: red;
+        border: 1px solid red;
+        background-color: white;
+        /* Highlighted background */
+        padding: 2px 4px;
+        border-radius: 5px;
+        /* Rounded corners */
+      }
+    </style>
   </head>
   <body>
     <!-- Modals -->
@@ -242,7 +287,11 @@
     <button data-modal="newProductModal" class="button button-secondary">
       Create New Product
     </button>
-    <button data-modal="product-modal" class="button button-secondary">
+    <button
+      data-modal="product-modal"
+      id="product-modal-btn"
+      class="button button-secondary"
+    >
       buy
     </button>
 
@@ -256,8 +305,12 @@
               <tr>
                 <th>Product</th>
                 <th>Quantity</th>
-                <th>Unit Price</th>
+                <th>Units</th>
+                <th>Buying P</th>
+                <th>subTotal</th>
+                <th>Taxes</th>
                 <th>Total</th>
+                <th>Selling P</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -286,164 +339,10 @@
           Confirm Transaction
         </button>
       </section>
-
-      <section class="supplier-section">
-        <div class="supplier-info-section">
-          <h2>Supplier Searchbar</h2>
-          <!-- Your supplier search form here -->
-          <div class="search-container">
-            <form id="search-form-supplier" class="search-form">
-              <input
-                type="text"
-                class="search-input"
-                id="search-input-supplier"
-                placeholder="Search for a supplier"
-                autocomplete="off"
-              />
-              <button type="submit" id="search-btn-supplier" class="search-btn">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="22"
-                  height="23"
-                  viewBox="0 0 22 23"
-                  fill="none"
-                >
-                  <path
-                    d="M16.4998 16.9997L13.2515 13.7513M13.2515 13.7513C13.7728 13.2299 14.1864 12.611 14.4686 11.9298C14.7508 11.2486 14.896 10.5184 14.896 9.7811C14.896 9.04376 14.7508 8.31364 14.4686 7.63243C14.1864 6.95121 13.7728 6.33225 13.2515 5.81087C12.7301 5.28949 12.1111 4.87592 11.4299 4.59375C10.7487 4.31158 10.0186 4.16635 9.28125 4.16635C8.54391 4.16635 7.81379 4.31158 7.13258 4.59375C6.45137 4.87592 5.8324 5.28949 5.31102 5.81087C4.25806 6.86384 3.6665 8.29197 3.6665 9.7811C3.6665 11.2702 4.25806 12.6984 5.31102 13.7513C6.36399 14.8043 7.79213 15.3958 9.28125 15.3958C10.7704 15.3958 12.1985 14.8043 13.2515 13.7513Z"
-                    stroke="#5B5B5B"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </button>
-            </form>
-            <div id="search-results-supplier" class="search-results hidden">
-              <ul id="results-list-supplier"></ul>
-            </div>
-          </div>
-
-          <!-- Your supplier details form here -->
-          <form id="supplier-details-form" class="supplier-details-form">
-            <!-- supplier Name -->
-            <div class="form-group">
-              <label for="supplierName">supplier Name</label>
-              <input
-                type="text"
-                id="supplierName"
-                name="supplierName"
-                required
-                readonly
-              />
-            </div>
-
-            <!-- Product Quantity -->
-            <div class="form-group">
-              <label for="supplierAddress">supplier Adrress</label>
-              <input
-                type="text"
-                id="supplierAddress"
-                name="supplierAddress"
-                required
-                readonly
-              />
-            </div>
-
-            <!-- supplier Phone -->
-            <div class="form-group">
-              <label for="supplierPhone">supplier Phone</label>
-              <input
-                type="text"
-                id="supplierPhone"
-                name="supplierPhone"
-                required
-                readonly
-              />
-            </div>
-
-            <!--supplier Total Debt -->
-            <div class="form-group">
-              <label for="supplierDebt">supplier Debt</label>
-              <input
-                type="number"
-                id="supplierDebt"
-                name="supplierDebt"
-                required
-                readonly
-              />
-            </div>
-
-            <!-- Submit Button -->
-            <button type="submit" class="button button-secondary">
-              Submit
-            </button>
-          </form>
-        </div>
-
-        <!-- Payment -->
-        <div class="purchase-section">
-          <h3>Purchase Details</h3>
-          <form id="purchase-form" class="purchase-form">
-            <div class="form-group">
-              <label for="totalAmount">Total Amount</label>
-              <input
-                type="number"
-                id="totalAmount"
-                name="totalAmount"
-                required
-                readonly
-              />
-            </div>
-            <div class="form-group">
-              <label for="discount">Discount</label>
-              <input
-                type="number"
-                id="discount"
-                name="discount"
-                min="0"
-                step="0.01"
-              />
-            </div>
-            <div class="form-group">
-              <label for="finalAmount">Final Amount</label>
-              <input
-                type="number"
-                id="finalAmount"
-                name="finalAmount"
-                required
-                readonly
-              />
-            </div>
-            <div class="form-group">
-              <label for="paymentAmount">Payment Amount</label>
-              <input
-                type="number"
-                id="paymentAmount"
-                name="paymentAmount"
-                required
-                min="0"
-                step="0.01"
-              />
-            </div>
-            <div class="form-group">
-              <label for="remainingDebt">New Total Debt</label>
-              <input
-                type="number"
-                id="remainingDebt"
-                name="remainingDebt"
-                readonly
-              />
-            </div>
-            <button type="submit" class="button button-secondary">
-              Complete Purchase
-            </button>
-          </form>
-        </div>
-      </section>
     </main>
 
     <script src="../../../scripts/common/Searchbar.js"></script>
-    <script src="../../../assets/js/modal.js"></script>
+    <!-- <script src="../../../assets/js/modal.js"></script>  -->
     <script type="module" src="buying.js"></script>
 
     <!-- Handle the creation of new product -->
@@ -487,97 +386,333 @@
         });
     </script>
 
-    <!-- supplier form handler -->
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const fetchParties = async (searchTerm) => {
-          return await window.electronAPI.parties.searchParty(
-            "supplier",
-            searchTerm
+    <!-- Porduct Form Handler -->
+    <!-- <script type="module">
+      const QuantityPriceManager = {
+        // Store DOM elements and values
+        elements: {
+          quantityInput: null,
+          subUnitInput: null,
+          subUnitsSpan: null,
+          quantityUnitSpan: null,
+        },
+
+        // Initialize the manager
+        init() {
+          // Get all required elements
+          this.elements = {
+            quantityInput: document.getElementById("quantity"),
+            subUnitInput: document.getElementById("subUnits"),
+            subUnitsSpan: document.getElementById("subunits-span"),
+            quantityUnitSpan: document.getElementById("quantityUnit"),
+          };
+
+          // Validate that all elements exist
+          for (const [key, element] of Object.entries(this.elements)) {
+            if (!element) {
+              console.error(`Required element ${key} not found`);
+              return false;
+            }
+          }
+
+          this.setupEventListeners();
+          this.initializeValues();
+          return true;
+        },
+
+        // Fetch the latest value of quantityUnit
+        getQuantityUnit() {
+          return parseInt(this.elements.quantityUnitSpan.textContent, 10);
+        },
+
+        // Set up all event listeners
+        setupEventListeners() {
+          // Quantity input handler
+          this.elements.quantityInput.addEventListener("input", (e) => {
+            this.handleQuantityInput(e.target.value);
+          });
+
+          // Add space and tab key handlers for quantity input
+          this.elements.quantityInput.addEventListener("keydown", (e) => {
+            // Check if the pressed key is Space or Tab
+            if (e.key === " " || e.key === "Tab") {
+              const value = e.target.value.trim();
+
+              // Only proceed if there's no & already and the value is a valid number
+              if (!value.includes("&") && /^\d+$/.test(value)) {
+                e.preventDefault(); // Prevent default space/tab behavior
+                this.elements.quantityInput.value = value + " & ";
+
+                // If it was a tab key, keep focus in the input
+                if (e.key === "Tab") {
+                  const cursorPosition =
+                    this.elements.quantityInput.value.length;
+                  this.elements.quantityInput.setSelectionRange(
+                    cursorPosition,
+                    cursorPosition
+                  );
+                }
+              }
+            }
+          });
+
+          // Add handler for sub-unit input
+          this.elements.subUnitInput.addEventListener("input", (e) => {
+            const subUnits = parseInt(e.target.value);
+            if (!isNaN(subUnits)) {
+              const quantityStr = this.convertSubUnitsToQuantity(
+                subUnits,
+                this.getQuantityUnit()
+              );
+              this.elements.quantityInput.value = quantityStr;
+              this.elements.subUnitsSpan.textContent = subUnits;
+            }
+          });
+        },
+
+        // Initialize starting values
+        initializeValues() {
+          if (this.elements.quantityInput.value) {
+            this.handleQuantityInput(this.elements.quantityInput.value);
+          }
+        },
+
+        // Handle quantity input changes
+        handleQuantityInput(value) {
+          const isValid = this.isValidQuantityFormat(value);
+
+          if (isValid) {
+            const totalSubUnits = this.calculateTotalSubUnits(
+              value,
+              this.getQuantityUnit()
+            );
+            // Update both sub-unit displays
+            this.updateSubUnits(totalSubUnits);
+
+            // If the input doesn't match the calculated format, update it
+            const calculatedQuantity = this.convertSubUnitsToQuantity(
+              totalSubUnits,
+              this.getQuantityUnit()
+            );
+            if (value.trim() !== calculatedQuantity) {
+              this.elements.quantityInput.value = calculatedQuantity;
+            }
+          } else {
+            this.updateSubUnits("");
+          }
+        },
+
+        // Update sub-units in both locations
+        updateSubUnits(value) {
+          this.elements.subUnitInput.value = value;
+          this.elements.subUnitsSpan.textContent = value;
+        },
+
+        // Utility Methods
+        isValidQuantityFormat(value) {
+          // Regex to match valid quantity formats like "1", "2", "1 & 2"
+          const quantityRegex = /^(\d+(\s*&\s*\d+)?)\s*$/;
+          return quantityRegex.test(value.trim());
+        },
+
+        calculateTotalSubUnits(quantityStr, quantityUnit) {
+          // Split the quantity string and calculate total sub-units
+          const quantities = quantityStr
+            .split("&")
+            .map((q) => parseInt(q.trim()));
+          return quantities.reduce(
+            (total, qty) => total + qty * quantityUnit,
+            0
           );
-        };
+        },
 
-        const onPartySelected = (selectedSupplier) => {
-          console.log("Supplier selected:", selectedSupplier);
-          // You can add custom behavior for what happens when a product is selected.
-          // For example, you might want to fill another input field or redirect the user.
-          displaySelectedSupplier(selectedSupplier);
-        };
+        convertSubUnitsToQuantity(subUnits, quantityUnit) {
+          // Convert total sub-units back to quantity format
+          const wholeUnits = Math.floor(subUnits / quantityUnit);
+          const remainingSubUnits = subUnits % quantityUnit;
 
-        // Form handler
-        function displaySelectedSupplier(supplier) {
-          // Get form input elements
-          const supplierNameInput = document.getElementById("supplierName");
-          const supplierAddressInput =
-            document.getElementById("supplierAddress");
-          const supplierPhoneInput = document.getElementById("supplierPhone");
-          const supplierDebtInput = document.getElementById("supplierDebt");
+          if (remainingSubUnits > 0) {
+            return `${wholeUnits} & ${remainingSubUnits}`;
+          }
+          return wholeUnits.toString();
+        },
 
-          // Store the supplier ID in the data attribute
-          supplierNameInput.dataset.supplierId = supplier.party_id;
-          // Populate form inputs with selected product data
-          supplierNameInput.value = supplier.name || "";
-          supplierAddressInput.value = supplier.address || "";
-          supplierPhoneInput.value = supplier.phone || "";
-          supplierDebtInput.value = supplier.total_debt || 0.0;
-        }
+        // Get current values (for form submission)
+        getValues() {
+          return {
+            quantity: this.elements.quantityInput.value,
+            subUnits: parseInt(this.elements.subUnitInput.value) || 0,
+          };
+        },
+      };
 
-        // Create an instance of the Searchbar class
-        const supplierSearchbar = new Searchbar(
-          "search-input-supplier", // Input field ID
-          "results-list-supplier", // Results list ID
-          "search-form-supplier", // Search form ID
-          "search-results-supplier", // Results div ID
-          fetchParties, // Fetch function for searching products
-          onPartySelected // Callback when a product is selected
-        );
+      // Initialize when document loads
+      document.addEventListener("DOMContentLoaded", () => {
+        QuantityPriceManager.init();
+      });
+    </script> -->
+
+    <script type="module">
+      import { UtilityHelpers } from "../selling//utilityHelpers.js";
+
+      const QuantityPriceManager = {
+        // Store DOM elements and values
+        elements: {
+          quantityInput: null,
+          subUnitInput: null,
+          quantityUnitSpan: null,
+        },
+
+        // Initialize the manager
+        init() {
+          // Get all required elements
+          this.elements = {
+            quantityInput: document.getElementById("quantity"),
+            subUnitInput: document.getElementById("subUnits"),
+            quantityUnitSpan: document.getElementById("quantityUnit"),
+          };
+
+          // Validate that all elements exist
+          for (const [key, element] of Object.entries(this.elements)) {
+            if (!element) {
+              console.error(`Required element ${key} not found`);
+              return false;
+            }
+          }
+
+          this.setupEventListeners();
+          this.initializeValues();
+          return true;
+        },
+
+        // Fetch the latest value of quantityUnit
+        getQuantityUnit() {
+          return parseInt(this.elements.quantityUnitSpan.textContent, 10);
+        },
+
+        // Set up all event listeners
+        setupEventListeners() {
+          // Quantity input handler
+          this.elements.quantityInput.addEventListener("input", (e) => {
+            this.handleQuantityInput(e.target.value);
+          });
+
+          // Add space and tab key handlers for quantity input
+          this.elements.quantityInput.addEventListener("keydown", (e) => {
+            // Check if the pressed key is Space or Tab
+            if (e.key === " " || e.key === "Tab") {
+              const value = e.target.value.trim();
+
+              // Only proceed if there's no & already and the value is a valid number
+              if (!value.includes("&") && /^\d+$/.test(value)) {
+                e.preventDefault(); // Prevent default space/tab behavior
+                this.elements.quantityInput.value = value + " & ";
+
+                // If it was a tab key, keep focus in the input
+                if (e.key === "Tab") {
+                  const cursorPosition =
+                    this.elements.quantityInput.value.length;
+                  this.elements.quantityInput.setSelectionRange(
+                    cursorPosition,
+                    cursorPosition
+                  );
+                }
+              }
+            }
+          });
+
+          // Add handler for sub-unit input
+          this.elements.subUnitInput.addEventListener("input", (e) => {
+            const subUnits = parseInt(e.target.value);
+            if (!isNaN(subUnits)) {
+              const quantityStr = this.convertSubUnitsToQuantity(
+                subUnits,
+                this.getQuantityUnit()
+              );
+              this.elements.quantityInput.value = quantityStr;
+            }
+          });
+        },
+
+        // Initialize starting values
+        initializeValues() {
+          if (this.elements.quantityInput.value) {
+            this.handleQuantityInput(this.elements.quantityInput.value);
+          }
+        },
+
+        // Handle quantity input changes
+        handleQuantityInput(value) {
+          const isValid = this.isValidQuantityFormat(value);
+
+          if (isValid) {
+            const totalSubUnits = this.calculateTotalSubUnits(
+              value,
+              this.getQuantityUnit()
+            );
+            // Update sub-unit input
+            this.updateSubUnits(totalSubUnits);
+
+            // If the input doesn't match the calculated format, update it
+            const calculatedQuantity = this.convertSubUnitsToQuantity(
+              totalSubUnits,
+              this.getQuantityUnit()
+            );
+            if (value.trim() !== calculatedQuantity) {
+              this.elements.quantityInput.value = calculatedQuantity;
+            }
+          } else {
+            this.updateSubUnits("");
+          }
+        },
+
+        // Update sub-units in the input
+        updateSubUnits(value) {
+          this.elements.subUnitInput.value = value;
+        },
+
+        // Utility Methods
+        isValidQuantityFormat(value) {
+          // Regex to match valid quantity formats like "1", "2", "1 & 2"
+          const quantityRegex = /^(\d+(\s*&\s*\d+)?)\s*$/;
+          return quantityRegex.test(value.trim());
+        },
+
+        calculateTotalSubUnits(quantityStr, quantityUnit) {
+          // Split the quantity string and calculate total sub-units
+          const quantities = quantityStr
+            .split("&")
+            .map((q) => parseInt(q.trim()));
+          return quantities.reduce(
+            (total, qty) => total + qty * quantityUnit,
+            0
+          );
+        },
+
+        convertSubUnitsToQuantity(subUnits, quantityUnit) {
+          // Convert total sub-units back to quantity format
+          const wholeUnits = Math.floor(subUnits / quantityUnit);
+          const remainingSubUnits = subUnits % quantityUnit;
+
+          if (remainingSubUnits > 0) {
+            return `${wholeUnits} & ${remainingSubUnits}`;
+          }
+          return wholeUnits.toString();
+        },
+
+        // Get current values (for form submission)
+        getValues() {
+          return {
+            quantity: this.elements.quantityInput.value,
+            subUnits: parseInt(this.elements.subUnitInput.value) || 0,
+          };
+        },
+      };
+
+      // Initialize when document loads
+      document.addEventListener("DOMContentLoaded", () => {
+        QuantityPriceManager.init();
       });
     </script>
-
-    <!-- The new product form implemnetaion -->
-    <!-- <script>
-      // Function to calculate total prices
-      function calculateTotals() {
-        const quantity =
-          parseFloat(document.getElementById("quantity").value) || 0;
-        const buyingPrice =
-          parseFloat(document.getElementById("buyingPrice").value) || 0;
-        const buyingTax =
-          parseFloat(document.getElementById("buyingTax").value) || 0;
-        const sellingPrice =
-          parseFloat(document.getElementById("sellingPrice").value) || 0;
-        const sellingTax =
-          parseFloat(document.getElementById("sellingTax").value) || 0;
-
-        const totalBuyingPrice = quantity * buyingPrice * (1 + buyingTax / 100);
-        const totalSellingPrice =
-          quantity * sellingPrice * (1 + sellingTax / 100);
-
-        document.getElementById("totalBuyingPrice").value =
-          totalBuyingPrice.toFixed(2);
-        document.getElementById("totalSellingPrice").value =
-          totalSellingPrice.toFixed(2);
-      }
-
-      // Add event listeners to input fields
-      const inputFields = [
-        "quantity",
-        "buyingPrice",
-        "buyingTax",
-        "sellingPrice",
-        "sellingTax",
-      ];
-      inputFields.forEach((fieldId) => {
-        document
-          .getElementById(fieldId)
-          .addEventListener("input", calculateTotals);
-      });
-
-      // Placeholder function for adding to purchase list
-      function addToPurchaseList() {
-        // Implement your logic here
-        alert("Product added to purchase list");
-      }
-    </script> -->
   </body>
 </html>
