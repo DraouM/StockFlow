@@ -144,7 +144,7 @@ header {
 .shopping-list-table th,
 .shopping-list-table td {
     padding: 12px;
-    text-align: left;
+    text-align: right;
     border-bottom: 1px solid #e0e0e0;
 }
 
