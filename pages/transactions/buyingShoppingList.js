@@ -25,8 +25,11 @@ class BuyingShoppingList {
 
   // Method to create a new item object for buying
   createNewItem(product) {
+    const subTotalBuyingPrice = product.subUnits * product.buyingPrice;
+
     const totalBuyingPrice =
-      product.quantity * product.buyingPrice * (1 + product.taxes / 100);
+      product.subUnits * product.buyingPrice * (1 + product.taxes / 100);
+
     return {
       tempId: product.tempId || crypto.randomUUID(),
       productId: product.productId,
@@ -36,6 +39,7 @@ class BuyingShoppingList {
       quantityUnit: product.quantityUnit,
       buyingPrice: product.buyingPrice,
       taxes: product.taxes,
+      subTotalBuyingPrice: subTotalBuyingPrice,
       totalBuyingPrice: totalBuyingPrice,
       sellingPrice: product.sellingPrice,
     };
@@ -75,6 +79,8 @@ class BuyingShoppingList {
 
   // Method to create a table row for the shopping list
   createTableRow(item, rowCount) {
+    console.log({ item });
+
     const newRow = document.createElement("tr");
     newRow.dataset.id = item.tempId;
 
@@ -84,8 +90,12 @@ class BuyingShoppingList {
         <span class="main-quantity">${item.quantity}</span>
         <span class="sub-quantity highlight">${item.quantityUnit || ""}</span>
       </td>
+      <td>${item.subUnits || "N/A"}</td>
       <td>${UtilityHelpers.formatNumber(item.buyingPrice)}</td>
+      <td>${UtilityHelpers.formatNumber(item.subTotalBuyingPrice)}</td>
+      <td>${UtilityHelpers.formatNumber(item.taxes)}</td>
       <td>${UtilityHelpers.formatNumber(item.totalBuyingPrice)}</td>
+      <td>${UtilityHelpers.formatNumber(item.sellingPrice)}</td>
       <td>
         <button class="button button-small button-secondary edit-button" data-id="${
           item.tempId
