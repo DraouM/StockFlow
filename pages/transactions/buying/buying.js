@@ -14,10 +14,16 @@ const shoppingListManager = new ShoppingListManager(shoppingList); // Create an 
 document.addEventListener("DOMContentLoaded", () => initializePage());
 
 function initializePage() {
+  // Initialize the Modals
   initializeModals();
-
+  // Initialize the product search fucntion
   initializeProductSearch();
+  // Initialize the shopping list form
   initializeProductForm();
+
+  const transactionId = getTransactionIdFromUrl();
+  // Initialize event listeners
+  initializeEventListeners(transactionId);
 }
 
 function initializeModals() {
@@ -103,8 +109,49 @@ function initializeProductForm() {
   });
 }
 
-/* Helper Functions */
+function initializeEventListeners(transactionId) {
+  // Handle shopping list table actions
+  const shoppingListTable = document.querySelector("#shopping-list tbody");
+  if (shoppingListTable) {
+    shoppingListTable.addEventListener("click", handleShoppingListActions);
+  }
 
+  // Handle confirm transaction button
+  const confirmTransactionButton = document.getElementById(
+    "confirm-transaction-btn"
+  );
+  if (confirmTransactionButton) {
+    confirmTransactionButton.addEventListener("click", async () => {
+      await handleTransaction(transactionId);
+    });
+  }
+}
+
+function handleShoppingListActions(event) {
+  console.log("Hnadling shopping list actions");
+
+  const target = event.target;
+  const tempId = target.dataset.id;
+
+  if (!tempId) return;
+
+  if (target.classList.contains("edit-button")) {
+    shoppingListManager.shoppingList.handleEditButtonClick(tempId); // Edit handler
+  } else if (target.classList.contains("delete-button")) {
+    shoppingListManager.deleteProduct(tempId); // Delete handler
+  }
+}
+
+function getTransactionIdFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get("transaction_id");
+}
+
+async function handleTransaction(transaction_id = null) {
+  console.log("Transaction Submitted");
+}
+
+/* Helper Functions */
 function openProductModal() {
   modalManager.open("product-modal");
 }
