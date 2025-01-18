@@ -5,12 +5,126 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Products</title>
     <link rel="stylesheet" href="./assets/styles/main.css" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <!-- TEST style -->
+    <style>
+      :root {
+        --color-light: rgb(203 213 225);
+        --color-mid: rgb(51 65 85);
+        --color-dark: rgb(24, 35, 51);
+      }
+
+      #wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        inset: 0;
+      }
+      .header {
+        width: 340px;
+        padding: 0 16px;
+        display: flex;
+        border: 1px solid var(--color-dark);
+        border-radius: 16px;
+      }
+      .iconDiv {
+        height: 36px;
+        width: 36px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        margin-left: 4px;
+        padding: 4px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
+        overflow: hidden;
+        cursor: pointer;
+        transition: width 300ms ease-in-out 0s,
+          background-color 300ms linear 200ms;
+      }
+      .iconSVG {
+        aspect-ratio: 1 / 1;
+      }
+      .iconDiv:hover,
+      .iconDiv:focus-visible {
+        width: 142px;
+        background-color: var(--color-mid);
+        transition: width 300ms ease-in-out 0s, background-color 100ms linear 0s;
+      }
+      .iconDiv:focus-visible {
+        outline: 1px solid var(--color-mid);
+        outline-offset: 4px;
+      }
+      .iconDiv:active {
+        opacity: 0.9;
+      }
+      .iconDiv::after {
+        content: attr(tooltip);
+        margin-left: 12px;
+        animation: fadeIn 600ms linear forwards;
+      }
+      .spacer {
+        flex-grow: 1;
+      }
+      .divider {
+        height: 36px;
+        width: 1px;
+        margin: 24px 18px;
+        background-color: var(--color-dark);
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        50% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+    </style>
   </head>
   <body>
     <aside id="sidebar"></aside>
     <div class="content">
       <h1>Hello, Electron!</h1>
       <p>Welcome to your first Electron app.</p>
+
+      <!-- TEST -->
+      <div id="wrapper">
+        <header class="header">
+          <div class="iconDiv" tooltip="Load file" tabindex="0">
+            <div class="iconSVG">
+              <i class="bx bx-folder-open"></i>
+            </div>
+          </div>
+          <div class="iconDiv" tooltip="Download" tabindex="0">
+            <div class="iconSVG">
+              <i class="bx bx-download"></i>
+            </div>
+          </div>
+
+          <div class="spacer"></div>
+          <div class="divider"></div>
+
+          <div class="iconDiv" tooltip="Notifications" tabindex="0">
+            <div class="iconSVG">
+              <i class="bx bx-bell"></i>
+            </div>
+          </div>
+          <div class="iconDiv" tooltip="Log out" tabindex="0">
+            <div class="iconSVG">
+              <i class="bx bx-log-out"></i>
+            </div>
+          </div>
+        </header>
+      </div>
     </div>
 
     <script src="./pages/common/sidebar.js"></script>
