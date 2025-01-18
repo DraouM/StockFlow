@@ -1,11 +1,10 @@
-// Fetch the products from  the databased and display it to the table
+import { UtilityHelpers } from "/home/mohamed/Documents/Projects/StockFlow/pages/transactions/selling/utilityHelpers.js";
+
+// Fetch the products from the database and display it to the table
 document.addEventListener("DOMContentLoaded", async () => {
   const spinner = new LoadingSpinner("stockTable", {
     message: "Loading products...",
   });
-  //   async function fetchProducts(filters = {}) {
-  //     return await window.api.invoke('list-products', filters);
-  // }
   try {
     spinner.show(); // Show spinner before data fetching
 
@@ -16,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       products = result.data;
       console.log("products ", products); // log the products
     } else {
-      console.log("Somthing happend in products fetching");
+      console.log("Something happened in products fetching");
       return;
     }
 
@@ -32,20 +31,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Iterate over each product and add a row to the fragment
     products.forEach((product) => {
       const row = document.createElement("tr");
-
+      const quantity = UtilityHelpers.convertSubUnitsToQuantity(
+        product.total_stock,
+        product.subunit_in_unit
+      );
       row.innerHTML = `
         <td>${product.id}</td>
         <td>${product.name}</td>
-        <td>${product.subunit_in_unit}</td>
-        <td>${product.h}</td>
-        <td>${product.total_stock}</td>
+        <td>
+          <span class="main-quantity">${quantity}</span>
+          <span class="sub-quantity highlight">${product.subunit_in_unit}</span>
+        </td>
+        <td>${product.total_stock || "N/A"}</td>
         <td>${product.selling_price}</td>
         <td>${product.buying_price}</td>
         <td>${product.tax_rate}</td>
-        <td>${product.updated_at}</td>
         <td>
-          <button class="button button-small button-secondary edit-button" data-id="${product.id}">Edit</button>
-          <button class="button button-small button-secondary delete-button" data-id="${product.id}">Delete</button>
+          <button class="button button-small button-secondary edit-button" data-id="${
+            product.id
+          }">Edit</button>
+          <button class="button button-small button-secondary delete-button" data-id="${
+            product.id
+          }">Delete</button>
         </td>
       `;
 
@@ -71,21 +78,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   } catch (error) {
     console.error("Error fetching products:", error);
-
     spinner.hide(); // Hide spinner in case of an error
-
-    // Optionally, display an error message to the user
   }
 });
 
 // Add a listener to the edit button for each row
-// Use event delegation to handle clicks on .edit-button
 document
   .querySelector("#stockTable tbody")
   .addEventListener("click", (event) => {
     if (event.target.classList.contains("edit-button")) {
       const productId = event.target.dataset.id;
-      // Handle the edit action for the product with productId
       console.log("Edit product with ID:", productId);
     }
   });
