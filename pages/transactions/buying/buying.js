@@ -22,6 +22,10 @@ function initializePage() {
   initializeProductForm();
 
   const transactionId = getTransactionIdFromUrl();
+
+  // Handle page context (new or update)
+  handlePageContext(transactionId);
+
   // Initialize event listeners
   initializeEventListeners(transactionId);
 }
@@ -103,10 +107,33 @@ function initializeProductForm() {
 
       const form = document.getElementById(productFormId);
       const itemId = form.getAttribute("data-item-id");
+
       shoppingListManager.updateProduct(itemId, product); // Use the class instance
       form.setAttribute("data-operation", "add");
     },
   });
+}
+
+function handlePageContext(transactionId) {
+  const confirmTransactionButton = document.getElementById(
+    "confirmTransactionBtn"
+  );
+
+  if (transactionId) {
+    console.log("CHECK LATER THIS PART");
+
+    // Update mode
+    // populateTransactionDetails(transactionId);
+    // if (confirmTransactionButton) {
+    //   confirmTransactionButton.textContent = "Update Order"; // Adjust button text
+    //   confirmTransactionButton.style.background = "green"; // Adjust button text
+    // }
+  } else {
+    // Create mode
+    if (confirmTransactionButton) {
+      confirmTransactionButton.textContent = "Confirm Order"; // Default button text
+    }
+  }
 }
 
 function initializeEventListeners(transactionId) {
@@ -147,8 +174,82 @@ function getTransactionIdFromUrl() {
   return urlParams.get("transaction_id");
 }
 
-async function handleTransaction(transaction_id = null) {
-  console.log("Transaction Submitted");
+async function handleTransaction(transactionId = null) {
+  if (transactionId) {
+    console.log("CHECK THIS PART LATER!!");
+
+    // updateTransaction();
+    // console.log(transactionId, "Transaction Updated !!");
+    // await updateTransaction(transactionId);
+  } else {
+    createNewTransaction();
+  }
+}
+
+async function createNewTransaction() {
+  try {
+    let clientId = document.getElementById("clientName").dataset.clientId;
+    if (!clientId) {
+      // throw new Error("Please select a client.");
+      clientId = "1";
+      console.log("THE BUYER WITH THE FIRST CLIENT");
+    }
+
+    if (shoppingListManager.shoppingList.length === 0) {
+      // Use the class instance
+      throw new Error("Your shopping list is empty.");
+    }
+
+    const transactionData = {
+      party_id: clientId, // Use the client ID as party_id
+      transaction_type: "buy", // Assuming this is a buying transaction
+      discount: 0, // Set discount if applicable
+    };
+
+    const transactionResponse = await window.transactionsAPI.createTransaction(
+      transactionData
+    );
+
+    if (!transactionResponse.success) {
+      throw new Error(transactionResponse.error);
+    }
+
+    const transactionId = transactionResponse.result;
+
+    for (const item of shoppingListManager.shoppingList.shoppingList) {
+      console.log({ item });
+
+      // Use the class instance
+      const itemDetail = {
+        product_id: item.productId, // Assuming productId is available in the item
+        quantity_selected: item.subUnits,
+        unit_price: item.buyingPrice,
+      };
+
+      const detailResponse =
+        await window.transactionsAPI.createTransactionDetail({
+          transactionId,
+          ...itemDetail,
+        });
+
+      if (!detailResponse.success) {
+        throw new Error(detailResponse.error);
+      }
+    }
+
+    shoppingListManager.clearList(); // Use the class instance
+
+    NotificationManager.showNotification(
+      "Transaction completed successfully!",
+      NotificationManager.NOTIFICATION_TYPES.INFO
+    );
+  } catch (error) {
+    console.error("Transaction error:", error);
+    NotificationManager.showNotification(
+      error.message || "Transaction failed. Please try again.",
+      NotificationManager.NOTIFICATION_TYPES.ERROR
+    );
+  }
 }
 
 /* Helper Functions */
