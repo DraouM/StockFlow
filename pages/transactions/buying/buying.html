@@ -51,6 +51,64 @@
         /* Rounded corners */
       }
     </style>
+
+    <!-- popover style
+    <style>
+      .right {
+        flex-shrink: 0;
+        width: 200px;
+      }
+      /* POPOVER*/
+      .popover {
+        display: none; /* Hidden by default */
+        padding: 15px; /* Increased padding */
+        z-index: 1000;
+        width: 300px;
+        border: 1px solid #007bff; /* Blue border */
+        transition: opacity 0.3s ease, transform 0.2s ease; /* Added transform transition */
+      }
+
+      .popover__title {
+        background-color: #007bff;
+        border-radius: 20px;
+        font-size: 16px;
+        text-decoration: none;
+        color: white;
+        text-align: center;
+        padding: 0.5rem;
+      }
+
+      .popover p {
+        margin: 5px 0;
+        font-family: "Arial", sans-serif; /* Modern font */
+        color: #333; /* Dark text color */
+      }
+
+      .popover .label {
+        font-weight: bold; /* Bold labels */
+        color: #007bff; /* Blue color for labels */
+      }
+
+      .popover .icon {
+        margin-right: 5px; /* Space between icon and text */
+      }
+
+      .popover:hover {
+        transform: scale(1.05); /* Slight scale effect on hover */
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+      }
+
+      .clickable:hover {
+        text-decoration: underline;
+        color: #e6e9ec; /* Darker blue on hover */
+      }
+
+      .clickable:hover + .popover,
+      .popover:focus {
+        display: block;
+        /* Show popover on hover or focus */
+      }
+    </style> -->
   </head>
   <body>
     <!-- Modals -->
@@ -339,6 +397,70 @@
           Confirm Transaction
         </button>
       </section>
+
+      <div class="right">
+        <section class="client-section">
+          <div id="client-details">
+            <h2
+              id="clientName"
+              popovertarget="clientPopover"
+              class="clickable popover__title"
+            >
+              <i class="fas fa-user"></i>
+              John Doe
+            </h2>
+            <!-- Add an icon next to the clientName span -->
+
+            <div id="clientPopover" class="popover card-style">
+              <p id="clientAddress">Address: 123 Main St</p>
+              <p id="clientPhone">Phone: (123) 456-7890</p>
+              <p id="clientDebt">Debt: $100.00</p>
+              <br />
+              <button
+                id="editClientBtn"
+                class="button button-secondary button-small"
+                style="margin-left: 10px"
+              >
+                Change
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Payment -->
+        <section class="purchase-section card-style">
+          <h3 class="section-title">Purchase Details</h3>
+          <form id="purchase-form" class="purchase-form">
+            <!-- Discount -->
+            <div class="form-group">
+              <label for="discount" class="form-label">Discount</label>
+              <div class="discount-container">
+                <input
+                  type="text"
+                  id="discount-input"
+                  class="discount-input"
+                  placeholder="Sum"
+                  value="0"
+                />
+                <button id="apply-button" class="button button-primary">
+                  Apply
+                </button>
+              </div>
+            </div>
+
+            <!-- Final Amount -->
+            <div class="form-group">
+              <label class="form-label">Final Amount</label>
+              <span id="finalAmount" class="form-value">0.00</span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-button" disabled>
+              Complete Purchase
+            </button>
+          </form>
+        </section>
+      </div>
     </main>
 
     <script src="../../../scripts/common/Searchbar.js"></script>
