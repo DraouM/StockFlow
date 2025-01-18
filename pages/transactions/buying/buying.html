@@ -51,64 +51,6 @@
         /* Rounded corners */
       }
     </style>
-
-    <!-- popover style
-    <style>
-      .right {
-        flex-shrink: 0;
-        width: 200px;
-      }
-      /* POPOVER*/
-      .popover {
-        display: none; /* Hidden by default */
-        padding: 15px; /* Increased padding */
-        z-index: 1000;
-        width: 300px;
-        border: 1px solid #007bff; /* Blue border */
-        transition: opacity 0.3s ease, transform 0.2s ease; /* Added transform transition */
-      }
-
-      .popover__title {
-        background-color: #007bff;
-        border-radius: 20px;
-        font-size: 16px;
-        text-decoration: none;
-        color: white;
-        text-align: center;
-        padding: 0.5rem;
-      }
-
-      .popover p {
-        margin: 5px 0;
-        font-family: "Arial", sans-serif; /* Modern font */
-        color: #333; /* Dark text color */
-      }
-
-      .popover .label {
-        font-weight: bold; /* Bold labels */
-        color: #007bff; /* Blue color for labels */
-      }
-
-      .popover .icon {
-        margin-right: 5px; /* Space between icon and text */
-      }
-
-      .popover:hover {
-        transform: scale(1.05); /* Slight scale effect on hover */
-        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
-      }
-
-      .clickable:hover {
-        text-decoration: underline;
-        color: #e6e9ec; /* Darker blue on hover */
-      }
-
-      .clickable:hover + .popover,
-      .popover:focus {
-        display: block;
-        /* Show popover on hover or focus */
-      }
-    </style> -->
   </head>
   <body>
     <!-- Modals -->
@@ -508,172 +450,7 @@
         });
     </script>
 
-    <!-- Porduct Form Handler -->
-    <!-- <script type="module">
-      const QuantityPriceManager = {
-        // Store DOM elements and values
-        elements: {
-          quantityInput: null,
-          subUnitInput: null,
-          subUnitsSpan: null,
-          quantityUnitSpan: null,
-        },
-
-        // Initialize the manager
-        init() {
-          // Get all required elements
-          this.elements = {
-            quantityInput: document.getElementById("quantity"),
-            subUnitInput: document.getElementById("subUnits"),
-            subUnitsSpan: document.getElementById("subunits-span"),
-            quantityUnitSpan: document.getElementById("quantityUnit"),
-          };
-
-          // Validate that all elements exist
-          for (const [key, element] of Object.entries(this.elements)) {
-            if (!element) {
-              console.error(`Required element ${key} not found`);
-              return false;
-            }
-          }
-
-          this.setupEventListeners();
-          this.initializeValues();
-          return true;
-        },
-
-        // Fetch the latest value of quantityUnit
-        getQuantityUnit() {
-          return parseInt(this.elements.quantityUnitSpan.textContent, 10);
-        },
-
-        // Set up all event listeners
-        setupEventListeners() {
-          // Quantity input handler
-          this.elements.quantityInput.addEventListener("input", (e) => {
-            this.handleQuantityInput(e.target.value);
-          });
-
-          // Add space and tab key handlers for quantity input
-          this.elements.quantityInput.addEventListener("keydown", (e) => {
-            // Check if the pressed key is Space or Tab
-            if (e.key === " " || e.key === "Tab") {
-              const value = e.target.value.trim();
-
-              // Only proceed if there's no & already and the value is a valid number
-              if (!value.includes("&") && /^\d+$/.test(value)) {
-                e.preventDefault(); // Prevent default space/tab behavior
-                this.elements.quantityInput.value = value + " & ";
-
-                // If it was a tab key, keep focus in the input
-                if (e.key === "Tab") {
-                  const cursorPosition =
-                    this.elements.quantityInput.value.length;
-                  this.elements.quantityInput.setSelectionRange(
-                    cursorPosition,
-                    cursorPosition
-                  );
-                }
-              }
-            }
-          });
-
-          // Add handler for sub-unit input
-          this.elements.subUnitInput.addEventListener("input", (e) => {
-            const subUnits = parseInt(e.target.value);
-            if (!isNaN(subUnits)) {
-              const quantityStr = this.convertSubUnitsToQuantity(
-                subUnits,
-                this.getQuantityUnit()
-              );
-              this.elements.quantityInput.value = quantityStr;
-              this.elements.subUnitsSpan.textContent = subUnits;
-            }
-          });
-        },
-
-        // Initialize starting values
-        initializeValues() {
-          if (this.elements.quantityInput.value) {
-            this.handleQuantityInput(this.elements.quantityInput.value);
-          }
-        },
-
-        // Handle quantity input changes
-        handleQuantityInput(value) {
-          const isValid = this.isValidQuantityFormat(value);
-
-          if (isValid) {
-            const totalSubUnits = this.calculateTotalSubUnits(
-              value,
-              this.getQuantityUnit()
-            );
-            // Update both sub-unit displays
-            this.updateSubUnits(totalSubUnits);
-
-            // If the input doesn't match the calculated format, update it
-            const calculatedQuantity = this.convertSubUnitsToQuantity(
-              totalSubUnits,
-              this.getQuantityUnit()
-            );
-            if (value.trim() !== calculatedQuantity) {
-              this.elements.quantityInput.value = calculatedQuantity;
-            }
-          } else {
-            this.updateSubUnits("");
-          }
-        },
-
-        // Update sub-units in both locations
-        updateSubUnits(value) {
-          this.elements.subUnitInput.value = value;
-          this.elements.subUnitsSpan.textContent = value;
-        },
-
-        // Utility Methods
-        isValidQuantityFormat(value) {
-          // Regex to match valid quantity formats like "1", "2", "1 & 2"
-          const quantityRegex = /^(\d+(\s*&\s*\d+)?)\s*$/;
-          return quantityRegex.test(value.trim());
-        },
-
-        calculateTotalSubUnits(quantityStr, quantityUnit) {
-          // Split the quantity string and calculate total sub-units
-          const quantities = quantityStr
-            .split("&")
-            .map((q) => parseInt(q.trim()));
-          return quantities.reduce(
-            (total, qty) => total + qty * quantityUnit,
-            0
-          );
-        },
-
-        convertSubUnitsToQuantity(subUnits, quantityUnit) {
-          // Convert total sub-units back to quantity format
-          const wholeUnits = Math.floor(subUnits / quantityUnit);
-          const remainingSubUnits = subUnits % quantityUnit;
-
-          if (remainingSubUnits > 0) {
-            return `${wholeUnits} & ${remainingSubUnits}`;
-          }
-          return wholeUnits.toString();
-        },
-
-        // Get current values (for form submission)
-        getValues() {
-          return {
-            quantity: this.elements.quantityInput.value,
-            subUnits: parseInt(this.elements.subUnitInput.value) || 0,
-          };
-        },
-      };
-
-      // Initialize when document loads
-      document.addEventListener("DOMContentLoaded", () => {
-        QuantityPriceManager.init();
-      });
-    </script> -->
-
+    <!-- Quantity input  -->
     <script type="module">
       import { UtilityHelpers } from "../selling//utilityHelpers.js";
 
@@ -719,6 +496,11 @@
             this.handleQuantityInput(e.target.value);
           });
 
+          // Handle blur events for formatting
+          this.elements.quantityInput.addEventListener("blur", () => {
+            this.formatQuantityDisplay();
+          });
+
           // Add space and tab key handlers for quantity input
           this.elements.quantityInput.addEventListener("keydown", (e) => {
             // Check if the pressed key is Space or Tab
@@ -747,7 +529,7 @@
           this.elements.subUnitInput.addEventListener("input", (e) => {
             const subUnits = parseInt(e.target.value);
             if (!isNaN(subUnits)) {
-              const quantityStr = this.convertSubUnitsToQuantity(
+              const quantityStr = UtilityHelpers.convertSubUnitsToQuantity(
                 subUnits,
                 this.getQuantityUnit()
               );
@@ -765,10 +547,11 @@
 
         // Handle quantity input changes
         handleQuantityInput(value) {
-          const isValid = this.isValidQuantityFormat(value);
+          const isValid = UtilityHelpers.isValidQuantityFormat(value);
+          this.toggleInputError(this.elements.quantityInput, !isValid);
 
           if (isValid) {
-            const totalSubUnits = this.calculateTotalSubUnits(
+            const totalSubUnits = UtilityHelpers.calculateTotalSubUnits(
               value,
               this.getQuantityUnit()
             );
@@ -776,7 +559,7 @@
             this.updateSubUnits(totalSubUnits);
 
             // If the input doesn't match the calculated format, update it
-            const calculatedQuantity = this.convertSubUnitsToQuantity(
+            const calculatedQuantity = UtilityHelpers.convertSubUnitsToQuantity(
               totalSubUnits,
               this.getQuantityUnit()
             );
@@ -793,33 +576,23 @@
           this.elements.subUnitInput.value = value;
         },
 
-        // Utility Methods
-        isValidQuantityFormat(value) {
-          // Regex to match valid quantity formats like "1", "2", "1 & 2"
-          const quantityRegex = /^(\d+(\s*&\s*\d+)?)\s*$/;
-          return quantityRegex.test(value.trim());
-        },
-
-        calculateTotalSubUnits(quantityStr, quantityUnit) {
-          // Split the quantity string and calculate total sub-units
-          const quantities = quantityStr
-            .split("&")
-            .map((q) => parseInt(q.trim()));
-          return quantities.reduce(
-            (total, qty) => total + qty * quantityUnit,
-            0
-          );
-        },
-
-        convertSubUnitsToQuantity(subUnits, quantityUnit) {
-          // Convert total sub-units back to quantity format
-          const wholeUnits = Math.floor(subUnits / quantityUnit);
-          const remainingSubUnits = subUnits % quantityUnit;
-
-          if (remainingSubUnits > 0) {
-            return `${wholeUnits} & ${remainingSubUnits}`;
+        // Format quantity input on blur
+        formatQuantityDisplay() {
+          const value = this.elements.quantityInput.value.trim();
+          if (UtilityHelpers.isValidQuantityFormat(value)) {
+            const parts = value.includes("&") ? value.split("&") : [value];
+            const formatted = parts.map((part) => part.trim()).join(" & ");
+            this.elements.quantityInput.value = formatted;
           }
-          return wholeUnits.toString();
+        },
+
+        // Toggle error state on inputs
+        toggleInputError(element, isError) {
+          if (isError) {
+            element.classList.add("error");
+          } else {
+            element.classList.remove("error");
+          }
         },
 
         // Get current values (for form submission)
