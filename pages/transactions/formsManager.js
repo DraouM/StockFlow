@@ -75,7 +75,7 @@ const formManager = {
   handleSubmit(event, formId) {
     event.preventDefault();
 
-    console.log("There is a problem");
+    console.log("There is No problem");
 
     // Validate the form before proceeding
     if (this.validate(formId)) {
