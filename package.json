@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1",
+    "jspdf": "^2.5.2",
     "sqlite3": "^5.1.7"
   }
 }
