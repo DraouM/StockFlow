@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       row.innerHTML = `
         <td>${transaction.transaction_id}</td>
         <td>${party.name}</td>
-        <td>${transaction.transaction_date}</td>
+        <td>${transaction.updated_at}</td>
         <td>${transaction.transaction_type}</td>
         <td>${transaction.total_amount}</td>
         <td>${transaction.discount}</td>

@@ -11,15 +11,6 @@
     />
 
     <style>
-      /* Shopping List Styles */
-      #transactionsContainer {
-        background-color: #f9f9f9;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        margin-top: 20px;
-      }
-
       #transactionsTable {
         width: 100%;
         border-collapse: collapse;
@@ -48,10 +39,6 @@
         font-size: 1.2em;
         font-weight: bold;
       }
-
-      .search-box {
-        margin-bottom: 20px;
-      }
     </style>
   </head>
   <body>
@@ -62,39 +49,49 @@
       <a
         href="./selling/selling.html"
         class="button button-primary button-medium"
+        title="View Selling Transactions"
       >
         Selling
       </a>
 
-      <!-- Search input outside the table -->
-      <div class="search-box">
-        <input
-          id="table-search-input"
-          type="text"
-          name="table-search"
-          placeholder="Search in the table..."
-        />
-      </div>
+      <a
+        href="./buying/buying.html"
+        class="button button-primary button-medium"
+        title="View Buying Transactions"
+      >
+        Buying
+      </a>
 
-      <section id="transactionsContainer">
-        <table id="transactionsTable">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Discount</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <div id="transactionsTable-empty-message">
-          <p>No transactions found.</p>
-        </div>
-      </section>
+      <main class="main-container">
+        <section id="transactionsContainer">
+          <!-- Search input outside the table -->
+          <div class="search-box">
+            <input
+              id="table-search-input"
+              type="text"
+              name="table-search"
+              placeholder="Search in the table..."
+            />
+          </div>
+          <table id="transactionsTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Discount</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="transactionsTable-empty-message">
+            <p>No transactions found.</p>
+          </div>
+        </section>
+      </main>
     </div>
 
     <script src="../../scripts/common/EnhancedTable.js"></script>
