@@ -95,7 +95,6 @@ class BuyingShoppingList {
       <td>${UtilityHelpers.formatNumber(item.subTotalBuyingPrice)}</td>
       <td>${UtilityHelpers.formatNumber(item.taxes)}</td>
       <td>${UtilityHelpers.formatNumber(item.totalBuyingPrice)}</td>
-      <td>${UtilityHelpers.formatNumber(item.sellingPrice)}</td>
       <td>
         <button class="button button-small button-secondary edit-button" data-id="${
           item.tempId

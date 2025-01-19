@@ -51,6 +51,59 @@
         /* Rounded corners */
       }
     </style>
+
+    <!-- popover style -->
+    <style>
+      /* POPOVER*/
+      .popover {
+        display: none; /* Hidden by default */
+        padding: 15px; /* Increased padding */
+        z-index: 1000;
+        border: 1px solid #007bff; /* Blue border */
+        transition: opacity 0.3s ease, transform 0.2s ease; /* Added transform transition */
+      }
+
+      .popover__title {
+        background-color: #007bff;
+        border-radius: 20px;
+        font-size: 16px;
+        text-decoration: none;
+        color: white;
+        text-align: center;
+        padding: 0.5rem;
+      }
+
+      .popover p {
+        margin: 5px 0;
+        font-family: "Arial", sans-serif; /* Modern font */
+        color: #333; /* Dark text color */
+      }
+
+      .popover .label {
+        font-weight: bold; /* Bold labels */
+        color: #007bff; /* Blue color for labels */
+      }
+
+      .popover .icon {
+        margin-right: 5px; /* Space between icon and text */
+      }
+
+      .popover:hover {
+        transform: scale(1.05); /* Slight scale effect on hover */
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+      }
+
+      .clickable:hover {
+        text-decoration: underline;
+        color: #e6e9ec; /* Darker blue on hover */
+      }
+
+      .clickable:hover + .popover,
+      .popover:focus {
+        display: block;
+        /* Show popover on hover or focus */
+      }
+    </style>
   </head>
   <body>
     <!-- Modals -->
@@ -282,20 +335,20 @@
 
     <!-- End Of Modals -->
 
-    <h1>Buying Page</h1>
-    <!-- HTML -->
     <a href="../transactions.html" id="back-button"> back </a>
-
-    <button data-modal="newProductModal" class="button button-secondary">
-      Create New Product
-    </button>
-    <button
-      data-modal="product-modal"
-      id="product-modal-btn"
-      class="button button-secondary"
-    >
-      buy
-    </button>
+    <h1>Buying Page</h1>
+    <div>
+      <button data-modal="newProductModal" class="button button-secondary">
+        Create New Product
+      </button>
+      <button
+        data-modal="product-modal"
+        id="product-modal-btn"
+        class="button button-secondary"
+      >
+        buy
+      </button>
+    </div>
 
     <main class="main-container">
       <section class="product-section">
@@ -312,7 +365,6 @@
                 <th>subTotal</th>
                 <th>Taxes</th>
                 <th>Total</th>
-                <th>Selling P</th>
                 <th>Action</th>
               </tr>
             </thead>

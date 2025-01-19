@@ -53,7 +53,6 @@ header {
     display: flex;
     gap: 30px;
     /* Subtract body padding */
-    height: calc(100vh - 40px);
 }
 
 /* Product section (left side) */
@@ -65,6 +64,10 @@ header {
 }
 
 /* Client section (right side) */
+.right {
+    flex-shrink: 0;
+}
+
 .client-section {
     flex: 1;
     display: flex;
@@ -176,6 +179,8 @@ header {
     justify-self: end;
 }
 
+/*  */
+
 @media (max-width: 768px) {
 
     .client-details-form,
@@ -197,7 +202,7 @@ header {
 }
 
 /*  */
-/* <!-- The new product form implemnetaion --> */
+/* <!-- The new product form implementation --> */
 
 .product-form {
     max-width: 800px;
