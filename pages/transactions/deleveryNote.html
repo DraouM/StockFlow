@@ -67,20 +67,23 @@
     <div class="details">
       <div>
         <strong>À:</strong>
-        <p>Amazon</p>
-        <p>Québec</p>
+        <p id="clientName"></p>
+        <p id="clientAddress"></p>
       </div>
       <div>
         <strong>EXPÉDIER À:</strong>
-        <p>John Doe</p>
-        <p>123 Main Street</p>
-        <p>Québec</p>
+        <p id="shipToName"></p>
+        <p id="shipToAddress"></p>
       </div>
       <div>
-        <p><strong>No:</strong> 00001</p>
-        <p><strong>Date de commande:</strong> 19 Janvier 2025</p>
-        <p><strong>Date d'expédition:</strong> 20 Janvier 2025</p>
-        <p><strong>Date de livraison:</strong> 21 Janvier 2025</p>
+        <p><strong>No:</strong> <span id="transactionNumber"></span></p>
+        <p><strong>Date de commande:</strong> <span id="orderDate"></span></p>
+        <p>
+          <strong>Date d'expédition:</strong> <span id="shippingDate"></span>
+        </p>
+        <p>
+          <strong>Date de livraison:</strong> <span id="deliveryDate"></span>
+        </p>
       </div>
     </div>
   </header>
@@ -93,78 +96,63 @@
         <th>Montant</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td>Tournevis</td>
-        <td>10.00 $</td>
-        <td>2</td>
-        <td>20.00 $</td>
-      </tr>
-      <tr>
-        <td>Marteau</td>
-        <td>15.00 $</td>
-        <td>1</td>
-        <td>15.00 $</td>
-      </tr>
+    <tbody id="itemsTableBody">
+      <!-- Items will be populated here -->
     </tbody>
   </table>
   <footer>
-    <div><strong>Sous-total:</strong> 35.00 $</div>
-    <div><strong>Taxes:</strong> 3.50 $</div>
-    <div><strong>Total:</strong> 38.50 $</div>
+    <div><strong>Sous-total:</strong> <span id="subTotal"></span></div>
+    <div><strong>Taxes:</strong> <span id="taxes"></span></div>
+    <div><strong>Total:</strong> <span id="total"></span></div>
   </footer>
 </div>
 <button id="download-pdf">Télécharger en PDF</button>
 
 <script>
-  // 1.run this command
-  //   npm install jspdf
+  document.addEventListener("DOMContentLoaded", () => {
+    const transactionData = JSON.parse(
+      sessionStorage.getItem("transactionData")
+    );
+    if (transactionData) {
+      document.getElementById("clientName").textContent =
+        transactionData.clientName;
+      document.getElementById("clientAddress").textContent =
+        transactionData.clientAddress;
+      document.getElementById("shipToName").textContent =
+        transactionData.shipToName;
+      document.getElementById("shipToAddress").textContent =
+        transactionData.shipToAddress;
+      document.getElementById("transactionNumber").textContent =
+        transactionData.transactionNumber;
+      document.getElementById("orderDate").textContent =
+        transactionData.orderDate;
+      document.getElementById("shippingDate").textContent =
+        transactionData.shippingDate;
+      document.getElementById("deliveryDate").textContent =
+        transactionData.deliveryDate;
+
+      const itemsTableBody = document.getElementById("itemsTableBody");
+      transactionData.items.forEach((item) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.productName}</td>
+          <td>${item.unitPrice}</td>
+          <td>${item.quantity}</td>
+          <td>${item.subTotal}</td>
+        `;
+        itemsTableBody.appendChild(row);
+      });
+
+      // Set totals
+      document.getElementById("subTotal").textContent =
+        transactionData.subTotal;
+      document.getElementById("taxes").textContent = transactionData.taxes;
+      document.getElementById("total").textContent = transactionData.total;
+    }
+  });
 
   document.getElementById("download-pdf").addEventListener("click", () => {
     const doc = new jsPDF();
-
-    // Add content
-    doc.setFontSize(18);
-    doc.text("BON DE LIVRAISON", 105, 10, null, null, "center");
-
-    doc.setFontSize(12);
-    doc.text("À:", 10, 30);
-    doc.text("Amazon\nQuébec", 10, 35);
-
-    doc.text("EXPÉDIER À:", 105, 30, null, null, "center");
-    doc.text(
-      "John Doe\n123 Main Street\nQuébec",
-      105,
-      35,
-      null,
-      null,
-      "center"
-    );
-
-    doc.text("No: 00001", 160, 30);
-    doc.text(
-      "Date de commande: 19 Janvier 2025\nDate d'expédition: 20 Janvier 2025\nDate de livraison: 21 Janvier 2025",
-      160,
-      35
-    );
-
-    // Add table
-    const items = [
-      ["Tournevis", "10.00 $", "2", "20.00 $"],
-      ["Marteau", "15.00 $", "1", "15.00 $"],
-    ];
-    doc.autoTable({
-      head: [["Description", "Prix", "Qté", "Montant"]],
-      body: items,
-      startY: 60,
-    });
-
-    // Add footer
-    doc.text("Sous-total: 35.00 $", 10, doc.lastAutoTable.finalY + 10);
-    doc.text("Taxes: 3.50 $", 10, doc.lastAutoTable.finalY + 20);
-    doc.text("Total: 38.50 $", 10, doc.lastAutoTable.finalY + 30);
-
-    // Save as PDF
-    doc.save("Bon_De_Livraison_John_Doe.pdf");
+    // PDF generation logic here...
   });
 </script>
