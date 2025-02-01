@@ -77,55 +77,158 @@ class TransactionDB {
 
     // Drop triggers if they exist
     const dropTriggersQuery = `
+      DROP TRIGGER IF EXISTS tr_update_party_debt_on_insert;
+      DROP TRIGGER IF EXISTS tr_update_party_debt_on_update;
+      DROP TRIGGER IF EXISTS tr_update_party_debt_on_delete;
+
       DROP TRIGGER IF EXISTS tr_update_transaction_on_insert;
       DROP TRIGGER IF EXISTS tr_update_transaction_on_update;
       DROP TRIGGER IF EXISTS tr_update_transaction_on_delete;
     `;
 
-    // #01
-    const tr_update_transaction_on_insert = `
-      CREATE TRIGGER IF NOT EXISTS tr_update_transaction_on_insert
-      AFTER INSERT ON transaction_details
-      FOR EACH ROW BEGIN
-          -- Update the total amount for the transaction
+    /* Transaction triggers*/
+
+    const tr_update_party_debt_on_insert = `
+        CREATE TRIGGER IF NOT EXISTS tr_update_party_debt_on_insert
+        AFTER INSERT ON transaction_details
+        FOR EACH ROW 
+        BEGIN
+            -- Update party's credit balance based on transaction type
+            UPDATE parties
+            SET credit_balance = credit_balance + 
+                CASE 
+                    WHEN (
+                        SELECT transaction_type 
+                        FROM transactions 
+                        WHERE transaction_id = NEW.transaction_id
+                    ) = 'buy' 
+                    THEN (SELECT total_amount FROM transactions WHERE transaction_id = NEW.transaction_id) -- Increase supplier debt
+                    ELSE -(SELECT total_amount FROM transactions WHERE transaction_id = NEW.transaction_id) -- Decrease customer debt
+                END
+            WHERE id = (
+                SELECT party_id 
+                FROM transactions 
+                WHERE transaction_id = NEW.transaction_id
+            );
+
+            -- Optional: Update timestamp for tracking changes
+            UPDATE parties
+            SET updated_at = CURRENT_TIMESTAMP
+            WHERE id = (
+                SELECT party_id 
+                FROM transactions 
+                WHERE transaction_id = NEW.transaction_id
+            );
+        END;
+      `;
+
+    const tr_update_party_debt_on_update = `
+      CREATE TRIGGER IF NOT EXISTS tr_update_party_debt_on_update
+      AFTER UPDATE ON transactions
+      FOR EACH ROW 
+      BEGIN
+          -- Reverse the previous credit effect
+          UPDATE parties 
+          SET credit_balance = credit_balance - 
+              CASE 
+                  WHEN OLD.transaction_type = 'buy' THEN OLD.total_amount  -- Remove old supplier debt
+                  WHEN OLD.transaction_type = 'sell' THEN -OLD.total_amount -- Remove old customer debt
+                  ELSE 0
+              END
+          WHERE id = OLD.party_id;
+
+          -- Apply the new credit effect
+          UPDATE parties 
+          SET credit_balance = credit_balance + 
+              CASE 
+                  WHEN NEW.transaction_type = 'buy' THEN NEW.total_amount  -- Apply new supplier debt
+                  WHEN NEW.transaction_type = 'sell' THEN -NEW.total_amount -- Apply new customer debt
+                  ELSE 0
+              END,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = NEW.party_id;
+      END;
+      `;
+
+    const tr_update_party_debt_on_delete = `
+      CREATE TRIGGER IF NOT EXISTS tr_update_party_debt_on_delete
+      AFTER DELETE ON transaction_details
+      FOR EACH ROW
+      BEGIN
+          -- Step 1: Update the total amount in transactions
           UPDATE transactions 
           SET 
               total_amount = (
-                  SELECT SUM(total_price)
+                  SELECT COALESCE(SUM(total_price), 0)
                   FROM transaction_details 
-                  WHERE transaction_id = NEW.transaction_id
+                  WHERE transaction_id = OLD.transaction_id
               ),
               updated_at = CURRENT_TIMESTAMP
-          WHERE transaction_id = NEW.transaction_id;
-          
-          -- Update product stock based on transaction type
-          UPDATE products
+          WHERE transaction_id = OLD.transaction_id;
+
+          -- Step 2: Adjust the party's credit balance based on transaction type
+          UPDATE parties
           SET 
-              total_stock = total_stock + 
+              credit_balance = credit_balance + 
               CASE 
                   WHEN (
-                      SELECT transaction_type 
-                      FROM transactions 
-                      WHERE transaction_id = NEW.transaction_id
-                  ) = 'sell' 
-                  THEN -NEW.quantity_selected
-                  ELSE NEW.quantity_selected
+                      SELECT transaction_type FROM transactions WHERE transaction_id = OLD.transaction_id
+                  ) = 'buy' THEN -OLD.total_price  -- Decrease debt if a purchase transaction is deleted
+                  ELSE OLD.total_price            -- Decrease credit if a sales transaction is deleted
               END,
               updated_at = CURRENT_TIMESTAMP
-          WHERE id = NEW.product_id;
-
-          -- Automatically update product status based on stock level
-          UPDATE products
-          SET 
-              status = CASE 
-                  WHEN total_stock > 0 THEN 'available'
-                  ELSE 'out_of_stock'
-              END,
-              updated_at = CURRENT_TIMESTAMP
-          WHERE id = NEW.product_id;
-
-          --LOG the changes-- ** LATER
+          WHERE id = (
+              SELECT party_id FROM transactions WHERE transaction_id = OLD.transaction_id
+          );
       END;
+      `;
+
+    /* Transaction details triggers*/
+    // #01
+    const tr_update_transaction_on_insert = `
+        CREATE TRIGGER IF NOT EXISTS tr_update_transaction_on_insert
+        AFTER INSERT ON transaction_details
+        FOR EACH ROW BEGIN
+            -- Update the total amount for the transaction
+            UPDATE transactions 
+            SET 
+                total_amount = (
+                    SELECT SUM(total_price)
+                    FROM transaction_details 
+                    WHERE transaction_id = NEW.transaction_id
+                ),
+                updated_at = CURRENT_TIMESTAMP
+            WHERE transaction_id = NEW.transaction_id;
+            
+            -- Update product stock based on transaction type
+            UPDATE products
+            SET 
+                total_stock = total_stock + 
+                CASE 
+                    WHEN (
+                        SELECT transaction_type 
+                        FROM transactions 
+                        WHERE transaction_id = NEW.transaction_id
+                    ) = 'sell' 
+                    THEN -NEW.quantity_selected
+                    ELSE NEW.quantity_selected
+                END,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = NEW.product_id;
+
+            -- Automatically update product status based on stock level
+            UPDATE products
+            SET 
+                status = CASE 
+                    WHEN status != 'inactive' AND total_stock > 0 THEN 'available'
+                    WHEN status != 'inactive' THEN 'out_of_stock'
+                    ELSE status
+                END,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = NEW.product_id;
+
+            --LOG the changes-- ** LATER
+        END;
     `;
 
     // #02
@@ -258,6 +361,26 @@ class TransactionDB {
         "Error deleting triggers for transaction_details table"
       );
 
+      // transactions
+      await this.runQuery(
+        tr_update_party_debt_on_insert,
+        "Trigger update party debt when a transaction is CREATED created successfully.",
+        "Error creating trigger for inserting on transaction"
+      );
+
+      await this.runQuery(
+        tr_update_party_debt_on_update,
+        "Trigger update party debt when a transaction is UPDATED created successfully.",
+        "Error creating trigger for inserting on transaction"
+      );
+
+      await this.runQuery(
+        tr_update_party_debt_on_delete,
+        "Trigger update party debt when a transaction is DELETED created successfully.",
+        "Error creating trigger for inserting on transaction"
+      );
+
+      // transaction details
       await this.runQuery(
         tr_update_transaction_on_insert,
         "Trigger for INSERT on transaction_details created successfully.",
